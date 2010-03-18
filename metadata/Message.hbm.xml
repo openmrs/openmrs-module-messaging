@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Mar 17, 2010 5:30:15 PM by Hibernate Tools 3.2.5.Beta -->
+<hibernate-mapping package="@MODULE_PACKAGE@.messaging"/>
+
+    <class name="org.openmrs.module.messaging.schema.Message" entity-name="Message" table="messaging_messages" abstract="true">
+        <id name="messageID" type="Integer" column="message_id" 
+			unsaved-value="0">
+				<generator class="native" />
+		</id>
+        <property name="content" type="java.lang.String">
+            <column name="content" />
+        </property>
+        <property name="origin" type="org.openmrs.module.messaging.schema.MessageAddress">
+            <column name="origin_address" />
+        </property>
+        <property name="destination" type="org.openmrs.module.messaging.schema.MessageAddress">
+            <column name="destination_address" />
+        </property>
+        <property name="dateSent" type="java.util.Date">
+            <column name="date_sent" />
+        </property>
+        <property name="dateRecieved" type="java.util.Date">
+            <column name="date_received" />
+        </property>
+        <property name="status" type="java.lang.Integer">
+            <column name="status" />
+        </property>
+    </class>
+</hibernate-mapping>

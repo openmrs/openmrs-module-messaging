@@ -5,13 +5,17 @@
 	<!-- Messaging Module Properties -->
 	<id>messaging</id>
 	<name>Messaging Module</name>
-	<version>0.0.1</version>
+	<version>1.0</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
-	<author>Dieterich</author>
+	<author>Dieterich Lawson</author>
 	<description>
-			
+		A short messaging API for OpenMRS, including SMS, email and twitter.
 	</description>
 	<activator>@MODULE_PACKAGE@.MessagingModuleActivator</activator>
 	<!-- /Messaging Module Properties -->
 	
+	<mappingFiles>
+		Message.hbm.xml
+		MessageAddress.hbm.xml
+	</mappingFiles>	
 </module>

@@ -1,13 +1,14 @@
-package org.openmrs.module.messaging.framework;
+package org.openmrs.module.messaging.schema;
 
 /**
  * This is an interface for objects that wish to receive notifications about the
  * status of messages that have been sent. Registration to receive these
- * notifications should be done by using the
- * {@link MessagingService#sendMessage(Message, Address, MessageDelegate)} or
- * {@link MessagingService#sendMessages(java.util.Map, MessageDelegate)}
- * methods.
+ * notifications should be done by using one of the sendMessage() methods that takes
+ * a delegate as a parameter.
  * 
+ * @see MessagingService#sendMessage(Message, MessageDelegate)
+ * @see MessagingService#sendMessages(java.util.List, MessageDelegate)
+ * @see MessagingService#sendMessageToAddresses(Message, java.util.List, MessageDelegate)
  */
 public interface MessageDelegate {
 
@@ -29,12 +30,12 @@ public interface MessageDelegate {
 	public void messageDeliveryFailedWithError(Message message, Exception error);
 
 	/**
-	 * This method will be called when a response is recieved for a message that
+	 * This method will be called when a response is received for a message that
 	 * was sent. Since determining which message is a response to which is
 	 * sometimes a tricky process, this callback may not be 100% accurate or may
 	 * not even be implemented by certain messaging frameworks
 	 * 
-	 * @param sentMessage The original message that was sent 
+	 * @param sentMessage  The original message that was sent
 	 * @param reply The reply to the message
 	 */
 	public void messageRepliedTo(Message sentMessage, Message reply);

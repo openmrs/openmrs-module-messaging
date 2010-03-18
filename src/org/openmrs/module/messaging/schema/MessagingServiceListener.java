@@ -1,10 +1,10 @@
-package org.openmrs.module.messaging.framework;
+package org.openmrs.module.messaging.schema;
 
 /**
  * An interface for objects that want to be notified when a message is received
  * by a messaging service. MessageServiceListeners can either listen on a
  * MessagingService or across messaging services by registering to listen on the
- * MessagingCenter
+ * MessagingCenter.
  * 
  * @param <M> The message type that this listener will receive notifications on
  */

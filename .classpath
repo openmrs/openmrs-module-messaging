@@ -15,5 +15,9 @@
 	<classpathentry kind="lib" path="lib-common/servlet-api.jar"/>
 	<classpathentry kind="lib" path="lib-common/spring-2.0.jar"/>
 	<classpathentry kind="lib" path="lib-common/web-openmrs-api-1.2.0.3530.jar"/>
+	<classpathentry kind="lib" path="lib-common/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="lib-common/smslib-3.4.5.jar"/>
+	<classpathentry kind="lib" path="lib-common/smsserver-3.4.5.jar"/>
+	<classpathentry kind="src" path="/openmrs-trunk"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
