@@ -13,9 +13,19 @@ import org.openmrs.module.messaging.util.ReflectionUtils;
  * @param <M>
  *            The type of messages that this service handles
  */
-public abstract class MessagingService<M extends Message, A extends MessageAddress> {
+public abstract class MessagingService<M extends Message, A extends MessagingAddress> {
 
 	protected CopyOnWriteArrayList<MessagingServiceListener> listeners;
+
+	/**
+	 * Sends a message to the address specified with the content specified.
+	 * Depending on the implementation, this method may throw exceptions due to
+	 * improperly formatted addresses or messages.
+	 * 
+	 * @param address
+	 * @param content
+	 */
+	public abstract void sendMessage(String address, String content);
 
 	/**
 	 * Sends a message to the destination specified in
@@ -78,7 +88,7 @@ public abstract class MessagingService<M extends Message, A extends MessageAddre
 	 * @param m
 	 * @param addresses
 	 */
-	public abstract void sendMessageToAddresses(M m, List<A> addresses,
+	public abstract void sendMessageToAddresses(M m, List<String> addresses,
 			MessageDelegate delegate);
 
 	/**
@@ -108,7 +118,7 @@ public abstract class MessagingService<M extends Message, A extends MessageAddre
 	 * 
 	 * @return the default address
 	 */
-	public abstract MessageAddress getDefaultSenderAddress();
+	public abstract MessagingAddress getDefaultSenderAddress();
 
 	/**
 	 * Should return true if the messaging service has the ability to send
@@ -132,10 +142,12 @@ public abstract class MessagingService<M extends Message, A extends MessageAddre
 
 	/**
 	 * Returns the class of the messages that this service handles
+	 * 
 	 * @return
 	 */
 	public Class<?> getMessageClass() {
-		List<Class<?>> genericParameters = ReflectionUtils.getTypeArguments(MessagingService.class, getClass());
+		List<Class<?>> genericParameters = ReflectionUtils.getTypeArguments(
+				MessagingService.class, getClass());
 		for (Class<?> c : genericParameters) {
 			if (ReflectionUtils.classExtendsClass(c, Message.class)) {
 				return c;
@@ -143,15 +155,17 @@ public abstract class MessagingService<M extends Message, A extends MessageAddre
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns the class of the messaging addresses that this service handles
+	 * 
 	 * @return
 	 */
 	public Class<?> getMessagingAddressClass() {
-		List<Class<?>> genericParameters = ReflectionUtils.getTypeArguments(MessagingService.class, getClass());
+		List<Class<?>> genericParameters = ReflectionUtils.getTypeArguments(
+				MessagingService.class, getClass());
 		for (Class<?> c : genericParameters) {
-			if (ReflectionUtils.classExtendsClass(c, MessageAddress.class)) {
+			if (ReflectionUtils.classExtendsClass(c, MessagingAddress.class)) {
 				return c;
 			}
 		}

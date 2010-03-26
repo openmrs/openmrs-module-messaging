@@ -6,7 +6,7 @@ package org.openmrs.module.messaging.schema;
  *
  * @param <M>
  */
-public interface MessageFactory<M extends Message, A extends MessageAddress> {
+public interface MessageFactory<M extends Message, A extends MessagingAddress> {
 	
 	public M createMessage(String content, A origin, A destination);
 	

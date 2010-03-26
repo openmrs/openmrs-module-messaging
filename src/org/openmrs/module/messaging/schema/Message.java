@@ -14,7 +14,7 @@ import org.openmrs.BaseOpenmrsObject;
  * 
  * @see MessageFactory
  */
-public abstract class Message<A extends MessageAddress> extends BaseOpenmrsObject{
+public abstract class Message extends BaseOpenmrsObject{
 
 	
 	private Integer messageId;
@@ -29,12 +29,12 @@ public abstract class Message<A extends MessageAddress> extends BaseOpenmrsObjec
 	/**
 	 * The address that the message originated from
 	 */
-	protected A origin;
+	protected String origin;
 
 	/**
 	 * The address that the message was sent/is being sent to
 	 */
-	protected A destination;
+	protected String destination;
 
 	/**
 	 * The date that the message was sent
@@ -68,12 +68,12 @@ public abstract class Message<A extends MessageAddress> extends BaseOpenmrsObjec
 	 * @param content
 	 *            the content of the message
 	 */
-	public Message(A destination, String content) {
+	public Message(String destination, String content) {
 		this.content = content;
 	}
 
 	/**
-	 * Creates a message with a destination, priority, and content. The date
+	 * Creates a message with a destination, origin, priority, and content. The date
 	 * sent, date received, and origin are all filled in automatically at the
 	 * time of sending. Origin is set to the relevant address of the currently
 	 * authenticated user
@@ -83,7 +83,7 @@ public abstract class Message<A extends MessageAddress> extends BaseOpenmrsObjec
 	 * @param content
 	 *            the content of the message
 	 */
-	public Message(A destination, String content, int priority) {
+	public Message(String destination, String origin, String content, int priority) {
 		this.destination = destination;
 		this.content = content;
 		this.priority = priority;
@@ -106,28 +106,28 @@ public abstract class Message<A extends MessageAddress> extends BaseOpenmrsObjec
 	/**
 	 * @return
 	 */
-	public A getOrigin() {
+	public String getOrigin() {
 		return origin;
 	}
 
 	/**
 	 * @param origin
 	 */
-	public void setOrigin(A origin) {
+	public void setOrigin(String origin) {
 		this.origin = origin;
 	}
 
 	/**
 	 * @return
 	 */
-	public A getDestination() {
+	public String getDestination() {
 		return destination;
 	}
 
 	/**
 	 * @param destination
 	 */
-	public void setDestination(A destination) {
+	public void setDestination(String destination) {
 		this.destination = destination;
 	}
 
@@ -187,11 +187,11 @@ public abstract class Message<A extends MessageAddress> extends BaseOpenmrsObjec
 		this.status = status;
 	}
 
-	public void setMessageId(Integer messageId) {
+	public void setId(Integer messageId) {
 		this.messageId = messageId;
 	}
 
-	public Integer getMessageId() {
+	public Integer getId() {
 		return messageId;
 	}
 

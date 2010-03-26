@@ -39,4 +39,8 @@ public class MessagingModuleActivator implements Activator {
 		log.info("Shutting down Messaging Module");
 	}
 	
+	public void random(){
+		
+	}
+	
 }
