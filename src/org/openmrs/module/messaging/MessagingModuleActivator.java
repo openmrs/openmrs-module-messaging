@@ -16,6 +16,7 @@ package org.openmrs.module.messaging;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.Activator;
+import org.openmrs.module.messaging.schema.MessagingCenter;
 
 /**
  * This class contains the logic that is run every time this module
@@ -30,6 +31,7 @@ public class MessagingModuleActivator implements Activator {
 	 */
 	public void startup() {
 		log.info("Starting Messaging Module");
+		MessagingCenter.getInstance().initServices();
 	}
 	
 	/**
