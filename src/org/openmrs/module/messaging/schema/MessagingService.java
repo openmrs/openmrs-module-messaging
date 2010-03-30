@@ -1,8 +1,11 @@
 package org.openmrs.module.messaging.schema;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.openmrs.api.context.Context;
+import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.util.ReflectionUtils;
 
 /**
@@ -30,7 +33,7 @@ public abstract class MessagingService<M extends Message, A extends MessagingAdd
 	/**
 	 * Sends a message to the destination specified in
 	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateRecieved} , and
+	 * {@link Message#dateSent}, {@link Message#dateReceived} , and
 	 * {@link Message#origin} fields of {@link Message} if it is applicable to
 	 * that message. Implementations of this method need to be thread safe, and
 	 * should honor the {@link Message#priority} value if applicable to this
@@ -43,7 +46,7 @@ public abstract class MessagingService<M extends Message, A extends MessagingAdd
 	/**
 	 * Sends a message to the destination specified in
 	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateRecieved} , and
+	 * {@link Message#dateSent}, {@link Message#dateReceived} , and
 	 * {@link Message#origin} fields of {@link Message} if it is applicable to
 	 * that message. The delegate provided will receive the callbacks specified
 	 * in the {@link MessageDelegate} interface. Implementations of this method
@@ -61,7 +64,7 @@ public abstract class MessagingService<M extends Message, A extends MessagingAdd
 	/**
 	 * Sends a collection of messages to the destinations specified in
 	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateRecieved}, and
+	 * {@link Message#dateSent}, {@link Message#dateReceived}, and
 	 * {@link Message#origin} fields of the {@link Message} if it is applicable
 	 * to that message. The delegate provided will receive the callbacks
 	 * specified in the {@link MessageDelegate} interface. Implementations of
@@ -79,7 +82,7 @@ public abstract class MessagingService<M extends Message, A extends MessagingAdd
 	/**
 	 * Sends one message to multiple addresses. Implementations of this method
 	 * need to handle the setting of {@link Message#dateSent},
-	 * {@link Message#dateRecieved}, {@link Message#destination}, and
+	 * {@link Message#dateReceived}, {@link Message#destination}, and
 	 * {@link Message#origin} when/if the messages are saved to the database.
 	 * Additionally, this method should be thread safe, tolerate a null
 	 * {@link MessageDelegate}, and honor the {@link Message#priority} if
@@ -118,7 +121,7 @@ public abstract class MessagingService<M extends Message, A extends MessagingAdd
 	 * 
 	 * @return the default address
 	 */
-	public abstract MessagingAddress getDefaultSenderAddress();
+	public abstract A getDefaultSenderAddress();
 
 	/**
 	 * Should return true if the messaging service has the ability to send
@@ -139,6 +142,14 @@ public abstract class MessagingService<M extends Message, A extends MessagingAdd
 	public abstract void startup();
 
 	public abstract void shutdown();
+	
+	public abstract String getName();
+	
+	public abstract String getDescription();
+	
+	public abstract AddressFactory getAddressFactory();
+	
+	public abstract MessageFactory getMessageFactory();
 
 	/**
 	 * Returns the class of the messages that this service handles
@@ -170,6 +181,12 @@ public abstract class MessagingService<M extends Message, A extends MessagingAdd
 			}
 		}
 		return null;
+	}
+	
+	protected void saveMessage(M message){
+		message.setDateSent(new Date());
+		((MessageService) Context.getService(MessageService.class)).saveMessage(message);
+
 	}
 
 }
