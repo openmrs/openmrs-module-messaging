@@ -2,7 +2,9 @@ package org.openmrs.module.messaging.sms;
 
 import java.util.List;
 
+import org.openmrs.module.messaging.schema.AddressFactory;
 import org.openmrs.module.messaging.schema.MessageDelegate;
+import org.openmrs.module.messaging.schema.MessageFactory;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
 import org.smslib.modem.SerialModemGateway;
@@ -12,6 +14,8 @@ public class SMSMessagingService extends MessagingService<SMSMessage, PhoneNumbe
 	protected boolean isStarted = false;
 	protected PhoneNumber defaultNumber;
 	protected List<SerialModemGateway> modems;
+	protected static PhoneNumberFactory addressFactory;
+	protected static SMSMessageFactory messageFactory;
 	
 	@Override
 	public boolean canReceive() {
@@ -24,7 +28,7 @@ public class SMSMessagingService extends MessagingService<SMSMessage, PhoneNumbe
 		return false;
 	}
 	@Override
-	public MessagingAddress getDefaultSenderAddress() {
+	public PhoneNumber getDefaultSenderAddress() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -44,8 +48,7 @@ public class SMSMessagingService extends MessagingService<SMSMessage, PhoneNumbe
 		
 	}
 	@Override
-	public void sendMessageToAddresses(SMSMessage m, List<String> addresses,
-			MessageDelegate delegate) {
+	public void sendMessageToAddresses(SMSMessage m, List<String> addresses, MessageDelegate delegate) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -63,6 +66,31 @@ public class SMSMessagingService extends MessagingService<SMSMessage, PhoneNumbe
 	public void startup() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public String getDescription() {
+		return "A service that allows users to " +
+				"send and recieve SMS messages " +
+				"through an attached GSM phone or modem";
+	}
+	@Override
+	public String getName() {
+		return "SMS";
+	}
+	@Override
+	public AddressFactory getAddressFactory() {
+		if(addressFactory == null){
+			addressFactory = new PhoneNumberFactory();
+		}
+		return addressFactory;
+	}
+	@Override
+	public MessageFactory getMessageFactory() {
+		if(messageFactory == null){
+			messageFactory = new SMSMessageFactory();
+		}
+		return messageFactory;
 	}
 	
 	

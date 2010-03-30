@@ -3,6 +3,7 @@ package org.openmrs.module.messaging.schema;
 import java.util.Date;
 
 import org.openmrs.BaseOpenmrsObject;
+import org.openmrs.Person;
 
 /**
  * A class that represents a text based message sent within the messaging
@@ -35,6 +36,16 @@ public abstract class Message extends BaseOpenmrsObject{
 	 * The address that the message was sent/is being sent to
 	 */
 	protected String destination;
+	
+	/**
+	 * The person that sent this message, can be null
+	 */
+	private Person sender;
+	
+	/**
+	 * The person who received this message, can be null
+	 */
+	private Person recipient;
 
 	/**
 	 * The date that the message was sent
@@ -44,7 +55,7 @@ public abstract class Message extends BaseOpenmrsObject{
 	/**
 	 * The date that this message was received
 	 */
-	protected Date dateRecieved;
+	protected Date dateReceived;
 
 	/**
 	 * The priority of this message. Priorities are currently
@@ -148,15 +159,15 @@ public abstract class Message extends BaseOpenmrsObject{
 	/**
 	 * @return
 	 */
-	public Date getDateRecieved() {
-		return dateRecieved;
+	public Date getDateReceived() {
+		return dateReceived;
 	}
 
 	/**
-	 * @param dateRecieved
+	 * @param dateReceived
 	 */
-	public void setDateRecieved(Date dateRecieved) {
-		this.dateRecieved = dateRecieved;
+	public void setDateReceived(Date dateRecieved) {
+		this.dateReceived = dateRecieved;
 	}
 
 	/**
@@ -186,13 +197,61 @@ public abstract class Message extends BaseOpenmrsObject{
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
+	
+	public void setMessageId(Integer messageId) {
+		this.messageId = messageId;
+	}
 
+	public Integer getMessageId() {
+		return messageId;
+	}
+	
 	public void setId(Integer messageId) {
 		this.messageId = messageId;
 	}
 
 	public Integer getId() {
 		return messageId;
+	}
+
+	public void setSender(Person sender) {
+		this.sender = sender;
+	}
+
+	public Person getSender() {
+		return sender;
+	}
+
+	public void setRecipient(Person recipient) {
+		this.recipient = recipient;
+	}
+
+	public Person getRecipient() {
+		return recipient;
+	}
+	
+	/**
+	 * @return The sender's name if the sender is set. Otherwise it returns the
+	 *         address of origin
+	 */
+	public String getDisplayOrigin() {
+		if (sender != null) {
+			return sender.getPersonName().toString();
+		} else {
+			return origin;
+		}
+	}
+
+	/**
+	 * @return The recipient's name if the recipient is set. Otherwise it
+	 *         returns the destination address
+	 */
+	public String getDisplayDestination() {
+		if (recipient != null) {
+			return recipient.getPersonName().toString();
+		} else {
+			return destination;
+		}
 	}
 
 }

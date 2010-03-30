@@ -1,5 +1,6 @@
 package org.openmrs.module.messaging.schema;
 
+import org.openmrs.BaseOpenmrsData;
 import org.openmrs.BaseOpenmrsMetadata;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
@@ -21,7 +22,7 @@ import org.openmrs.PersonAttribute;
  * @see PersonAttribute
  * @see AddressFactory
  */
-public abstract class MessagingAddress extends BaseOpenmrsMetadata {
+public abstract class MessagingAddress extends BaseOpenmrsData {
 
 	public MessagingAddress(String address, String password, Person person) {
 		super();
@@ -36,7 +37,7 @@ public abstract class MessagingAddress extends BaseOpenmrsMetadata {
 		this.person = person;
 	}
 
-	protected Integer messagingAdressId;
+	protected Integer messagingAddressId;
 
 	/**
 	 * The plain text address
@@ -95,12 +96,20 @@ public abstract class MessagingAddress extends BaseOpenmrsMetadata {
 		this.person = person;
 	}
 
+	public Integer getMessagingAddressId() {
+		return messagingAddressId;
+	}
+
+	public void setMessagingAddressId(Integer id) {
+		this.messagingAddressId = id;
+	}
+	
 	public Integer getId() {
-		return messagingAdressId;
+		return messagingAddressId;
 	}
 
 	public void setId(Integer id) {
-		this.messagingAdressId = id;
+		this.messagingAddressId = id;
 	}
 
 }

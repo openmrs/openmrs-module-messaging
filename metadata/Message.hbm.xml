@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated Mar 17, 2010 5:30:15 PM by Hibernate Tools 3.2.5.Beta -->
-<hibernate-mapping package="@MODULE_PACKAGE@.messaging">
+<hibernate-mapping package="@MODULE_PACKAGE@.schema">
     <class table="messaging_messages" name="Message" abstract="true">
        
-        <id name="messageID" type="Integer" column="message_id"  unsaved-value="0">
+        <id name="messageId" type="int" column="message_id"  unsaved-value="0">
 				<generator class="native" />
 		</id>
 		
@@ -15,8 +14,17 @@
         <property name="origin" type="java.lang.String"/>
         <property name="destination" type="java.lang.String"/>
         
-        <property name="dateSent" type="java.util.Date" column="date_sent"/>
-        <property name="dateReceived" type="java.util.Date" column="date_received"/>
-        <property name="status" type="java.lang.Integer"/>
+        <property name="dateSent" type="java.util.Date" column="date_sent" length="19"/>
+        <property name="dateReceived" type="java.util.Date" column="date_received" length="19"/>
+        <property name="status" type="int"/>
+        
+        <many-to-one name="sender" class="org.openmrs.Person">
+			<column name="sender"></column>
+		</many-to-one>
+		
+		<many-to-one name="recipient" class="org.openmrs.Person">
+			<column name="recipient"></column>
+		</many-to-one>
+		
     </class>
 </hibernate-mapping>

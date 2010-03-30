@@ -14,7 +14,7 @@
 	</help>
 
 	<diff>
-		<version>1.0</version>
+		<version>1.1</version>
 		<author>Dieterich Lawson</author>
 		<date>March 14th 2010</date>
 		<description>
@@ -31,10 +31,10 @@
 				`date_created` datetime NOT NULL default '0000-00-00 00:00:00',
 				`changed_by` int(11) default NULL,
 				`date_changed` datetime default NULL,
-				`retired` tinyint(1) NOT NULL default '0',
-				`retired_by` int(11) default NULL,
-				`date_retired` datetime default NULL,
-				`retire_reason` varchar(255) default NULL,
+				`voided` tinyint(1) NOT NULL default '0',
+				`voided_by` int(11) default NULL,
+				`date_voided` datetime default NULL,
+				`void_reason` varchar(255) default NULL,
 				PRIMARY KEY (address_id)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -43,6 +43,8 @@
 				`message_type` varchar(40) NOT NULL,
 				`content` varchar(600) default '',
 				`origin` varchar(255) default '',
+				`sender` int(11) default NULL,
+				`recipient` int(11) default NULL,
 				`destination` varchar(255) default '',
 				`date_sent` datetime default NULL,
 				`date_received` datetime default NULL,

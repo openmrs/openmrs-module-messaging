@@ -2,10 +2,10 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated Mar 17, 2010 5:27:26 PM by Hibernate Tools 3.2.5.Beta -->
-<hibernate-mapping package="@MODULE_PACKAGE@.messaging">
+<hibernate-mapping package="@MODULE_PACKAGE@.schema">
     <class table="messaging_addresses" name="MessagingAddress" abstract="true">
     
-        <id name="messagingAddressId" type="Integer" column="address_id" 
+        <id name="messagingAddressId" type="int" column="address_id" 
 			unsaved-value="0">
 				<generator class="native" />
 		</id>
@@ -14,18 +14,18 @@
         
         <property name="address" type="java.lang.String"/>
         <property name="password" type="java.lang.String" />
-        <many-to-one name="person" lazy="false"/>
-        
-        <property name="creator" type="java.lang.Integer" column="creator" not-null="true" />
-		<property name="dateCreated" type="java.util.Date"	column="date_created" not-null="true" />
-		
-		<property name="changedBy" type="java.lang.Integer" column="changed_by" />
-		<property name="dateChanged" type="java.util.Date" column="date_changed"  />
+        <many-to-one name="person" class="org.openmrs.Person" lazy="false"/>
+                
+        <many-to-one name="creator" class="org.openmrs.User" not-null="true" column="creator"/>
+		<property name="dateCreated" type="java.util.Date"  column="date_created" not-null="true" length="19" />
 
-		<property name="retiredBy" type="java.lang.Integer" column="retired_by" />
-		<property name="dateRetired" type="java.util.Date" column="date_retired" />
-		<property name="retired" type="boolean" not-null="true" />
-		<property name="retireReason" type="java.lang.String" column="retire_reason" length="255" />
+		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
+		<property name="dateChanged" type="java.util.Date"  column="date_changed" length="19" />
+			
+		<many-to-one name="voidedBy" class="org.openmrs.User" column="voided_by"/>
+		<property name="dateVoided" type="java.util.Date" column="date_voided" length="19"/>
+		<property name="voided" type="boolean" not-null="true" length="1"/>
+		<property name="voidReason" type="java.lang.String" column="void_reason" length="255" />
         
     </class>
 </hibernate-mapping>

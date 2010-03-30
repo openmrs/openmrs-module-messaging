@@ -14,4 +14,8 @@ public class PhoneNumberFactory implements AddressFactory<PhoneNumber> {
 		return new PhoneNumber(address, person);
 	}
 
+	public String getFormatHint() {
+		return "###.###.####";
+	}
+
 }
