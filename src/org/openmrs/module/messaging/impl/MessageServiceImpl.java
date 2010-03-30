@@ -27,7 +27,7 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 	}
 	
 	public List<Message> getMessagesToPerson(Person recipient) {
-		return dao. getMessagesToPerson(recipient);
+		return dao.getMessagesToPerson(recipient);
 	}
 	
 	public List<Message> getMessagesFromPerson(Person sender) {

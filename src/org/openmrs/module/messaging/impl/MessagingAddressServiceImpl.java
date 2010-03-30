@@ -14,7 +14,7 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 
 	protected MessagingAddressDAO dao;
 	
-	public void setMessageAddressDAO(MessagingAddressDAO dao) {
+	public void setMessagingAddressDAO(MessagingAddressDAO dao) {
 		this.dao = dao;
 	}	
 	
@@ -59,11 +59,11 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 	}
 	
 	public void retireMessagingAddress(MessagingAddress address, String reason) throws APIException {
-		dao.retireMessagingAddress(address,reason);
+		dao.voidMessagingAddress(address,reason);
 	}
 
 	public void unretireMessagingAddress(MessagingAddress address) throws APIException {
-		dao.unretireMessagingAddress(address);
+		dao.unvoidMessagingAddress(address);
 	}
 
 }

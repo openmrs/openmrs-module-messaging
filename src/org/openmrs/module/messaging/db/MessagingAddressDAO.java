@@ -62,11 +62,11 @@ public interface MessagingAddressDAO {
 	/**
 	 * @see MessagingAddressService#retireMessagingAddress(MessagingAddress, String)
 	 */
-	public void retireMessagingAddress(MessagingAddress address, String reason);
+	public void voidMessagingAddress(MessagingAddress address, String reason);
 
 	/**
 	 * @see MessagingAddressService#unretireMessagingAddress(MessagingAddress)
 	 */
-	public void unretireMessagingAddress(MessagingAddress address);
+	public void unvoidMessagingAddress(MessagingAddress address);
 
 }
