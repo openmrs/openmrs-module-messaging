@@ -3,10 +3,11 @@ package org.openmrs.module.messaging;
 import java.util.List;
 
 import org.openmrs.Person;
+import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
 
-public interface MessagingAddressService {
+public interface MessagingAddressService extends OpenmrsService{
 
 	/**
 	 * @return All messaging addresses

@@ -5,10 +5,11 @@ import java.util.List;
 import org.openmrs.Person;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
+import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessagingService;
 
-public interface MessageService {
+public interface MessageService extends OpenmrsService{
 
 	/**
 	 * @return all messages

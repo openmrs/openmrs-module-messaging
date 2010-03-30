@@ -7,11 +7,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
@@ -51,8 +49,12 @@ public class HibernateMessageDAO implements MessageDAO {
 		for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(sender)){
 			addresses.add(address.getAddress());
 		}
-		c.add(Restrictions.in("origin", addresses));
-		return c.list();
+		if(addresses.size() <= 0){
+			return new ArrayList<Message>();
+		}else{
+			c.add(Restrictions.in("origin", addresses));
+			return c.list();
+		}
 	}
 	
 	public List<Message> getMessagesToPerson(Person recipient){
@@ -61,8 +63,12 @@ public class HibernateMessageDAO implements MessageDAO {
 		for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(recipient)){
 			addresses.add(address.getAddress());
 		}
-		c.add(Restrictions.in("destination", addresses));
-		return c.list();
+		if(addresses.size() <= 0){
+			return new ArrayList<Message>();
+		}else{
+			c.add(Restrictions.in("destination", addresses));
+			return c.list();
+		}
 	}
 	
 	public List<Message> getMessagesToOrFromPerson(Person person){
@@ -71,8 +77,12 @@ public class HibernateMessageDAO implements MessageDAO {
 		for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(person)){
 			addresses.add(address.getAddress());
 		}
-		c.add(Restrictions.or(Restrictions.in("destination", addresses),Restrictions.in("origin", addresses)));
-		return c.list();
+		if(addresses.size() <= 0){
+			return new ArrayList<Message>();
+		}else{
+			c.add(Restrictions.or(Restrictions.in("destination", addresses),Restrictions.in("origin", addresses)));
+			return c.list();
+		}
 	}
 	
 	public List<Message> getMessagesFromAddress(String address){
@@ -144,14 +154,18 @@ public class HibernateMessageDAO implements MessageDAO {
 			for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(sender)){
 				fromAddresses.add(address.getAddress());
 			}
-			c.add(Restrictions.in("origin",fromAddresses));
+			if(fromAddresses.size() > 0){
+				c.add(Restrictions.in("origin",fromAddresses));
+			}
 		}
 		if(recipient!= null){
 			ArrayList<String> toAddresses= new ArrayList<String>();
 			for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(recipient)){
 				toAddresses.add(address.getAddress());
 			}
-			c.add(Restrictions.in("origin",toAddresses));
+			if(toAddresses.size() > 0){
+				c.add(Restrictions.in("destination",toAddresses));
+			}
 		}
 		if(content!= null && !content.equals("")){
 			c.add(Restrictions.like("content", "%"+content+"%"));
@@ -170,5 +184,5 @@ public class HibernateMessageDAO implements MessageDAO {
 	public void saveMessage(Message message) {
 		sessionFactory.getCurrentSession().saveOrUpdate(message);
 	}
-
+	
 }

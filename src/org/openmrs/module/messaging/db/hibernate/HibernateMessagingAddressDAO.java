@@ -87,10 +87,10 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		sessionFactory.getCurrentSession().delete(address);
 	}
 
-	public void retireMessagingAddress(MessagingAddress address, String reason) throws APIException {
-		address.setRetired(true);
-		address.setRetiredBy(Context.getAuthenticatedUser());
-		address.setRetireReason(reason);
+	public void voidMessagingAddress(MessagingAddress address, String reason) throws APIException {
+		address.setVoided(true);
+		address.setVoidedBy(Context.getAuthenticatedUser());
+		address.setVoidReason(reason);
 		sessionFactory.getCurrentSession().save(address);
 	}
 
@@ -98,8 +98,8 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		sessionFactory.getCurrentSession().saveOrUpdate(address);
 	}
 
-	public void unretireMessagingAddress(MessagingAddress address) throws APIException{
-		address.setRetired(false);
+	public void unvoidMessagingAddress(MessagingAddress address) throws APIException{
+		address.setVoided(false);
 		sessionFactory.getCurrentSession().save(address);
 	}
 
