@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated Mar 17, 2010 5:27:26 PM by Hibernate Tools 3.2.5.Beta -->
-<hibernate-mapping package="@MODULE_PACKAGE@.schema">
-    <class table="messaging_addresses" name="MessagingAddress" abstract="true">
+<hibernate-mapping>
+    <class table="messaging_addresses" name="@MODULE_PACKAGE@.schema.MessagingAddress" abstract="true">
     
         <id name="messagingAddressId" type="int" column="address_id" 
 			unsaved-value="0">
@@ -27,5 +26,7 @@
 		<property name="voided" type="boolean" not-null="true" length="1"/>
 		<property name="voidReason" type="java.lang.String" column="void_reason" length="255" />
         
+        <subclass  name="@MODULE_PACKAGE@.sms.PhoneNumber" discriminator-value="phonenumber"/>
+   		<subclass name="@MODULE_PACKAGE@.twitter.TwitterAddress" discriminator-value="twitter"/>
     </class>
 </hibernate-mapping>
