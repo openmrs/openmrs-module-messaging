@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.openmrs.Person;
 import org.openmrs.module.messaging.sms.SMSMessagingService;
+import org.openmrs.module.messaging.twitter.TwitterMessagingService;
 
 /**
  * The Messaging Center is the main singleton in the Messaging framework. It is
@@ -15,13 +16,24 @@ import org.openmrs.module.messaging.sms.SMSMessagingService;
  */
 public class MessagingCenter {
 	
-	protected static MessagingCenter instance;
+	protected static SMSMessagingService smsMessagingService;
 	
-	public static MessagingCenter getInstance(){
-		if(instance == null){
-			instance = new MessagingCenter();
+	public void setSmsMessagingService(SMSMessagingService smsService){
+		this.smsMessagingService = smsService;
+		if(services == null){
+			services = new ArrayList<MessagingService>();
 		}
-		return instance;
+		services.add(smsService);
+	}
+	
+	protected static TwitterMessagingService twitterMessagingService;
+	
+	public void setTwitterMessagingService(TwitterMessagingService twitterService){
+		this.twitterMessagingService = twitterService;
+		if(services == null){
+			services = new ArrayList<MessagingService>();
+		}
+		services.add(twitterService);
 	}
 	
 	public MessagingCenter(){
@@ -30,12 +42,14 @@ public class MessagingCenter {
 	
 	private static ArrayList<MessagingService> services;
 
-	public void initServices() {
-		SMSMessagingService smsService = new SMSMessagingService();
-		services.add(smsService);
-		
+	public static void initServices() {
+		if(services == null){
+			services = new ArrayList<MessagingService>();
+		}
 		for(MessagingService ms:services){
-			ms.startup();
+			if(ms instanceof TwitterMessagingService){
+				ms.startup();
+			}
 		}
 	}
 

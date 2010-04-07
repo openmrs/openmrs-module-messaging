@@ -8,7 +8,7 @@ package org.openmrs.module.messaging.schema;
  */
 public interface MessageFactory<M extends Message, A extends MessagingAddress> {
 	
-	public M createMessage(String content, A origin, A destination);
+	public M createMessage(String content, A origin, A destination) throws MessageFormattingException;
 	
 	public M createMessageFromCurrentUser(String content, A destination);
 		

@@ -147,9 +147,9 @@ public abstract class MessagingService<M extends Message, A extends MessagingAdd
 	
 	public abstract String getDescription();
 	
-	public abstract AddressFactory getAddressFactory();
+	public abstract AddressFactory<A> getAddressFactory();
 	
-	public abstract MessageFactory getMessageFactory();
+	public abstract MessageFactory<M,A> getMessageFactory();
 
 	/**
 	 * Returns the class of the messages that this service handles
