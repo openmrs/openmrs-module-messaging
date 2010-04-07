@@ -7,7 +7,7 @@ import org.openmrs.module.messaging.schema.AddressFormattingException;
 public class PhoneNumberFactory implements AddressFactory<PhoneNumber> {
 
 	public Boolean addressIsValid(String address) {
-		return null;
+		return true;
 	}
 
 	public PhoneNumber createAddress(String address,Person person) throws AddressFormattingException {

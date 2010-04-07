@@ -5,11 +5,13 @@ import org.openmrs.module.messaging.schema.MessageFactory;
 public class SMSMessageFactory implements MessageFactory<SMSMessage,PhoneNumber>{
 
 	public boolean messageContentIsValid(String content) {
-		return false;
+		return content.length() <=160;
 	}
 
 	public SMSMessage createMessage(String content, PhoneNumber origin, PhoneNumber destination) {
-		return null;
+		SMSMessage result = new SMSMessage(destination.getAddress(), content);
+		result.setOrigin(origin.getAddress());
+		return result;
 	}
 
 	public SMSMessage createMessageFromCurrentUser(String content, PhoneNumber destination) {

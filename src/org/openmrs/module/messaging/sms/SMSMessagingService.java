@@ -1,71 +1,121 @@
 package org.openmrs.module.messaging.sms;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.openmrs.module.messaging.schema.AddressFactory;
 import org.openmrs.module.messaging.schema.MessageDelegate;
-import org.openmrs.module.messaging.schema.MessageFactory;
-import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.sms.util.AllModemsDetector;
+import org.smslib.AGateway;
+import org.smslib.OutboundMessage;
+import org.smslib.Service;
+import org.smslib.Service.ServiceStatus;
 import org.smslib.modem.SerialModemGateway;
 
 public class SMSMessagingService extends MessagingService<SMSMessage, PhoneNumber> {
 
 	protected boolean isStarted = false;
-	protected PhoneNumber defaultNumber;
-	protected List<SerialModemGateway> modems;
-	protected static PhoneNumberFactory addressFactory;
-	protected static SMSMessageFactory messageFactory;
+	
+ 	protected Service service;
+ 	
+	protected PhoneNumberFactory phoneNumberFactory;
+	
+	protected SMSMessageFactory smsMessageFactory;
+	
+	public void setPhoneNumberFactory(PhoneNumberFactory factory){
+		this.phoneNumberFactory = factory;
+	}
+	
+	public void setSmsMessageFactory(SMSMessageFactory smsMessageFactory){
+		this.smsMessageFactory = smsMessageFactory;
+	}
+	
+	@Override
+	public PhoneNumberFactory getAddressFactory() {
+		return phoneNumberFactory;
+	}
+	
+	@Override
+	public SMSMessageFactory getMessageFactory() {
+		return smsMessageFactory;
+	}
+	
+	public Collection<SerialModemGateway> getActiveModems(){
+		Collection<SerialModemGateway> results = new ArrayList<SerialModemGateway>();
+		if(isStarted){
+			for(AGateway gateway: service.getGateways()){
+				if(gateway instanceof SerialModemGateway){
+					results.add((SerialModemGateway) gateway);
+				}
+			}
+		}
+		return results;
+	}
 	
 	@Override
 	public boolean canReceive() {
-		// TODO Auto-generated method stub
-		return false;
+		return isStarted;
 	}
+	
 	@Override
 	public boolean canSend() {
-		// TODO Auto-generated method stub
-		return false;
+		return isStarted;
 	}
+	
 	@Override
 	public PhoneNumber getDefaultSenderAddress() {
-		// TODO Auto-generated method stub
 		return null;
 	}
+	
 	@Override
 	public void sendMessage(String address, String content) {
-		// TODO Auto-generated method stub
-		
+		try {
+			service.sendMessage(new OutboundMessage(address,content));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+	
 	@Override
 	public void sendMessage(SMSMessage message) {
-		// TODO Auto-generated method stub
-		
+		try {
+			service.sendMessage(new OutboundMessage(message.getOrigin(),message.getContent()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+	
 	@Override
 	public void sendMessage(SMSMessage message, MessageDelegate delegate) {
-		// TODO Auto-generated method stub
 		
 	}
+	
 	@Override
 	public void sendMessageToAddresses(SMSMessage m, List<String> addresses, MessageDelegate delegate) {
-		// TODO Auto-generated method stub
 		
 	}
+	
 	@Override
 	public void sendMessages(List<SMSMessage> messages, MessageDelegate delegate) {
-		// TODO Auto-generated method stub
 		
 	}
+	
 	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
-		
+		try {
+			service.stopService();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+	
 	@Override
 	public void startup() {
-		// TODO Auto-generated method stub
-		
+		service = AllModemsDetector.getService();
+		if(service.getServiceStatus() == ServiceStatus.STARTED && service.getGateways().size() > 0){
+			isStarted=true;
+		}
 	}
 
 	@Override
@@ -78,20 +128,5 @@ public class SMSMessagingService extends MessagingService<SMSMessage, PhoneNumbe
 	public String getName() {
 		return "SMS";
 	}
-	@Override
-	public AddressFactory getAddressFactory() {
-		if(addressFactory == null){
-			addressFactory = new PhoneNumberFactory();
-		}
-		return addressFactory;
-	}
-	@Override
-	public MessageFactory getMessageFactory() {
-		if(messageFactory == null){
-			messageFactory = new SMSMessageFactory();
-		}
-		return messageFactory;
-	}
-	
 	
 }
