@@ -19,7 +19,6 @@ import org.openmrs.module.messaging.schema.MessagingService;
 public class HibernateMessageDAO implements MessageDAO {
 
 	protected Log log = LogFactory.getLog(getClass());
-
 	
 	/**
 	 * Hibernate session factory

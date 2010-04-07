@@ -10,6 +10,7 @@ import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.db.DAOException;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
@@ -83,7 +84,7 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 
 	//CRUD
 	
-	public void deleteMessagingAddress(MessagingAddress address) throws APIException{
+	public void deleteMessagingAddress(MessagingAddress address) throws DAOException{
 		sessionFactory.getCurrentSession().delete(address);
 	}
 
@@ -91,16 +92,16 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		address.setVoided(true);
 		address.setVoidedBy(Context.getAuthenticatedUser());
 		address.setVoidReason(reason);
-		sessionFactory.getCurrentSession().save(address);
-	}
-
-	public void saveMessagingAddress(MessagingAddress address) throws APIException{
 		sessionFactory.getCurrentSession().saveOrUpdate(address);
 	}
 
-	public void unvoidMessagingAddress(MessagingAddress address) throws APIException{
-		address.setVoided(false);
+	public void saveMessagingAddress(MessagingAddress address) throws DAOException{
 		sessionFactory.getCurrentSession().save(address);
+	}
+
+	public void unvoidMessagingAddress(MessagingAddress address) throws DAOException{
+		address.setVoided(false);
+		sessionFactory.getCurrentSession().saveOrUpdate(address);
 	}
 
 }
