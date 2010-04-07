@@ -19,22 +19,22 @@ import org.openmrs.web.controller.PortletController;
 public class MessagingDashboardTabController extends PortletController {
 
 	@Override
-	protected void populateModel(HttpServletRequest request, Map<String, Object> model){
+	protected void populateModel(HttpServletRequest request, Map<String, Object> model) {
 		Patient p = (Patient) model.get("patient");
-		try{
-		MessagingAddressService addressService = (MessagingAddressService) Context.getService(MessagingAddressService.class);
-		List<MessagingAddress> addresses =addressService.getMessagingAddressesForPerson(p);
-		List<Message> messages = ((MessageService) Context.getService(MessageService.class)).getMessagesToOrFromPerson(p);
-		List<MessagingService> services = MessagingCenter.getInstance().getAllMessagingServices();
-		model.put("messagingAddresses", addresses);
-		model.put("messages", messages);
-		model.put("services", services);
-		List<String> serviceTitles = new ArrayList<String>();
-		for(MessagingService service: services){
-			serviceTitles.add(service.getName());
-		}
-		model.put("serviceTitles", serviceTitles);
-		}catch(Exception e){
+		try {
+			MessagingAddressService addressService = (MessagingAddressService) Context.getService(MessagingAddressService.class);
+			List<MessagingAddress> addresses = addressService.getMessagingAddressesForPerson(p);
+			List<Message> messages = ((MessageService) Context .getService(MessageService.class)).getMessagesToOrFromPerson(p);
+			List<MessagingService> services = MessagingCenter.getAllMessagingServices();
+			model.put("messagingAddresses", addresses);
+			model.put("messages", messages);
+			model.put("services", services);
+			List<String> serviceTitles = new ArrayList<String>();
+			for (MessagingService service : services) {
+				serviceTitles.add(service.getName());
+			}
+			model.put("serviceTitles", serviceTitles);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
