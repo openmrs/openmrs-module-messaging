@@ -8,5 +8,10 @@ public class TwitterAddress extends MessagingAddress{
 	public TwitterAddress(String address, String password, Person person) {
 		super(address, password, person);
 	}
+	
+	public TwitterAddress(String address, String password) {
+		super(address, password,null);
+	}
 
+	protected TwitterAddress(){}
 }

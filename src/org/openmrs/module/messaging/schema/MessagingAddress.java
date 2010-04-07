@@ -1,7 +1,6 @@
 package org.openmrs.module.messaging.schema;
 
 import org.openmrs.BaseOpenmrsData;
-import org.openmrs.BaseOpenmrsMetadata;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
 
@@ -24,6 +23,8 @@ import org.openmrs.PersonAttribute;
  */
 public abstract class MessagingAddress extends BaseOpenmrsData {
 
+	protected MessagingAddress(){}
+	
 	public MessagingAddress(String address, String password, Person person) {
 		super();
 		this.address = address;

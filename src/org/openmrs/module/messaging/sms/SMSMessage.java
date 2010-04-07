@@ -8,5 +8,6 @@ public class SMSMessage extends Message {
 		super(destination, content);
 	}
 
+	protected SMSMessage(){}
 
 }

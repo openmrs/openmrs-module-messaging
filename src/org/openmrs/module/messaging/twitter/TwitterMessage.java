@@ -6,7 +6,7 @@ public class TwitterMessage extends Message {
 
 	public TwitterMessage(String destination, String content) {
 		super(destination, content);
-		
 	}
-
+	
+	protected TwitterMessage(){}
 }

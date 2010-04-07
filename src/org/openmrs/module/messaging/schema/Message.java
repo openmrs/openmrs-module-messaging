@@ -17,6 +17,7 @@ import org.openmrs.Person;
  */
 public abstract class Message extends BaseOpenmrsObject{
 
+	protected Message(){}
 	
 	private Integer messageId;
 

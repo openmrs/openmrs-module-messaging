@@ -9,5 +9,6 @@ public class PhoneNumber extends MessagingAddress {
 		super(address, person);
 	}
 
+	protected PhoneNumber(){}
 	
 }
