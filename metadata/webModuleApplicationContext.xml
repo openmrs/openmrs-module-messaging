@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<!-- URL mappings -->
+	<context:component-scan base-package="org.openmrs.module.messaging" />
+
+	<bean id="messagingDashboardMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="order"><value>1</value></property>
+		<property name="mappings">
+			<props>
+				<prop key="**/messagesPatientDashboardTab.portlet">messagesPatientDashboardTab</prop>
+				<prop key="module/messaging/sendMessage.form">sendMessageController</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="messagesPatientDashboardTab" class="org.openmrs.module.messaging.web.controller.MessagingDashboardTabController" />
+
+	<bean id="sendMessageController" class="@MODULE_PACKAGE@.web.controller.SendMessageController">
+		<property name="commandName"><value>sendMessage</value></property>
+		<property name="formView"><value>/module/@MODULE_ID@/sendMessage</value></property>
+		<property name="successView"><value>sendMessage.form</value></property>
+	</bean>
+
+</beans>

@@ -16,8 +16,19 @@
 	
 	<!-- /Messaging Module Properties -->
 	
+	<globalProperty>
+		<property>@MODULE_ID@.serial.library</property>
+		<defaultValue>rxtx</defaultValue>
+		<description>The library that you are using to manage your serial connections, either javax.comm or RXTX</description>
+	</globalProperty>
 	
 	<!-- Extension points -->
+	
+	<extension>
+		<point>org.openmrs.admin.list</point>
+		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
+	</extension>
+	
 	<extension>
 		<point>org.openmrs.patientDashboardTab</point>
 		<class>@MODULE_PACKAGE@.extension.html.MessagingPatientDashboardTabExt</class>
