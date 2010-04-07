@@ -7,15 +7,15 @@ import org.openmrs.module.messaging.schema.AddressFormattingException;
 public class TwitterAddressFactory implements AddressFactory<TwitterAddress> {
 
 	public Boolean addressIsValid(String address) {
-		return null;
+		return true;
 	}
 
 	public TwitterAddress createAddress(String address, Person person) throws AddressFormattingException {
-		return null;
+		return new TwitterAddress(address,"",person);
 	}
 
 	public String getFormatHint() {
-		return null;
+		return "alphanumeric characters and the underscore (_)";
 	}
 
 }

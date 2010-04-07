@@ -5,19 +5,70 @@ import java.util.List;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
-import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.AddressFactory;
 import org.openmrs.module.messaging.schema.MessageDelegate;
-import org.openmrs.module.messaging.schema.MessageFactory;
-import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
 
 import winterwell.jtwitter.Twitter;
+
 
 public class TwitterMessagingService extends MessagingService<TwitterMessage, TwitterAddress> {
 
 	protected Twitter twitter;
 	
+	protected TwitterAddressFactory twitterAddressFactory;
+	
+	protected TwitterMessageFactory twitterMessageFactory;
+	
+	public void setTwitterAddressFactory(TwitterAddressFactory twitterAddressFactory){
+		this.twitterAddressFactory = twitterAddressFactory;
+	}
+	
+	public void setTwitterMessageFactory(TwitterMessageFactory twitterMessageFactory){
+		this.twitterMessageFactory = twitterMessageFactory;
+	}
+	
+	@Override
+	public TwitterAddressFactory getAddressFactory() {
+		return twitterAddressFactory; 
+	}
+	@Override
+	public TwitterMessageFactory getMessageFactory() {
+		return twitterMessageFactory;
+	}
+	
+	@Override
+	public TwitterAddress getDefaultSenderAddress() {
+		return new TwitterAddress("devTestingJuan", "martyr441", null);
+	}
+	
+	/**
+	 * Returns the Twitter Address of the currently authenticated user,
+	 *  if there is one. If there is not, it returns null
+	 * @return
+	 */
+	protected TwitterAddress getCurrentUserTwitterAddress(){
+		TwitterAddress result = null;
+//		if(Context.getAuthenticatedUser() != null){
+//			List<MessagingAddress> addresses = ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPersonAndService(Context.getAuthenticatedUser(), this);
+//			if(addresses != null && addresses.size() > 0){
+//				result = new TwitterAddress(addresses.get(0).getAddress(),addresses.get(0).getPassword());
+//			}
+//		}
+		return result;
+	}
+	
+	/**
+	 * Returns either the twitter address of the currently authenticated user
+	 * or the default twitter address
+	 * @return
+	 */
+	protected TwitterAddress getCurrentTwitterAddress(){
+		TwitterAddress result = getCurrentUserTwitterAddress();
+		if(result == null){
+			result = getDefaultSenderAddress();
+		}
+		return result;
+	}
 	/**
 	 * This is used to get the current twitter session. If the currently
 	 * authenticated user has a twitter address, it returns a session
@@ -25,45 +76,24 @@ public class TwitterMessagingService extends MessagingService<TwitterMessage, Tw
 	 * sender address
 	 * @return
 	 */
-	protected Twitter getTwitterSession(){
-		if(Context.getAuthenticatedUser() != null){
-			List<MessagingAddress> addresses = ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPersonAndService(Context.getAuthenticatedUser(), this);
-			if(addresses != null && addresses.size() >0){
-				TwitterAddress address = (TwitterAddress) addresses.get(0);
-				//if the session isn't already running, make one
-				if(!twitter.getScreenName().equals(address.getAddress())){
-					twitter = new Twitter(address.getAddress(),address.getPassword());
-				}
-			}else{
-				twitter = new Twitter(getDefaultSenderAddress().getAddress(),getDefaultSenderAddress().getPassword());
-			}
+	protected Twitter getCurrentTwitterSession(){
+		TwitterAddress address = getCurrentTwitterAddress();
+		//if the session has not been initialized or a session for the user
+		//is not already running
+		if(twitter == null || !twitter.getScreenName().equals(address.getAddress())){
+			twitter = new Twitter(address.getAddress(),address.getPassword());
 		}
 		return twitter;
 	}
+	
 	@Override
 	public boolean canReceive() {
-		return getTwitterSession() != null && getTwitterSession().isValidLogin();
+		return getCurrentTwitterSession() != null;
 	}
 
 	@Override
 	public boolean canSend() {
-		return false;
-	}
-
-	@Override
-	public AddressFactory getAddressFactory() {
-		return null;
-	}
-
-	@Override
-	public TwitterAddress getDefaultSenderAddress() {
-		if(Context.getAuthenticatedUser() != null){
-			List<MessagingAddress> addresses = ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPersonAndService(Context.getAuthenticatedUser(), this);
-			if(addresses != null && addresses.size() >0){
-				return (TwitterAddress) addresses.get(0);
-			}
-		}
-		return new TwitterAddress("devtestingjuan", "martyr441", null);
+		return canReceive();
 	}
 
 	@Override
@@ -71,10 +101,6 @@ public class TwitterMessagingService extends MessagingService<TwitterMessage, Tw
 		return "Allows users to send and receive twitter messages";
 	}
 
-	@Override
-	public MessageFactory getMessageFactory() {
-		return null;
-	}
 
 	@Override
 	public String getName() {
@@ -82,16 +108,16 @@ public class TwitterMessagingService extends MessagingService<TwitterMessage, Tw
 	}
 	
 	public void changeStatus(String status){
-		getTwitterSession().setStatus(status);
+		getCurrentTwitterSession().updateStatus(status);
 	}
 
 	@Override
 	public void sendMessage(String address, String content) {
 		if(getAddressFactory().addressIsValid(address) && getMessageFactory().messageContentIsValid(content)){
-			getTwitterSession().sendMessage(address, content);
+			getCurrentTwitterSession().sendMessage(address, content);
 		}
 		TwitterMessage m = new TwitterMessage(address,content);
-		m.setOrigin(getDefaultSenderAddress().getAddress());
+		m.setOrigin(getCurrentTwitterAddress().getAddress());
 		m.setDateSent(new Date());
 		m.setDateReceived(new Date());
 		((MessageService) Context.getService(MessageService.class)).saveMessage(m);
@@ -100,8 +126,8 @@ public class TwitterMessagingService extends MessagingService<TwitterMessage, Tw
 
 	@Override
 	public void sendMessage(TwitterMessage message) {
-		getTwitterSession().sendMessage(message.getDestination(), message.getContent());
-		message.setOrigin(getDefaultSenderAddress().getAddress());
+		getCurrentTwitterSession().sendMessage(message.getDestination(), message.getContent());
+		message.setOrigin(getCurrentTwitterAddress().getAddress());
 		message.setDateReceived(new Date());
 		saveMessage(message);
 	}
@@ -114,26 +140,21 @@ public class TwitterMessagingService extends MessagingService<TwitterMessage, Tw
 
 	@Override
 	public void sendMessageToAddresses(TwitterMessage m, List<String> addresses, MessageDelegate delegate) {
-		for(String address:addresses){
-			getTwitterSession().sendMessage(address, m.getContent());
-		}
+		//TODO
 	}
 
 	@Override
 	public void sendMessages(List<TwitterMessage> messages, MessageDelegate delegate) {
-		for(TwitterMessage m: messages){
-			getTwitterSession().sendMessage(m.getDestination(), m.getContent());
-		}
+		//TODO
 	}
 
 	@Override
 	public void shutdown() {
-		
 	}
 
 	@Override
 	public void startup() {
-		twitter = new Twitter(getDefaultSenderAddress().getAddress(),getDefaultSenderAddress().getPassword());
+		getCurrentTwitterSession();
 	}
 
 }
