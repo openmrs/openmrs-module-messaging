@@ -8,12 +8,14 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessagingService;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface MessageService extends OpenmrsService{
 
 	/**
 	 * @return all messages
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getAllMessages();
 	
@@ -21,6 +23,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param messageId
 	 * @return the message with the corresponding messageId
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public Message getMessage(Integer messageId);
 	
@@ -28,6 +31,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param sender
 	 * @return all messages that sender has sent
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesFromPerson(Person sender);
 	
@@ -35,6 +39,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param recipient
 	 * @return all messages that recipient has received
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesToPerson(Person recipient);
 	
@@ -42,6 +47,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param person
 	 * @return all messages to or from person
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesToOrFromPerson(Person person);
 	
@@ -49,6 +55,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param address
 	 * @return all messages sent from the supplied address 
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesFromAddress(String address);
 	
@@ -56,6 +63,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param address
 	 * @return all messages sent to the supplied address 
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesToAddress(String address);
 	
@@ -63,6 +71,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param address
 	 * @return all messages sent to or from the supplied address 
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesToOrFromAddress(String address);
 	
@@ -72,6 +81,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param service
 	 * @return
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesForService(MessagingService service);
 	
@@ -82,6 +92,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param recipient
 	 * @return
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesToPersonUsingService(MessagingService service, Person recipient);
 	
@@ -92,6 +103,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param sender
 	 * @return
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesFromPersonUsingService(MessagingService service, Person sender);
 	
@@ -102,6 +114,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param person
 	 * @return
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> getMessagesToOrFromPersonUsingService(MessagingService service, Person person);
 	
@@ -111,6 +124,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param content
 	 * @return
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> findMessages(String content);
 	
@@ -123,6 +137,7 @@ public interface MessageService extends OpenmrsService{
 	 * @param status the status of the message
 	 * @return
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> findMessagesWithAdresses(MessagingService service, String toAddress,String fromAddress, String content,Integer status);
 	
@@ -135,18 +150,21 @@ public interface MessageService extends OpenmrsService{
 	 * @param status the status of the message
 	 * @return
 	 */
+	@Transactional(readOnly=true)
 	@Authorized( { MessagingConstants.PRIV_VIEW_MESSAGES })
 	public List<Message> findMessagesWithPeople(MessagingService service, Person sender, Person recipient, String content, Integer status);
 	
 	/**
 	 * Create or update message
 	 */
+	@Transactional
 	@Authorized( { MessagingConstants.PRIV_MANAGE_MESSAGES })
 	public void saveMessage(Message message) throws APIException;
 
 	/**
 	 * Delete message
 	 */
+	@Transactional
 	@Authorized({ MessagingConstants.PRIV_MANAGE_MESSAGES})
 	public void deleteMessage(Message message) throws APIException;
 
