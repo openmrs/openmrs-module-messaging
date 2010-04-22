@@ -14,12 +14,55 @@
 	</description>
 	<activator>@MODULE_PACKAGE@.MessagingModuleActivator</activator>
 	
+	
+	<dwr>
+		<allow>
+			<create creator="new" javascript="DWRMessagingService">
+				<param name="class" value="org.openmrs.module.messaging.web.DWRMessagingService"/>
+				<include method="getCompatibleAddresses"/>
+				<include method="requiresPassword"/>
+			</create>
+		</allow>
+
+		<signatures>
+			<![CDATA[
+				import org.openmrs.module.messaging.web.DWRMessagingService;
+				DWRHtmlFormEntryService.getCompatibleAddresses(String fromAddress,String personId);
+				DWRHtmlFormEntryService.requiresPassword(String addressType);
+			]]>
+		</signatures>
+	</dwr>
+	
 	<!-- /Messaging Module Properties -->
 	
 	<globalProperty>
-		<property>@MODULE_ID@.serial.library</property>
-		<defaultValue>rxtx</defaultValue>
-		<description>The library that you are using to manage your serial connections, either javax.comm or RXTX</description>
+		<property>@MODULE_ID@.sms.default.country.code</property>
+		<defaultValue>1</defaultValue>
+		<description>The default country code for your location</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.twitter.default.username</property>
+		<defaultValue></defaultValue>
+		<description>The default sender's username for the Twitter messaging service</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.twitter.default.password</property>
+		<defaultValue></defaultValue>
+		<description>The default sender's password for the Twitter messaging service</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.google.voice.username</property>
+		<defaultValue></defaultValue>
+		<description>A google voice username for the server to use</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.google.voice.password</property>
+		<defaultValue></defaultValue>
+		<description>The matching password for the google voice username</description>
 	</globalProperty>
 	
 	<!-- Extension points -->
