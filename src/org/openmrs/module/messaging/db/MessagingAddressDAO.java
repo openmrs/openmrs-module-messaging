@@ -5,7 +5,7 @@ import java.util.List;
 import org.openmrs.Person;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingGateway;
 
 public interface MessagingAddressDAO {
 	
@@ -20,9 +20,9 @@ public interface MessagingAddressDAO {
 	public MessagingAddress getMessagingAddress(Integer addressId);
 
 	/**
-	 * @see MessagingAddressService#getMessagingAddressesForService(MessagingService)
+	 * @see MessagingAddressService#getMessagingAddressesForGateway(MessagingGateway)
 	 */
-	public List<MessagingAddress> getMessagingAddressesForService(MessagingService service);
+	public List<MessagingAddress> getMessagingAddressesForGateway(MessagingGateway gateway);
 
 	/**
 	 * @see MessagingAddressService#getMessagingAddressesForPerson(Person)
@@ -30,9 +30,9 @@ public interface MessagingAddressDAO {
 	public List<MessagingAddress> getMessagingAddressesForPerson(Person person);
 
 	/**
-	 * @see MessagingAddressService#getMessagingAddressesForPersonAndService(Person, MessagingService)
+	 * @see MessagingAddressService#getMessagingAddressesForPersonAndGateway(Person, MessagingGateway)
 	 */
-	public List<MessagingAddress> getMessagingAddressesForPersonAndService(Person person, MessagingService service);
+	public List<MessagingAddress> getMessagingAddressesForPersonAndGateway(Person person, MessagingGateway gateway);
 
 	/**
 	 * @see MessagingAddressService#findMessagingAddresses(String)
@@ -40,9 +40,9 @@ public interface MessagingAddressDAO {
 	public List<MessagingAddress> findMessagingAddresses(String search);
 
 	/**
-	 * @see MessagingAddressService#findMessagingAddresses(String, MessagingService)
+	 * @see MessagingAddressService#findMessagingAddresses(String, MessagingGateway)
 	 */
-	public List<MessagingAddress> findMessagingAddresses(String search, MessagingService service);
+	public List<MessagingAddress> findMessagingAddresses(String search, MessagingGateway gateway);
 	
 	/**
 	 * @see MessagingAddressService#getPreferredMessagingAddressForPerson(Person)
@@ -68,5 +68,9 @@ public interface MessagingAddressDAO {
 	 * @see MessagingAddressService#unretireMessagingAddress(MessagingAddress)
 	 */
 	public void unvoidMessagingAddress(MessagingAddress address);
+
+	public Person getPersonForAddress(String address);
+
+	public MessagingAddress getMessagingAddress(String address);
 
 }

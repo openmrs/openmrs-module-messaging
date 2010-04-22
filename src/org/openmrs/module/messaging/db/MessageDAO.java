@@ -6,7 +6,7 @@ import org.openmrs.Person;
 import org.openmrs.api.APIException;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingGateway;
 
 /**
  * @author Dieterich
@@ -56,24 +56,24 @@ public interface MessageDAO {
 	public List<Message> getMessagesToOrFromAddress(String address);
 	
 	/**
-	 * @see MessageService#getMessagesForService(MessagingService)
+	 * @see MessageService#getMessagesForGateway(MessagingGateway)
 	 */
-	public List<Message> getMessagesForService(MessagingService service);
+	public List<Message> getMessagesForGateway(MessagingGateway gateway);
 	
 	/**
-	 * @see MessageService#getMessagesToPersonUsingService(MessagingService, Person)
+	 * @see MessageService#getMessagesToPersonUsingGateway(MessagingGateway, Person)
 	 */
-	public List<Message> getMessagesToPersonUsingService(MessagingService service, Person recipient);
+	public List<Message> getMessagesToPersonUsingGateway(MessagingGateway gateway, Person recipient);
 
 	/**
-	 * @see MessageService#getMessagesFromPersonUsingService(MessagingService, Person)
+	 * @see MessageService#getMessagesFromPersonUsingGateway(MessagingGateway, Person)
 	 */
-	public List<Message> getMessagesFromPersonUsingService(MessagingService service, Person sender);
+	public List<Message> getMessagesFromPersonUsingGateway(MessagingGateway gateway, Person sender);
 
 	/**
-	 * @see MessageService#getMessagesToOrFromPersonUsingService(MessagingService, Person)
+	 * @see MessageService#getMessagesToOrFromPersonUsingGateway(MessagingGateway, Person)
 	 */
-	public List<Message> getMessagesToOrFromPersonUsingService(MessagingService service, Person person);
+	public List<Message> getMessagesToOrFromPersonUsingGateway(MessagingGateway gateway, Person person);
 
 	/**
 	 * @see MessageService#findMessages(String)
@@ -83,12 +83,12 @@ public interface MessageDAO {
 	/**
 	 * @see MessageService#findMessagesWithAdresses(MessageService, String, String, String, Integer)
 	 */
-	public List<Message> findMessagesWithAddresses(MessagingService service, String toAddress,String fromAddress, String content,Integer status);
+	public List<Message> findMessagesWithAddresses(MessagingGateway gateway, String toAddress,String fromAddress, String content,Integer status);
 
 	/**
-	 * @see MessageService#findMessages(MessagingService, Person, Person, String, Integer)
+	 * @see MessageService#findMessages(MessagingGateway, Person, Person, String, Integer)
 	 */
-	public List<Message> findMessagesWithPeople(MessagingService service, Person sender, Person recipient, String content, Integer status);
+	public List<Message> findMessagesWithPeople(MessagingGateway gateway, Person sender, Person recipient, String content, Integer status);
 
 	/**
 	 * @see MessageService#saveMessage(Message)

@@ -8,7 +8,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingGateway;
 
 public class MessageServiceImpl extends BaseOpenmrsService implements MessageService {
 
@@ -50,33 +50,33 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 		return dao.getMessagesToOrFromAddress(address);
 	}
 	
-	public List<Message> getMessagesForService(MessagingService service) {
-		return dao.getMessagesForService(service);
+	public List<Message> getMessagesForGateway(MessagingGateway gateway) {
+		return dao.getMessagesForGateway(gateway);
 	}
 	
-	public List<Message> getMessagesToPersonUsingService(MessagingService service, Person recipient) {
-		return dao.getMessagesToPersonUsingService(service, recipient);
+	public List<Message> getMessagesToPersonUsingGateway(MessagingGateway gateway, Person recipient) {
+		return dao.getMessagesToPersonUsingGateway(gateway, recipient);
 	}
 	
-	public List<Message> getMessagesFromPersonUsingService(MessagingService service, Person sender) {
-		return dao.getMessagesFromPersonUsingService(service, sender);
+	public List<Message> getMessagesFromPersonUsingGateway(MessagingGateway gateway, Person sender) {
+		return dao.getMessagesFromPersonUsingGateway(gateway, sender);
 	}
 	
-	public List<Message> getMessagesToOrFromPersonUsingService(MessagingService service, Person person) {
-		return dao.getMessagesToOrFromPersonUsingService(service,person);
+	public List<Message> getMessagesToOrFromPersonUsingGateway(MessagingGateway gateway, Person person) {
+		return dao.getMessagesToOrFromPersonUsingGateway(gateway,person);
 	}
 
 	public List<Message> findMessages(String content) {
 		return dao.findMessages(content);
 	}
 	
-	public List<Message> findMessagesWithAdresses(MessagingService service, String toAddress, String fromAddress, String content, Integer status) {
-		return dao.findMessagesWithAddresses(service,toAddress,fromAddress,content,status);
+	public List<Message> findMessagesWithAdresses(MessagingGateway gateway, String toAddress, String fromAddress, String content, Integer status) {
+		return dao.findMessagesWithAddresses(gateway,toAddress,fromAddress,content,status);
 	}
 
 
-	public List<Message> findMessagesWithPeople(MessagingService service, Person sender, Person recipient, String content, Integer status) {
-		return dao.findMessagesWithPeople(service, sender, recipient, content, status);
+	public List<Message> findMessagesWithPeople(MessagingGateway gateway, Person sender, Person recipient, String content, Integer status) {
+		return dao.findMessagesWithPeople(gateway, sender, recipient, content, status);
 	}
 
 	public void deleteMessage(Message message) throws APIException {

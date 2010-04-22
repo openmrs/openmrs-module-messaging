@@ -8,7 +8,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingGateway;
 
 public class MessagingAddressServiceImpl extends BaseOpenmrsService implements MessagingAddressService {
 
@@ -26,24 +26,24 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 		return dao.getMessagingAddress(addressId);
 	}
 	
-	public List<MessagingAddress> getMessagingAddressesForService(MessagingService service) {
-		return dao.getMessagingAddressesForService(service);
+	public List<MessagingAddress> getMessagingAddressesForGateway(MessagingGateway gateway) {
+		return dao.getMessagingAddressesForGateway(gateway);
 	}
 	
 	public List<MessagingAddress> getMessagingAddressesForPerson(Person person) {
 		return dao.getMessagingAddressesForPerson(person);
 	}
 
-	public List<MessagingAddress> getMessagingAddressesForPersonAndService(Person person, MessagingService service) {
-		return dao.getMessagingAddressesForPersonAndService(person, service);
+	public List<MessagingAddress> getMessagingAddressesForPersonAndGateway(Person person, MessagingGateway gateway) {
+		return dao.getMessagingAddressesForPersonAndGateway(person, gateway);
 	}
 
 	public List<MessagingAddress> findMessagingAddresses(String search) {
 		return dao.findMessagingAddresses(search);
 	}
 
-	public List<MessagingAddress> findMessagingAddresses(String search, MessagingService service) {
-		return dao.findMessagingAddresses(search,service);
+	public List<MessagingAddress> findMessagingAddresses(String search, MessagingGateway gateway) {
+		return dao.findMessagingAddresses(search,gateway);
 	}
 
 	public MessagingAddress getPreferredMessagingAddressForPerson(Person person) {
@@ -64,6 +64,16 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 
 	public void unretireMessagingAddress(MessagingAddress address) throws APIException {
 		dao.unvoidMessagingAddress(address);
+	}
+
+	@Override
+	public Person getPersonForAddress(String address) {
+		return dao.getPersonForAddress(address);
+	}
+
+	@Override
+	public MessagingAddress getMessagingAddress(String address) {
+		return dao.getMessagingAddress(address);
 	}
 
 }

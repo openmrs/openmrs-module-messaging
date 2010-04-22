@@ -1,6 +1,5 @@
 package org.openmrs.module.messaging.db.hibernate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -9,12 +8,9 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingGateway;
 
 public class HibernateMessageDAO implements MessageDAO {
 
@@ -44,44 +40,21 @@ public class HibernateMessageDAO implements MessageDAO {
 	
 	public List<Message> getMessagesFromPerson(Person sender){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		ArrayList<String> addresses= new ArrayList<String>();
-		for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(sender)){
-			addresses.add(address.getAddress());
-		}
-		if(addresses.size() <= 0){
-			return new ArrayList<Message>();
-		}else{
-			c.add(Restrictions.in("origin", addresses));
-			return c.list();
-		}
+		c.add(Restrictions.eq("sender", sender));
+		return c.list();
 	}
 	
 	public List<Message> getMessagesToPerson(Person recipient){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		ArrayList<String> addresses= new ArrayList<String>();
-		for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(recipient)){
-			addresses.add(address.getAddress());
-		}
-		if(addresses.size() <= 0){
-			return new ArrayList<Message>();
-		}else{
-			c.add(Restrictions.in("destination", addresses));
-			return c.list();
-		}
+		c.add(Restrictions.eq("recipient", recipient));
+		return c.list();
 	}
 	
 	public List<Message> getMessagesToOrFromPerson(Person person){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		ArrayList<String> addresses= new ArrayList<String>();
-		for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(person)){
-			addresses.add(address.getAddress());
-		}
-		if(addresses.size() <= 0){
-			return new ArrayList<Message>();
-		}else{
-			c.add(Restrictions.or(Restrictions.in("destination", addresses),Restrictions.in("origin", addresses)));
-			return c.list();
-		}
+		c.add(Restrictions.or(Restrictions.eq("sender", person),Restrictions.eq("recipient", person)));
+		return c.list();
+
 	}
 	
 	public List<Message> getMessagesFromAddress(String address){
@@ -102,31 +75,34 @@ public class HibernateMessageDAO implements MessageDAO {
 		return c.list();
 	}
 	
-	public List<Message> getMessagesForService(MessagingService service){
-		return sessionFactory.getCurrentSession().createCriteria(service.getMessageClass()).list();
+	public List<Message> getMessagesForGateway(MessagingGateway gateway){
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessageClass());
+		c.add(Restrictions.eq("gatewayId",gateway.getGatewayId()));
+		return c.list();
 	}
 	
 
-	public List<Message> getMessagesToPersonUsingService(MessagingService service, Person recipient){
-		return findMessagesWithPeople(service,null,recipient,null,null);
+	public List<Message> getMessagesToPersonUsingGateway(MessagingGateway gateway, Person recipient){
+		return findMessagesWithPeople(gateway,null,recipient,null,null);
 	}
 
-	public List<Message> getMessagesFromPersonUsingService(MessagingService service, Person sender){
-		return findMessagesWithPeople(service,sender,null,null,null);
+	public List<Message> getMessagesFromPersonUsingGateway(MessagingGateway gateway, Person sender){
+		return findMessagesWithPeople(gateway,sender,null,null,null);
 	}
 
-	public List<Message> getMessagesToOrFromPersonUsingService(MessagingService service, Person person){
-		return findMessagesWithPeople(service, person, person, null, null);
+	public List<Message> getMessagesToOrFromPersonUsingGateway(MessagingGateway gateway, Person person){
+		return findMessagesWithPeople(gateway, person, person, null, null);
 	}
 
 	public List<Message> findMessages(String content){
 		return findMessagesWithAddresses(null,null,null,content,null);
 	}
 	
-	public List<Message> findMessagesWithAddresses(MessagingService service, String toAddress,String fromAddress, String content,Integer status){
+	public List<Message> findMessagesWithAddresses(MessagingGateway gateway, String toAddress,String fromAddress, String content,Integer status){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		if(service !=null){
-			c = sessionFactory.getCurrentSession().createCriteria(service.getMessageClass());
+		if(gateway !=null){
+			c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessageClass());
+			c.add(Restrictions.eq("gatewayId",gateway.getGatewayId()));
 		}
 		if(toAddress!= null && !toAddress.equals("")){
 			c.add(Restrictions.eq("origin", toAddress));
@@ -143,28 +119,17 @@ public class HibernateMessageDAO implements MessageDAO {
 		return c.list();
 	}
 
-	public List<Message> findMessagesWithPeople(MessagingService service, Person sender, Person recipient, String content, Integer status){
+	public List<Message> findMessagesWithPeople(MessagingGateway gateway, Person sender, Person recipient, String content, Integer status){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		if(service !=null){
-			c = sessionFactory.getCurrentSession().createCriteria(service.getMessageClass());
+		if(gateway !=null){
+			c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessageClass());
+			c.add(Restrictions.eq("gatewayId",gateway.getGatewayId()));
 		}
 		if(sender!= null){
-			ArrayList<String> fromAddresses= new ArrayList<String>();
-			for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(sender)){
-				fromAddresses.add(address.getAddress());
-			}
-			if(fromAddresses.size() > 0){
-				c.add(Restrictions.in("origin",fromAddresses));
-			}
+			c.add(Restrictions.eq("sender", sender));
 		}
 		if(recipient!= null){
-			ArrayList<String> toAddresses= new ArrayList<String>();
-			for(MessagingAddress address: ((MessagingAddressService) Context.getService(MessagingAddressService.class)).getMessagingAddressesForPerson(recipient)){
-				toAddresses.add(address.getAddress());
-			}
-			if(toAddresses.size() > 0){
-				c.add(Restrictions.in("destination",toAddresses));
-			}
+			c.add(Restrictions.eq("recipient", recipient));
 		}
 		if(content!= null && !content.equals("")){
 			c.add(Restrictions.like("content", "%"+content+"%"));

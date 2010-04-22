@@ -13,7 +13,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingGateway;
 
 public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 
@@ -33,7 +33,6 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		this.sessionFactory = sessionFactory;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<MessagingAddress> getAllMessagingAddresses() {
 		return sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class).list();
 	}
@@ -42,21 +41,19 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		return (MessagingAddress) sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class).add(Restrictions.eq("addressId", addressId)).uniqueResult();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<MessagingAddress> getMessagingAddressesForService(MessagingService service) {
-		return sessionFactory.getCurrentSession().createCriteria(service.getMessagingAddressClass()).list();
+	public List<MessagingAddress> getMessagingAddressesForGateway(MessagingGateway gateway) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessagingAddressClass());
+		return c.list();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<MessagingAddress> getMessagingAddressesForPerson(Person person) {
 		Criteria c= sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
 		c.add(Restrictions.eq("person", person));
 		return c.list();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<MessagingAddress> getMessagingAddressesForPersonAndService(Person person, MessagingService service) {
-		Criteria c= sessionFactory.getCurrentSession().createCriteria(service.getMessagingAddressClass());
+	public List<MessagingAddress> getMessagingAddressesForPersonAndGateway(Person person, MessagingGateway gateway) {
+		Criteria c= sessionFactory.getCurrentSession().createCriteria(gateway.getMessagingAddressClass());
 		if(person !=null){
 			c.add(Restrictions.eq("person", person));
 		}
@@ -71,8 +68,8 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<MessagingAddress> findMessagingAddresses(String search, MessagingService service) {
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(service.getMessagingAddressClass());
+	public List<MessagingAddress> findMessagingAddresses(String search, MessagingGateway gateway) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessagingAddressClass());
 		c.add(Restrictions.like("address","%"+search+"%"));
 		return c.list();
 	}
@@ -96,12 +93,37 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	}
 
 	public void saveMessagingAddress(MessagingAddress address) throws DAOException{
+		if(address.getPreferred()){
+			List<MessagingAddress> addresses = getMessagingAddressesForPerson(address.getPerson());
+			for(MessagingAddress ad:addresses){
+				ad.setPreferred(false);
+				saveMessagingAddress(ad);
+			}
+		}
 		sessionFactory.getCurrentSession().save(address);
 	}
 
 	public void unvoidMessagingAddress(MessagingAddress address) throws DAOException{
 		address.setVoided(false);
 		sessionFactory.getCurrentSession().saveOrUpdate(address);
+	}
+
+	@Override
+	public Person getPersonForAddress(String address) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
+		c.add(Restrictions.eq("address", address));
+		MessagingAddress ma = (MessagingAddress) c.uniqueResult();
+		if(ma != null){
+			return ma.getPerson();
+		}
+		return null;
+	}
+
+	@Override
+	public MessagingAddress getMessagingAddress(String address) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
+		c.add(Restrictions.eq("address",address));
+		return (MessagingAddress) c.uniqueResult();
 	}
 
 }
