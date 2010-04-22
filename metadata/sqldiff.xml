@@ -9,12 +9,11 @@
 		expected to not fail or overwrite old data
 
 		EXPECT:
-		- "use business-database-name;" was called prior to
-		calling this script
+		- "use business-database-name;" was called prior to calling this script
 	</help>
 
 	<diff>
-		<version>1.1</version>
+		<version>1.5</version>
 		<author>Dieterich Lawson</author>
 		<date>March 14th 2010</date>
 		<description>
@@ -27,6 +26,7 @@
 				`address` varchar(255) NOT NULL default '',
 				`password` varchar(255) default '',
 				`person` int(11) NOT NULL default 0,
+				`preferred` tinyint(1) NOT NULL default '0',
 				`creator` int(11) NOT NULL default '0',
 				`date_created` datetime NOT NULL default '0000-00-00 00:00:00',
 				`changed_by` int(11) default NULL,
@@ -42,6 +42,7 @@
 				`message_id` int(11) NOT NULL auto_increment,
 				`message_type` varchar(40) NOT NULL,
 				`content` varchar(600) default '',
+				`gateway_id` varchar(255) NOT NULL default '',
 				`origin` varchar(255) default '',
 				`sender` int(11) default NULL,
 				`recipient` int(11) default NULL,
