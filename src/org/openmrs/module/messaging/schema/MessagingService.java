@@ -1,192 +1,273 @@
 package org.openmrs.module.messaging.schema;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openmrs.Person;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessageService;
-import org.openmrs.module.messaging.util.ReflectionUtils;
+import org.openmrs.module.messaging.MessagingAddressService;
+import org.openmrs.module.messaging.sms.PhoneNumber;
+import org.openmrs.module.messaging.sms.SmsModemGateway;
+import org.openmrs.module.messaging.twitter.TwitterAddress;
+import org.openmrs.module.messaging.twitter.TwitterGateway;
 
 /**
- * An abstract superclass that represents a service that can send and receive
- * messages. All methods in this class should be thread safe since it will be
- * used as a singleton, and could potentially be accessed by multiple threads.
+ * The Messaging Center is the main singleton in the Messaging framework. It is
+ * focused on cross-service functionality like sending to preferred messaging
+ * addresses and listening across all messaging gateways.
  * 
- * @param <M>
- *            The type of messages that this service handles
+ * @author Dieterich
+ * 
  */
-public abstract class MessagingService<M extends Message, A extends MessagingAddress> {
+public class MessagingService {
+	
+	protected static Log log = LogFactory.getLog(MessagingService.class);
+	
+	protected static MessagingService instance;
+	
+	protected static HashMap<String,Class> addressTypes;
+	
+	static{
+		addressTypes = new HashMap<String, Class>();
+		addressTypes.put("Phone Number", PhoneNumber.class);
+		addressTypes.put("Twitter Username", TwitterAddress.class);
+	}
+	
+	protected CopyOnWriteArraySet<MessagingGateway> gateways;
+	
+	//for Hibernate only
+	public void setGateways(Set gateways){
+		this.gateways = new CopyOnWriteArraySet<MessagingGateway>(gateways);
+		log.info("Services initialized: ");
+		for(MessagingGateway ms: this.gateways){
+			log.info("service: " + ms.getName());
+		}
+		
+	}
+	
+	public void initGateways() {
+		for(MessagingGateway ms:gateways){
+				ms.startup();
+		}
+	}
+	
+	public MessagingService(){}
+	
+	public static MessagingService getInstance(){
+		if(instance != null){
+			return instance;
+		}else{
+			instance = new MessagingService();
+			HashSet<MessagingGateway> s = new HashSet<MessagingGateway>();
+			s.add(new SmsModemGateway());
+			s.add(new TwitterGateway());
+			instance.setGateways(s);
+			return instance;
+		}
+	}
 
-	protected CopyOnWriteArrayList<MessagingServiceListener> listeners;
 
+
+	public void sendMessageViaPreferredMethod(Person destination, Message m) {}
+
+	public void registerListenerForPerson(MessagingServiceListener listener, Person p) {}
+
+	public void registerListener(MessagingServiceListener listener) {}
+
+	//> service getter methods
+	
 	/**
-	 * Sends a message to the address specified with the content specified.
-	 * Depending on the implementation, this method may throw exceptions due to
-	 * improperly formatted addresses or messages.
+	 * Returns the messaging service singleton for the provided class
 	 * 
-	 * @param address
-	 * @param content
+	 * @param messagingGatewayClass
+	 * @return
 	 */
-	public abstract void sendMessage(String address, String content);
-
+	public <S extends MessagingGateway> S getMessagingGateway(Class<? extends S> messagingGatewayClass) {
+		for (MessagingGateway mService : gateways) {
+			if (mService.getClass().equals(messagingGatewayClass)) {
+				return (S) mService;
+			}
+		}
+		return null;
+	}
+	
 	/**
-	 * Sends a message to the destination specified in
-	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateReceived} , and
-	 * {@link Message#origin} fields of {@link Message} if it is applicable to
-	 * that message. Implementations of this method need to be thread safe, and
-	 * should honor the {@link Message#priority} value if applicable to this
-	 * messaging service.
-	 * 
-	 * @param message
+	 * @param name
+	 * @return a messaging gateway that has a name that matches the parameter
 	 */
-	public abstract void sendMessage(M message);
-
+	public MessagingGateway getMessagingGatewayForName(String name) {
+		for (MessagingGateway mService : gateways) {
+			if (mService.getName().equalsIgnoreCase(name)) {
+				return mService;
+			}
+		}
+		return null;
+	}
+	
 	/**
-	 * Sends a message to the destination specified in
-	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateReceived} , and
-	 * {@link Message#origin} fields of {@link Message} if it is applicable to
-	 * that message. The delegate provided will receive the callbacks specified
-	 * in the {@link MessageDelegate} interface. Implementations of this method
-	 * need to be thread safe, allow a null {@link MessageDelegate}, and honor
-	 * the {@link Message#priority} value if applicable to this messaging
-	 * service
-	 * 
-	 * @param message
-	 *            The message to be sent
-	 * @param delegate
-	 *            The delegate that will receive callbacks. This can be null.
+	 * @param id
+	 * @return a messaging gateway that has an id that matches the parameter
 	 */
-	public abstract void sendMessage(M message, MessageDelegate delegate);
-
+	public MessagingGateway getMessagingGatewayForId(String id) {
+		for (MessagingGateway mService : gateways) {
+			if (mService.getGatewayId().equalsIgnoreCase(id)) {
+				return mService;
+			}
+		}
+		return null;
+	}
+	
 	/**
-	 * Sends a collection of messages to the destinations specified in
-	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateReceived}, and
-	 * {@link Message#origin} fields of the {@link Message} if it is applicable
-	 * to that message. The delegate provided will receive the callbacks
-	 * specified in the {@link MessageDelegate} interface. Implementations of
-	 * this method need to be thread safe, allow a null {@link MessageDelegate},
-	 * and honor the {@link Message#priority} if applicable to this messaging
-	 * service.
-	 * 
-	 * @param messages
-	 *            The messages to be sent
-	 * @param delegate
-	 *            The delegate that will receive callbacks. This can be null.
+	 * @return All messaging gateways
 	 */
-	public abstract void sendMessages(List<M> messages, MessageDelegate delegate);
-
+	public Set<MessagingGateway> getAllMessagingGateways() {
+		return gateways;
+	}
+	
+	
 	/**
-	 * Sends one message to multiple addresses. Implementations of this method
-	 * need to handle the setting of {@link Message#dateSent},
-	 * {@link Message#dateReceived}, {@link Message#destination}, and
-	 * {@link Message#origin} when/if the messages are saved to the database.
-	 * Additionally, this method should be thread safe, tolerate a null
-	 * {@link MessageDelegate}, and honor the {@link Message#priority} if
-	 * applicable to this messaging service.
-	 * 
 	 * @param m
-	 * @param addresses
+	 * @return A list of all messaging gateways that can send that type of message
 	 */
-	public abstract void sendMessageToAddresses(M m, List<String> addresses,
-			MessageDelegate delegate);
-
+	public List<MessagingGateway> getMessagingGatewaysForMessage(Message m){
+		List<MessagingGateway> gateways= new ArrayList<MessagingGateway>();
+		//search through all the messaging gateways
+		for(MessagingGateway ms: getAllMessagingGateways()){
+			//if the gateway deals with the proper class
+			if(ms.getMessageClass().equals(m.getClass())){
+					gateways.add(ms);
+			}
+		}
+		return gateways;
+	}
+	
 	/**
-	 * Registers a listener to receive notifications when a message is received
-	 * by this service. This method is thread safe.
-	 * 
-	 * @param listener
-	 *            The listener to register
+	 * @param a
+	 * @return A lit of all messaging gateways that can send to that type of address
 	 */
-	public void registerListener(MessagingServiceListener listener) {
-		listeners.addIfAbsent(listener);
+	public List<MessagingGateway> getMessagingGatewaysForAddress(MessagingAddress a){
+		List<MessagingGateway> gateways= new ArrayList<MessagingGateway>();
+		for(MessagingGateway ms: getAllMessagingGateways()){
+			if(ms.getMessagingAddressClass().equals(a.getClass())){
+					gateways.add(ms);
+			}
+		}
+		return gateways;
+	}
+	
+	public List<MessagingGateway> getMessagingGatewaysForAddress(String address){
+		MessagingAddress a = Context.getService(MessagingAddressService.class).getMessagingAddress(address);
+		if(a!=null){
+			return getMessagingGatewaysForAddress(a);
+		}else{
+			return new ArrayList<MessagingGateway>();
+		}
+	}
+	
+	/**
+	 * @param messagingGatewayClass the gateway's class
+	 * @return The address factory for that gateway
+	 */
+	public AddressFactory getAddressFactoryForGateway(Class messagingGatewayClass) {
+		try{
+			return getMessagingGateway(messagingGatewayClass).getAddressFactory();
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
+	/**
+	 * @param messagingGatewayClass the gateway's class
+	 * @return the message factory for that gateway
+	 */
+	public MessageFactory getMessageFactoryForGateway(Class messagingGatewayClass) {
+		try{
+			return getMessagingGateway(messagingGatewayClass).getMessageFactory();
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
+	/**
+	 * @return All message factories
+	 */
+	public Set<MessageFactory> getMessageFactories(){
+		HashSet<MessageFactory> factories = new HashSet<MessageFactory>();
+		for(MessagingGateway service:gateways){
+			factories.add(service.getMessageFactory());
+		}
+		return factories;
+	}
+	
+	/**
+	 * @return All address factories
+	 */
+	public Set<AddressFactory> getAddressFactories(){
+		HashSet<AddressFactory> factories = new HashSet<AddressFactory>();
+		for(MessagingGateway service:gateways){
+			factories.add(service.getAddressFactory());
+		}
+		return factories;
 	}
 
 	/**
-	 * Unregisters a listener that was registered. This method is thread safe.
-	 * 
-	 * @param listener
-	 *            The listener to unregister
+	 * @param name
+	 * @return The address factory that supports the address type represented by the parameter
 	 */
-	public void unregisterListener(MessagingServiceListener listener) {
-		listeners.remove(listener);
+	public AddressFactory getAddressFactoryForAddressTypeName(String name){
+		for(AddressFactory af: getAddressFactories()){
+			try {
+				if(((MessagingAddress) af.getAddressClass().newInstance()).getName().equalsIgnoreCase(name)){
+					return af;
+				}
+			} catch (Exception e) {}
+		}
+		return null;
 	}
-
-	/**
-	 * Should return the default sender address of this messaging service. This
-	 * would most likely be the address from which OpenMRS sends messages.
-	 * 
-	 * @return the default address
-	 */
-	public abstract A getDefaultSenderAddress();
-
-	/**
-	 * Should return true if the messaging service has the ability to send
-	 * messages currently and return false otherwise.
-	 * 
-	 * @return
-	 */
-	public abstract boolean canSend();
-
-	/**
-	 * Should return true if the messaging service has the ability to receive
-	 * messages currently and return false otherwise.
-	 * 
-	 * @return
-	 */
-	public abstract boolean canReceive();
-
-	public abstract void startup();
-
-	public abstract void shutdown();
 	
-	public abstract String getName();
+	public Class getAddressClassForAddressTypeName(String name){
+		for(AddressFactory af: getAddressFactories()){
+			try {
+				if(((MessagingAddress) af.getAddressClass().newInstance()).getName().equalsIgnoreCase(name)){
+					return af.getAddressClass();
+				}
+			} catch (Exception e) {}
+		
+		}
+		return null;
+	}
 	
-	public abstract String getDescription();
-	
-	public abstract AddressFactory<A> getAddressFactory();
-	
-	public abstract MessageFactory<M,A> getMessageFactory();
-
 	/**
-	 * Returns the class of the messages that this service handles
-	 * 
-	 * @return
+	 * @param addressClass
+	 * @return The address factory that produces the provided addresses
 	 */
-	public Class<?> getMessageClass() {
-		List<Class<?>> genericParameters = ReflectionUtils.getTypeArguments(
-				MessagingService.class, getClass());
-		for (Class<?> c : genericParameters) {
-			if (ReflectionUtils.classExtendsClass(c, Message.class)) {
-				return c;
+	public AddressFactory getAddressFactoryForAddressClass(Class addressClass){
+		for(AddressFactory af: getAddressFactories()){
+			if(addressClass.equals(af.getAddressClass())){
+				return af;
 			}
 		}
 		return null;
 	}
-
-	/**
-	 * Returns the class of the messaging addresses that this service handles
-	 * 
-	 * @return
-	 */
-	public Class<?> getMessagingAddressClass() {
-		List<Class<?>> genericParameters = ReflectionUtils.getTypeArguments(
-				MessagingService.class, getClass());
-		for (Class<?> c : genericParameters) {
-			if (ReflectionUtils.classExtendsClass(c, MessagingAddress.class)) {
-				return c;
+	
+	public Set<String> getAddressTypes(){
+		HashSet<String> set = new HashSet<String>();
+		for(AddressFactory af: getAddressFactories()){
+			try {
+				Class maClass =  af.getAddressClass();
+				MessagingAddress ma = (MessagingAddress) maClass.newInstance();
+				String name = ma.getName();
+				set.add(name);
+			} catch (Exception e) {
+				System.out.println("Shit");
 			}
 		}
-		return null;
+		return set;
 	}
-	
-	protected void saveMessage(M message){
-		message.setDateSent(new Date());
-		((MessageService) Context.getService(MessageService.class)).saveMessage(message);
-
-	}
-
 }
