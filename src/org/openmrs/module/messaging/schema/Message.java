@@ -68,6 +68,11 @@ public abstract class Message extends BaseOpenmrsObject{
 	 * The status of this message
 	 */
 	protected Integer status;
+	
+	/**
+	 * The string Id of the gateway that sent this message
+	 */
+	private String gatewayId;
 
 	/**
 	 * Creates a message with only a destination and content. The date sent,
@@ -81,6 +86,7 @@ public abstract class Message extends BaseOpenmrsObject{
 	 *            the content of the message
 	 */
 	public Message(String destination, String content) {
+		this.destination= destination;
 		this.content = content;
 	}
 
@@ -97,6 +103,7 @@ public abstract class Message extends BaseOpenmrsObject{
 	 */
 	public Message(String destination, String origin, String content, int priority) {
 		this.destination = destination;
+		this.origin =origin;
 		this.content = content;
 		this.priority = priority;
 	}
@@ -253,6 +260,14 @@ public abstract class Message extends BaseOpenmrsObject{
 		} else {
 			return destination;
 		}
+	}
+
+	public void setGatewayId(String gatewayId) {
+		this.gatewayId = gatewayId;
+	}
+
+	public String getGatewayId() {
+		return gatewayId;
 	}
 
 }

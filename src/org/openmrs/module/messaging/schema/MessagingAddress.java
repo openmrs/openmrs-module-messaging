@@ -23,7 +23,7 @@ import org.openmrs.PersonAttribute;
  */
 public abstract class MessagingAddress extends BaseOpenmrsData {
 
-	protected MessagingAddress(){}
+	public MessagingAddress(){}
 	
 	public MessagingAddress(String address, String password, Person person) {
 		super();
@@ -54,6 +54,9 @@ public abstract class MessagingAddress extends BaseOpenmrsData {
 	 * The person this address is for
 	 */
 	protected Person person;
+	
+	protected Boolean preferred = false;
+	
 	
 	/**
 	 * @return the address
@@ -113,4 +116,21 @@ public abstract class MessagingAddress extends BaseOpenmrsData {
 		this.messagingAddressId = id;
 	}
 
+	/**
+	 * @param preferred the preferred to set
+	 */
+	public void setPreferred(Boolean preferred) {
+		this.preferred = preferred;
+	}
+
+	/**
+	 * @return the preferred
+	 */
+	public Boolean getPreferred() {
+		return preferred;
+	}
+	
+	public abstract String getName();
+	
+	public abstract boolean requiresPassword();
 }
