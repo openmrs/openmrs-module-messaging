@@ -1,6 +1,9 @@
 package org.openmrs.module.messaging.schema;
 
+import java.util.List;
+
 import org.openmrs.Person;
+import org.openmrs.module.messaging.util.ReflectionUtils;
 
 /**
  * An interface that classes responsible for formatting and creation of
@@ -43,5 +46,7 @@ public interface AddressFactory<A extends MessagingAddress> {
 	 * 
 	 * @return
 	 */
-	public String getFormatHint();
+	public String getFormatHint(String currentAddress);
+	
+	public Class getAddressClass();
 }
