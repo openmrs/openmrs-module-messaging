@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>	             
+<beans>
+	 
+	 <!-- 
+	<bean id="messagingService" class="org.openmrs.module.messaging.schema.MessagingService">
+		<property name="gateways">
+			<set>
+				<ref bean="smsGateway" />
+				<ref bean="twitterGateway" />
+			</set>
+		</property>
+	</bean>
 
-<bean id="messagingCenter" class="org.openmrs.module.messaging.schema.MessagingCenter">
-	<property name="smsMessagingService" ref="smsMessagingService"/>
-	<property name="twitterMessagingService" ref="twitterMessagingService"/>
-</bean>
+	<bean id="smsGateway" class="org.openmrs.module.messaging.sms.SmsModemGateway">
+		<property name="smsMessageFactory" ref="smsMessageFactory" />
+		<property name="phoneNumberFactory" ref="phoneNumberFactory" />
+	</bean>
 
-<bean id="smsMessagingService" class="org.openmrs.module.messaging.sms.SMSMessagingService">
-	<property name="smsMessageFactory" ref="smsMessageFactory"/>
-	<property name="phoneNumberFactory" ref="phoneNumberFactory"/>
-</bean>
+	<bean id="twitterGateway" class="org.openmrs.module.messaging.twitter.TwitterGateway">
+		<property name="twitterMessageFactory" ref="twitterMessageFactory" />
+		<property name="twitterAddressFactory" ref="twitterAddressFactory" />
+	</bean>
 
-<bean id="twitterMessagingService" class="org.openmrs.module.messaging.twitter.TwitterMessagingService">
-	<property name="twitterMessageFactory" ref="twitterMessageFactory"/>
-	<property name="twitterAddressFactory" ref="twitterAddressFactory"/>
-</bean>
-
-<bean id="smsMessageFactory" class="org.openmrs.module.messaging.sms.SMSMessageFactory"/>
-<bean id="phoneNumberFactory" class="org.openmrs.module.messaging.sms.PhoneNumberFactory"/>
-<bean id="twitterMessageFactory" class="org.openmrs.module.messaging.twitter.TwitterMessageFactory"/>
-<bean id="twitterAddressFactory" class="org.openmrs.module.messaging.twitter.TwitterAddressFactory"/>
-
+	<bean id="smsMessageFactory" class="org.openmrs.module.messaging.sms.SmsMessageFactory" />
+	<bean id="phoneNumberFactory" class="org.openmrs.module.messaging.sms.PhoneNumberFactory" />
+	<bean id="twitterMessageFactory" class="org.openmrs.module.messaging.twitter.TwitterMessageFactory" />
+	<bean id="twitterAddressFactory" class="org.openmrs.module.messaging.twitter.TwitterAddressFactory" />
+	 -->
 <!-- Database Access -->
 	<bean parent="serviceContext">
 		<property name="moduleService">
