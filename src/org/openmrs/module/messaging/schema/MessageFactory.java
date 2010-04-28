@@ -10,7 +10,9 @@ public interface MessageFactory<M extends Message, A extends MessagingAddress> {
 	
 	public M createMessage(String content, A origin, A destination) throws MessageFormattingException;
 	
-	public M createMessageFromCurrentUser(String content, A destination);
+	public M createMessageFromCurrentUser(String content, A destination) throws MessageFormattingException;
 		
 	public boolean messageContentIsValid(String content);
+	
+	public String getFormattingHint(String currentMessage);
 }
