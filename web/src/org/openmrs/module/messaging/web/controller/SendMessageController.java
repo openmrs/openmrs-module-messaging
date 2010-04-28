@@ -1,68 +1,132 @@
 package org.openmrs.module.messaging.web.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openmrs.Person;
 import org.openmrs.module.messaging.schema.AddressFormattingException;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessageFormattingException;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingCenter;
+import org.openmrs.module.messaging.schema.MessagingGateway;
 import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.propertyeditor.PersonEditor;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindException;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.SimpleFormController;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-public class SendMessageController extends SimpleFormController{
+public class SendMessageController{
 
-	protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object obj, BindException errors) throws Exception {
-		MessagingService ms = (MessagingService) MessagingCenter.getMessagingServiceForName(request.getParameter("service"));
-		MessagingAddress address = null;
-		Message message = null;
-		String view = getSuccessView();
-		//check the validity of the address
-		try{
-			address = ms.getAddressFactory().createAddress(request.getParameter("address"), null);
-		}catch(AddressFormattingException e){
-			HttpSession httpSession = request.getSession();
-			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
-			return new ModelAndView(new RedirectView(view));
-		}
-		//check the validity of the message
-		try{
-			message = ms.getMessageFactory().createMessage(request.getParameter("content"), null, address);
-		}catch(MessageFormattingException e){
-			HttpSession httpSession = request.getSession();
-			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
-			return new ModelAndView(new RedirectView(view));
+	protected static final Log log = LogFactory.getLog(SendMessageController.class);
+	
+	@InitBinder
+	public void initBinder(WebDataBinder wdb) {
+		wdb.registerCustomEditor(Person.class, new PersonEditor());
+	}
+	
+	/**
+	 * Sends a message to the specified address
+	 * fromAddress, sender, recipient, and gateway are all optional
+	 * parameters. However, if an address is specified that more than one
+	 * gateway can send to, and a gateway is not specified, then an error is thrown
+	 * @param toAddressString
+	 * @param fromAddressString
+	 * @param sender
+	 * @param recipient
+	 * @param gatewayName
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/module/messaging/sendMessage", method = RequestMethod.POST)
+	protected String sendMessage(
+			@RequestParam("content") String content,
+			@RequestParam("toAddress") String toAddressString,
+			@RequestParam(value="fromAddress",required=false) String fromAddressString,
+			@RequestParam(value="sender",required=false) Person sender,
+			@RequestParam(value="recipient",required=false) Person recipient,
+			@RequestParam(value="gateway",required=false) String gatewayName,
+			@RequestParam(value="returnUrl", required=false) String returnUrl,
+			HttpServletRequest request){
+		
+		//get the http session
+		HttpSession httpSession = request.getSession();
+		
+		if (returnUrl == null || returnUrl.equals(""))
+			returnUrl = "sendMessage.form";
+
+		returnUrl= "redirect:" + returnUrl;
+		
+		MessagingGateway mg = null;
+		//if the service parameter is specified, then use that
+		if(gatewayName != null){
+			mg = MessagingService.getInstance().getMessagingGatewayForName(gatewayName);			
+		}else{
+			//otherwise, attempt to infer it from the supplied address
+			List<MessagingGateway> gateways = MessagingService.getInstance().getMessagingGatewaysForAddress(toAddressString);
+			if(gateways.size() == 1){
+				mg = gateways.get(0);
+			}else{
+				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "No service specified to send the message");
+				return returnUrl;
+			}
 		}
 		
-		if(!ms.canSend()){
-			HttpSession httpSession = request.getSession();
-			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The "+ms.getName()+" service is not currently running");
-			return new ModelAndView(new RedirectView(view));
+		MessagingAddress toAddress = null;
+		MessagingAddress fromAddress = null;
+		Message message = null;
+		
+		//check the validity of the address
+		try{
+			toAddress = mg.getAddressFactory().createAddress(toAddressString,null);
+			if(fromAddressString!=null && !fromAddressString.equals("")){
+				fromAddress = mg.getAddressFactory().createAddress(fromAddressString,null);
+			}
+			message = mg.getMessageFactory().createMessage(content, fromAddress, toAddress);
+			message.setSender(sender);
+			message.setRecipient(recipient);
+		}catch(AddressFormattingException e){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
+			return returnUrl;
+		}catch(MessageFormattingException e){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
+			return returnUrl;
+		}
+		
+		if(!mg.canSend()){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The "+mg.getName()+" service is not currently running");
+			return returnUrl;
 		}else{
-			ms.sendMessage(request.getParameter("address"), request.getParameter("content"));
-			HttpSession httpSession = request.getSession();
-			httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "DM sent successfully!");
-			return new ModelAndView(new RedirectView(view));
+			try{
+				mg.sendMessage(message);
+			}catch(Exception e){
+				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Message could not be sent : " + e.getMessage());
+				log.error("Could not send a message",e);
+				return returnUrl;
+			}
+			httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Message sent successfully!");
+			return returnUrl;
 		}
 	
 	}
-	
-    protected Object formBackingObject(HttpServletRequest request) throws ServletException {
+	@RequestMapping(value="/module/messaging/admin/sendaMessage")
+    public void populateModel(HttpServletRequest request){
     	ArrayList<String> services = new ArrayList<String>();
-    	for(MessagingService ms: MessagingCenter.getAllMessagingServices()){
-    		services.add(ms.getName());
+    	for(MessagingGateway mg: MessagingService.getInstance().getAllMessagingGateways()){
+    		if(mg.canSend()){
+    			services.add(mg.getName());
+    		}
     	}
-    	return services;
+    	request.setAttribute("services", services);
     }
 }
