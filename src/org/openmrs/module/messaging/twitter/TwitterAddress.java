@@ -12,6 +12,15 @@ public class TwitterAddress extends MessagingAddress{
 	public TwitterAddress(String address, String password) {
 		super(address, password,null);
 	}
+	
+	public String getName(){
+		return "Twitter Username";
+	}
+	
+	public TwitterAddress(){}
 
-	protected TwitterAddress(){}
+	@Override
+	public boolean requiresPassword() {
+		return true;
+	}
 }
