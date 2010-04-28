@@ -1,5 +1,6 @@
 package org.openmrs.module.messaging.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openmrs.Person;
@@ -32,4 +33,40 @@ public class DWRMessagingService {
 		}
 		return true;
 	}
+	
+	/**
+	 * 
+	 * precondition: the addresses being passed in can be sent
+	 * by a currently active gateway. (i.e. do not need to check for
+	 * gateway activity when returning addresses)
+	 * @param address
+	 * @param personId
+	 * @return
+	 */
+	public List<String> getToOrFromAddresses(String gatewayString, Integer personId){
+		MessagingGateway gateway = MessagingService.getInstance().getMessagingGatewayForName(gatewayString);
+		Person p = null;
+		if(personId == null){
+			p = Context.getAuthenticatedUser().getPerson();
+		}else{
+			p = Context.getPersonService().getPerson(personId);
+		}
+		List<MessagingAddress> addresses = Context.getService(MessagingAddressService.class).getMessagingAddressesForPersonAndGateway(p, gateway);
+		List<String> results = new ArrayList<String>();
+		for(MessagingAddress ma: addresses){
+			results.add(ma.getAddress());
+		}
+		return results;
+	}
+	
+	public List<String> getGatewaysForAddress(String address){
+		List<MessagingGateway> gateways = MessagingService.getInstance().getMessagingGatewaysForAddress(address);
+		List<String> results = new ArrayList<String>();
+		for(MessagingGateway mg: gateways){
+			results.add(mg.getName());
+		}
+		return results;
+	}
+	
+	
 }
