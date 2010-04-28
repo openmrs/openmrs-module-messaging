@@ -2,10 +2,13 @@ package org.openmrs.module.messaging.db;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingGateway;
+import org.openmrs.module.messaging.schema.MessagingService;
 
 public interface MessagingAddressDAO {
 	
@@ -72,5 +75,12 @@ public interface MessagingAddressDAO {
 	public Person getPersonForAddress(String address);
 
 	public MessagingAddress getMessagingAddress(String address);
-
+	
+	public <A extends MessagingAddress> List<A> getMessagingAddressesForClass(Class<? extends A> addressClass);
+	
+	public List<MessagingAddress> getMessagingAddressesForTypeName(String typeName);
+	
+	public <A extends MessagingAddress> List<A> getMessagingAddressesForPersonAndClass(Person person, Class<? extends A> addressClass);
+	
+	public List<MessagingAddress> getMessagingAddressesForPersonAndTypeName(Person person, String typeName);
 }

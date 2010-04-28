@@ -61,6 +61,18 @@ public interface MessagingAddressService extends OpenmrsService{
 	 */
 	@Transactional(readOnly=true)
 	public List<MessagingAddress> getMessagingAddressesForPersonAndGateway(Person person, MessagingGateway gateway);
+	
+	@Transactional(readOnly=true)
+	public <A extends MessagingAddress> List<A> getMessagingAddressesForClass(Class<? extends A> addressClass);
+	
+	@Transactional(readOnly=true)
+	public List<MessagingAddress> getMessagingAddressesForTypeName(String typeName);
+	
+	@Transactional(readOnly=true)
+	public <A extends MessagingAddress> List<A> getMessagingAddressesForPersonAndClass(Person person, Class<? extends A> addressClass);
+	
+	@Transactional(readOnly=true)
+	public List<MessagingAddress> getMessagingAddressesForPersonAndTypeName(Person person, String typeName);
 
 	/**
 	 * This method performs a like query on MessagingAddress.address with

@@ -75,5 +75,21 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 	public MessagingAddress getMessagingAddress(String address) {
 		return dao.getMessagingAddress(address);
 	}
+	
+	public <A extends MessagingAddress> List<A> getMessagingAddressesForClass(Class<? extends A> addressClass){
+		return dao.getMessagingAddressesForClass(addressClass);
+	}
+	
+	public List<MessagingAddress> getMessagingAddressesForTypeName(String typeName){
+		return dao.getMessagingAddressesForTypeName(typeName);
+	}
+	
+	public <A extends MessagingAddress> List<A> getMessagingAddressesForPersonAndClass(Person person, Class<? extends A> addressClass){
+		return dao.getMessagingAddressesForPersonAndClass(person, addressClass);
+	}
+	
+	public List<MessagingAddress> getMessagingAddressesForPersonAndTypeName(Person person, String typeName){
+		return dao.getMessagingAddressesForPersonAndTypeName(person, typeName);
+	}
 
 }

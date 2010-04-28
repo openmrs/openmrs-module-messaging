@@ -14,6 +14,7 @@ import org.openmrs.api.db.DAOException;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingGateway;
+import org.openmrs.module.messaging.schema.MessagingService;
 
 public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 
@@ -46,6 +47,20 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		return c.list();
 	}
 	
+	public <A extends MessagingAddress> List<A> getMessagingAddressesForClass(Class<? extends A> addressClass) {
+		Criteria c= sessionFactory.getCurrentSession().createCriteria(addressClass);
+		return c.list();
+	}
+	
+	public List<MessagingAddress> getMessagingAddressesForTypeName(String typeName) {
+		Class aClass = MessagingService.getInstance().getAddressClassForAddressTypeName(typeName);
+		if(aClass != null){
+			return getMessagingAddressesForClass(aClass);
+		}
+		return null;
+		
+	}
+	
 	public List<MessagingAddress> getMessagingAddressesForPerson(Person person) {
 		Criteria c= sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
 		c.add(Restrictions.eq("person", person));
@@ -58,6 +73,23 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 			c.add(Restrictions.eq("person", person));
 		}
 		return c.list();
+	}
+	
+	public <A extends MessagingAddress> List<A> getMessagingAddressesForPersonAndClass(Person person, Class<? extends A> addressClass) {
+		Criteria c= sessionFactory.getCurrentSession().createCriteria(addressClass);
+		if(person !=null){
+			c.add(Restrictions.eq("person", person));
+		}
+		return c.list();
+	}
+	
+	public List<MessagingAddress> getMessagingAddressesForPersonAndTypeName(Person person, String typeName) {
+		Class aClass = MessagingService.getInstance().getAddressClassForAddressTypeName(typeName);
+		if(aClass != null){
+			return getMessagingAddressesForPersonAndClass(person,aClass);
+		}
+		return null;
+		
 	}
 	
 	@SuppressWarnings("unchecked")
