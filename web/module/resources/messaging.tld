@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+  version="2.0">
+
+	<description>messaging tag library</description>
+	<tlib-version>1.0</tlib-version>
+	<short-name>messaging</short-name>
+	
+	<tag>
+		<description>Returns the to/from text of a message - either the person or address (if person is null) that the message is to/from</description>
+		<name>formatAddress</name>
+		<tag-class>org.openmrs.module.messaging.web.taglib.FormatAddressTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>message</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>messageId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			
+		</attribute>	
+		<attribute>
+			<name>toOrFrom</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<description>Prints out the name of the service associated with a message or address</description>
+		<name>serviceName</name>
+		<tag-class>org.openmrs.module.messaging.web.taglib.MessagingServiceTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>message</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>messageId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>service</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<description>Prints out the type of a messaging address</description>
+		<name>addressType</name>
+		<tag-class>org.openmrs.module.messaging.web.taglib.MessagingAddressTypeTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>address</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>addressId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+</taglib>
