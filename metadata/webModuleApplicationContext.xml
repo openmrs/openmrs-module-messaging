@@ -19,17 +19,16 @@
 		<property name="mappings">
 			<props>
 				<prop key="**/messagesPatientDashboardTab.portlet">messagesPatientDashboardTab</prop>
-				<prop key="module/messaging/sendMessage.form">sendMessageController</prop>
+				<prop key="module/messaging/admin/sendaMessage.form">sendMessageController</prop>
+				<prop key="module/messaging/admin/manageGateways.form">manageGatewaysController</prop>
+				<prop key="module/messaging/admin/manageAddresses.form">manageAddressesController</prop>
 			</props>
 		</property>
 	</bean>
-
+	
+	<bean id="manageAddressesController" class="org.openmrs.module.messaging.web.controller.ManageAddressesController" />
+	<bean id="manageGatewaysController" class="org.openmrs.module.messaging.web.controller.ManageGatewaysController" />
 	<bean id="messagesPatientDashboardTab" class="org.openmrs.module.messaging.web.controller.MessagingDashboardTabController" />
-
-	<bean id="sendMessageController" class="@MODULE_PACKAGE@.web.controller.SendMessageController">
-		<property name="commandName"><value>sendMessage</value></property>
-		<property name="formView"><value>/module/@MODULE_ID@/sendMessage</value></property>
-		<property name="successView"><value>sendMessage.form</value></property>
-	</bean>
+	<bean id="sendMessageController" class="org.openmrs.module.messaging.web.controller.SendMessageController" />
 
 </beans>
