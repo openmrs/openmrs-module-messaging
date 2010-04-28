@@ -6,9 +6,9 @@ package org.openmrs.module.messaging.schema;
  * notifications should be done by using one of the sendMessage() methods that takes
  * a delegate as a parameter.
  * 
- * @see MessagingService#sendMessage(Message, MessageDelegate)
- * @see MessagingService#sendMessages(java.util.List, MessageDelegate)
- * @see MessagingService#sendMessageToAddresses(Message, java.util.List, MessageDelegate)
+ * @see MessagingGateway#sendMessage(Message, MessageDelegate)
+ * @see MessagingGateway#sendMessages(java.util.List, MessageDelegate)
+ * @see MessagingGateway#sendMessageToAddresses(Message, java.util.List, MessageDelegate)
  */
 public interface MessageDelegate {
 

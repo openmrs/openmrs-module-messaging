@@ -18,7 +18,7 @@ import org.openmrs.module.messaging.twitter.TwitterAddress;
 import org.openmrs.module.messaging.twitter.TwitterGateway;
 
 /**
- * The Messaging Center is the main singleton in the Messaging framework. It is
+ * The Messaging Service is the main singleton in the Messaging framework. It is
  * focused on cross-service functionality like sending to preferred messaging
  * addresses and listening across all messaging gateways.
  * 
@@ -59,6 +59,14 @@ public class MessagingService {
 	
 	public MessagingService(){}
 	
+	/**
+	 * TEMPORARY METHOD
+	 * This method returns the singleton instance of MessagingService.
+	 * Once the module startup() method is changed to be after the spring
+	 * applicationcontext is already initialized, we will move back to spring
+	 * dependency injection and bean management
+	 * @return
+	 */
 	public static MessagingService getInstance(){
 		if(instance != null){
 			return instance;
@@ -130,7 +138,6 @@ public class MessagingService {
 		return gateways;
 	}
 	
-	
 	/**
 	 * @param m
 	 * @return A list of all messaging gateways that can send that type of message
@@ -149,7 +156,7 @@ public class MessagingService {
 	
 	/**
 	 * @param a
-	 * @return A lit of all messaging gateways that can send to that type of address
+	 * @return A list of all messaging gateways that can send to that type of address
 	 */
 	public List<MessagingGateway> getMessagingGatewaysForAddress(MessagingAddress a){
 		List<MessagingGateway> gateways= new ArrayList<MessagingGateway>();
@@ -231,6 +238,11 @@ public class MessagingService {
 		return null;
 	}
 	
+	/**
+	 * Returns the class of the address type that matches the provided name
+	 * @param name
+	 * @return
+	 */
 	public Class getAddressClassForAddressTypeName(String name){
 		for(AddressFactory af: getAddressFactories()){
 			try {
@@ -256,6 +268,9 @@ public class MessagingService {
 		return null;
 	}
 	
+	/**
+	 * @return all possible address types
+	 */
 	public Set<String> getAddressTypes(){
 		HashSet<String> set = new HashSet<String>();
 		for(AddressFactory af: getAddressFactories()){
