@@ -139,6 +139,20 @@ public class MessagingService {
 	}
 	
 	/**
+	 * @return All Messaging Gateways that can send messages
+	 */
+	public Set<MessagingGateway> getActiveMessagingGateways(){
+		Set<MessagingGateway> gways = new HashSet<MessagingGateway>();
+		for(MessagingGateway msg: gateways){
+			if(msg.canSend()){
+				gways.add(msg);
+			}
+		}
+		return gways;
+	}
+	
+	
+	/**
 	 * @param m
 	 * @return A list of all messaging gateways that can send that type of message
 	 */
