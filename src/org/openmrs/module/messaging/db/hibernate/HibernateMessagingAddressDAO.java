@@ -140,7 +140,6 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		sessionFactory.getCurrentSession().saveOrUpdate(address);
 	}
 
-	@Override
 	public Person getPersonForAddress(String address) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
 		c.add(Restrictions.eq("address", address));
@@ -151,7 +150,6 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		return null;
 	}
 
-	@Override
 	public MessagingAddress getMessagingAddress(String address) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
 		c.add(Restrictions.eq("address",address));

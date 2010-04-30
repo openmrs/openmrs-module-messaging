@@ -66,12 +66,10 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 		dao.unvoidMessagingAddress(address);
 	}
 
-	@Override
 	public Person getPersonForAddress(String address) {
 		return dao.getPersonForAddress(address);
 	}
 
-	@Override
 	public MessagingAddress getMessagingAddress(String address) {
 		return dao.getMessagingAddress(address);
 	}
