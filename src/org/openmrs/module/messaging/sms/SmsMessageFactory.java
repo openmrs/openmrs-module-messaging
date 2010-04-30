@@ -5,7 +5,6 @@ import org.openmrs.module.messaging.schema.MessageFormattingException;
 
 public class SmsMessageFactory implements MessageFactory<SmsMessage,PhoneNumber>{
 
-	@Override
 	public SmsMessage createMessage(String content, PhoneNumber origin, PhoneNumber destination) throws MessageFormattingException {
 		SmsMessage m;
 		if(messageContentIsValid(content)){
@@ -20,17 +19,14 @@ public class SmsMessageFactory implements MessageFactory<SmsMessage,PhoneNumber>
 		return m;
 	}
 
-	@Override
 	public SmsMessage createMessageFromCurrentUser(String content, PhoneNumber destination) throws MessageFormattingException {
 		return null;
 	}
 
-	@Override
 	public String getFormattingHint(String currentMessage) {
 		return "";
 	}
 
-	@Override
 	public boolean messageContentIsValid(String content) {
 		return content.length() <=160;
 	}

@@ -27,7 +27,6 @@ public class TwitterMessageFactory implements MessageFactory<TwitterMessage,Twit
 		return content.length() <=140;
 	}
 
-	@Override
 	public String getFormattingHint(String currentMessage) {
 		return (140 - currentMessage.length()) + " characters left";
 	}
