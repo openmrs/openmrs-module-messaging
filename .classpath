@@ -11,14 +11,17 @@
 	<classpathentry kind="lib" path="lib-common/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib-common/hibernate3.jar"/>
 	<classpathentry kind="lib" path="lib-common/junit-3.8.1.jar"/>
-	<classpathentry kind="lib" path="lib-common/openmrs-api-1.2.0.3409.jar" sourcepath="/openmrs-trunk"/>
 	<classpathentry kind="lib" path="lib-common/servlet-api.jar"/>
-	<classpathentry kind="lib" path="lib-common/spring-2.0.jar"/>
-	<classpathentry kind="lib" path="lib-common/web-openmrs-api-1.2.0.3530.jar"/>
 	<classpathentry kind="src" path="/openmrs-trunk"/>
 	<classpathentry kind="lib" path="lib/jtwitter.jar"/>
 	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
 	<classpathentry kind="lib" path="lib/smslib-3.4.5.jar"/>
-	<classpathentry kind="lib" path="lib/smsserver-3.4.5.jar"/>
+	<classpathentry kind="lib" path="lib-common/openmrs-api-1.5.2.11623-dev.jar"/>
+	<classpathentry kind="lib" path="lib-common/spring-2.5.6.jar"/>
+	<classpathentry kind="lib" path="lib-common/spring-test.jar"/>
+	<classpathentry kind="lib" path="lib-common/spring-webmvc.jar"/>
+	<classpathentry kind="lib" path="lib-common/tests-openmrs-api-1.5.2.11623-dev.jar"/>
+	<classpathentry kind="lib" path="lib-common/web-openmrs-api-1.5.2.11623-dev.jar"/>
+	<classpathentry kind="lib" path="lib-common/jsp-api.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
