@@ -12,7 +12,6 @@ import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.MessagingConstants;
 import org.openmrs.module.messaging.schema.MessageDelegate;
 import org.openmrs.module.messaging.schema.MessageFormattingException;
-import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingGateway;
 
 import winterwell.jtwitter.Twitter;
@@ -29,6 +28,8 @@ public class TwitterGateway extends MessagingGateway<TwitterMessage, TwitterAddr
 	protected static TwitterAddressFactory twitterAddressFactory = new TwitterAddressFactory();
 	
 	protected static TwitterMessageFactory twitterMessageFactory = new TwitterMessageFactory();
+	
+	protected boolean canSend = false;
 
 	@Override
 	public TwitterAddressFactory getAddressFactory() {
@@ -45,64 +46,24 @@ public class TwitterGateway extends MessagingGateway<TwitterMessage, TwitterAddr
 		return new TwitterAddress(uname,pword);
 	}
 	
-	/**
-	 * Returns the Twitter Address of the currently authenticated user,
-	 *  if there is one. If there is not, it returns null
-	 * @return
-	 */
-	protected TwitterAddress getCurrentUserTwitterAddress(){
-		TwitterAddress result = null;
-		if(Context.getAuthenticatedUser() != null){
-			List<MessagingAddress> addresses = Context.getService(MessagingAddressService.class).getMessagingAddressesForPersonAndGateway(Context.getAuthenticatedUser().getPerson(), this);
-			if(addresses != null && addresses.size() > 0){
-				result = (TwitterAddress) addresses.get(0);
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Returns either the twitter address of the currently authenticated user
-	 * or the default twitter address
-	 * @return
-	 */
-	protected TwitterAddress getCurrentTwitterAddress(){
-		TwitterAddress result = getCurrentUserTwitterAddress();
-		if(result == null){
-			result = getDefaultSenderAddress();
-		}
-		return result;
-	}
-	/**
-	 * This is used to get the current twitter session. If the currently
-	 * authenticated user has a twitter address, it returns a session
-	 * with that address. Otherwise, it returns a session with the default
-	 * sender address
-	 * @return
-	 */
-	protected Twitter getCurrentTwitterSession(){
-		TwitterAddress address = getCurrentTwitterAddress();
-		//if the session has not been initialized or a session for the user
-		//is not already running
-		if(twitter == null || !twitter.getScreenName().equals(address.getAddress())){
-			twitter = new Twitter(address.getAddress(),address.getPassword());
+	protected Twitter getDefaultTwitterSession(){
+		//if the default twitter address has changed since the last time the session
+		//was requested, update it
+		
+		if(twitter == null || !twitter.getScreenName().equals(getDefaultSenderAddress().getAddress())){
+			twitter = new Twitter(getDefaultSenderAddress().getAddress(),getDefaultSenderAddress().getPassword());
+			canSend = twitter.isValidLogin();
 		}
 		return twitter;
 	}
-	
 	@Override
 	public boolean canReceive() {
-		try{
-			return getCurrentTwitterSession().isValidLogin();
-		}catch(Exception e){
-			log.error("Error with twitter",e);
-			return false;
-		}
+		return canSend();
 	}
 
 	@Override
 	public boolean canSend() {
-		return canReceive();
+		return canSend;
 	}
 
 	@Override
@@ -121,10 +82,13 @@ public class TwitterGateway extends MessagingGateway<TwitterMessage, TwitterAddr
 	}
 
 	@Override
-	public void sendMessage(String address, String content) {
+	public void sendMessage(String address, String content) throws MessageFormattingException {
+		if(getDefaultTwitterSession().isFollowing(address) || !getDefaultTwitterSession().isFollower(address)){
+			throw new MessageFormattingException("Could not send the direct message - either you are not following that user or they are not following you.");
+		}
 		//set header info
 		TwitterMessage m = new TwitterMessage(address,content);
-		m.setOrigin(getCurrentTwitterAddress().getAddress());
+		m.setOrigin(getDefaultSenderAddress().getAddress());
 		m.setDateSent(new Date());
 		m.setDateReceived(new Date());
 		//set recipient, if we can find it
@@ -136,27 +100,29 @@ public class TwitterGateway extends MessagingGateway<TwitterMessage, TwitterAddr
 		//save message
 		Context.getService(MessageService.class).saveMessage(m);
 		if(getAddressFactory().addressIsValid(address) && getMessageFactory().messageContentIsValid(content)){
-			getCurrentTwitterSession().sendMessage(address, content);
+			getDefaultTwitterSession().sendMessage(address, content);
 		}
 	}
 	
 
 	@Override
 	public void sendMessage(TwitterMessage message) throws MessageFormattingException{
-		//make sure that the currently authenticated user is following the 
-		//person that they want to send a message to
+		//get the twitter session that we will be using
 		Twitter twitSession;
-		if(message.getOrigin() != null && !message.getOrigin().equals("") && message.getOrigin().equals(getDefaultSenderAddress().getAddress())){
+		//if there is an origin in the message and the origin is not the default address
+		//then create a new twitter session for that origin
+		if(message.getOrigin() != null && !message.getOrigin().equals("") && !message.getOrigin().equals(getDefaultSenderAddress().getAddress())){
 			TwitterAddress fromAddress = (TwitterAddress) Context.getService(MessagingAddressService.class).getMessagingAddress(message.getOrigin());
 			twitSession = new Twitter(fromAddress.getAddress(),fromAddress.getPassword());
 		}else{
-			twitSession = getCurrentTwitterSession();
+			twitSession = getDefaultTwitterSession();
 		}
-		if(!twitSession.isFollowing(message.getDestination())
-		|| !twitSession.isFollower(message.getDestination())){
+		//if the twitter user that is designated as the sender is not following and followed by
+		//the designated recipient, then throw an exception
+		if(!twitSession.isFollowing(message.getDestination()) || !twitSession.isFollower(message.getDestination())){
 			throw new MessageFormattingException("Could not send the direct message - either you are not following that user or they are not following you.");
 		}
-		//set the origin of the message
+		//set header info of the message
 		message.setOrigin(twitSession.getScreenName());
 		message.setDateSent(new Date());
 		message.setDateReceived(new Date());
@@ -164,9 +130,6 @@ public class TwitterGateway extends MessagingGateway<TwitterMessage, TwitterAddr
 		Person p = Context.getService(MessagingAddressService.class).getPersonForAddress(message.getDestination());
 		if(message.getRecipient() == null && p != null){
 			message.setRecipient(p);
-		}
-		if(message.getSender() == null && Context.getAuthenticatedUser() !=null){
-			message.setSender(Context.getAuthenticatedUser().getPerson());
 		}
 		message.setGatewayId(getGatewayId());
 		//save the message
@@ -177,7 +140,6 @@ public class TwitterGateway extends MessagingGateway<TwitterMessage, TwitterAddr
 
 	@Override
 	public void sendMessage(TwitterMessage message, MessageDelegate delegate) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -197,12 +159,14 @@ public class TwitterGateway extends MessagingGateway<TwitterMessage, TwitterAddr
 
 	@Override
 	public void startup() {
-		twitter= new Twitter(getDefaultSenderAddress().getAddress(), getDefaultSenderAddress().getPassword());
+		getDefaultTwitterSession();
 	}
+	
 	@Override
 	public String getGatewayId() {
 		return "twitter";
 	}
+	
 	@Override
 	public boolean canSendFromUserAddresses() {
 		return true;
