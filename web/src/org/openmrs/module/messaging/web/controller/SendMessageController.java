@@ -3,13 +3,14 @@ package org.openmrs.module.messaging.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.AddressFormattingException;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessageFormattingException;
@@ -53,6 +54,7 @@ public class SendMessageController{
 			@RequestParam("content") String content,
 			@RequestParam("toAddress") String toAddressString,
 			@RequestParam(value="fromAddress",required=false) String fromAddressString,
+			@RequestParam(value="fromCurrentUser",required=false) Boolean fromCurrentUser,
 			@RequestParam(value="sender",required=false) Person sender,
 			@RequestParam(value="recipient",required=false) Person recipient,
 			@RequestParam(value="gateway",required=false) String gatewayName,
@@ -91,14 +93,22 @@ public class SendMessageController{
 			toAddress = mg.getAddressFactory().createAddress(toAddressString,null);
 			if(fromAddressString!=null && !fromAddressString.equals("")){
 				fromAddress = mg.getAddressFactory().createAddress(fromAddressString,null);
+			}else if(fromCurrentUser){
+					List<MessagingAddress> fromAddresses = Context.getService(MessagingAddressService.class).getMessagingAddressesForPersonAndGateway(Context.getAuthenticatedUser().getPerson(), mg);
+					if(fromAddresses.size() == 1){
+						fromAddress = fromAddresses.get(0);
+					}else{
+						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Current user has more than one address for that gateway. Please specify an address");
+						return returnUrl;
+					}
 			}
 			message = mg.getMessageFactory().createMessage(content, fromAddress, toAddress);
 			message.setSender(sender);
 			message.setRecipient(recipient);
-		}catch(AddressFormattingException e){
+		}catch(MessageFormattingException e){
 			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
 			return returnUrl;
-		}catch(MessageFormattingException e){
+		}catch(AddressFormattingException e){
 			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
 			return returnUrl;
 		}
