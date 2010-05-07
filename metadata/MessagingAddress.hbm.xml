@@ -30,5 +30,6 @@
         
         <subclass  name="@MODULE_PACKAGE@.sms.PhoneNumber" discriminator-value="phonenumber"/>
    		<subclass name="@MODULE_PACKAGE@.twitter.TwitterAddress" discriminator-value="twitter"/>
+   		<subclass name="@MODULE_PACKAGE@.nuntium.NuntiumAddress" discriminator-value="nuntium"/>
     </class>
 </hibernate-mapping>

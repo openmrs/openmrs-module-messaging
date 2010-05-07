@@ -51,5 +51,15 @@ Change the default Twitter address:
 <br/><br/>
 Twitter service status: ${twitterServiceStatus}
 </div>
+<br/>
+
+<div class="boxHeader">Nuntium</div>
+<div class="box">
+<form method="post" action="<openmrs:contextPath/>/module/messaging/saveNuntiumSettings.form">
+	Username: <input type="text" name="username" value="${nuntiumUsername}" /><br/>
+	Password: <input type="password" name="password" value="${nuntiumPassword}" /><br/>
+	<input type="submit" value="Save Changes" />
+</form>
+</div>
 
 <%@ include file="/WEB-INF/template/footer.jsp" %>

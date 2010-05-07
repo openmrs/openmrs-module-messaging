@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
+import org.openmrs.module.messaging.nuntium.NuntiumGateway;
 import org.openmrs.module.messaging.sms.PhoneNumber;
 import org.openmrs.module.messaging.sms.SmsModemGateway;
 import org.openmrs.module.messaging.twitter.TwitterAddress;
@@ -53,7 +54,11 @@ public class MessagingService {
 	
 	public void initGateways() {
 		for(MessagingGateway ms:gateways){
+			try {
 				ms.startup();
+			} catch (Throwable t) {
+				log.error("Unable to initialize gateway: " + ms.getName(), t);
+			}
 		}
 	}
 	
@@ -75,6 +80,7 @@ public class MessagingService {
 			HashSet<MessagingGateway> s = new HashSet<MessagingGateway>();
 			s.add(new SmsModemGateway());
 			s.add(new TwitterGateway());
+			s.add(new NuntiumGateway());
 			instance.setGateways(s);
 			return instance;
 		}

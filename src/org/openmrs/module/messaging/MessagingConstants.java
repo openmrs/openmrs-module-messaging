@@ -12,5 +12,6 @@ public final class MessagingConstants {
 	public static final String GP_DEFAULT_TWITTER_PASSWORD = "messaging.twitter.default.password";
 	public static final String GP_GOOGLE_VOICE_UNAME= "messaging.google.voice.username";
 	public static final String GP_GOOGLE_VOICE_PWORD = "messaging.google.voice.password";
-	
+	public static final String GP_NUNTIUM_USERNAME = "messaging.nuntium.username";
+	public static final String GP_NUNTIUM_PASSWORD = "messaging.nuntium.password";
 }

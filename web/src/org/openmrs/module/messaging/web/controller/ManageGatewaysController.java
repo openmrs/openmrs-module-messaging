@@ -33,6 +33,10 @@ public class ManageGatewaysController {
 		request.setAttribute("twitterServiceStatus", twitterStatus);
 		List<ModemInfo> modems = MessagingService.getInstance().getMessagingGateway(SmsModemGateway.class).getActiveModems();
 		request.setAttribute("modems", modems);
+		
+		// Nuntium properties
+		request.setAttribute("nuntiumUsername", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_NUNTIUM_USERNAME));
+		request.setAttribute("nuntiumPassword", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_NUNTIUM_PASSWORD));
 	}
 	
 	@RequestMapping(value="/module/messaging/changeDefaultTwitterCreds", method=RequestMethod.POST)
@@ -70,5 +74,23 @@ public class ManageGatewaysController {
 			returnUrl = "admin/manageGateways.form";
 
 		return "redirect:" + returnUrl;
+	}
+	
+	@RequestMapping("/module/messaging/saveNuntiumSettings")
+	public ModelAndView saveNuntiumSettings(
+			@RequestParam("username") String username,
+			@RequestParam("password") String password,
+			@RequestParam(value="returnUrl", required=false) String returnUrl,
+			HttpServletRequest request) {
+		
+		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_NUNTIUM_USERNAME, username));
+		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_NUNTIUM_PASSWORD, password));
+		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Nuntium credentials saved");
+		
+		if (returnUrl == null)
+			returnUrl = "admin/manageGateways.form";
+		
+		return new ModelAndView(new RedirectView(returnUrl));
+		
 	}
 }
