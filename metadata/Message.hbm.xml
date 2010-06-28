@@ -2,20 +2,17 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class table="messaging_messages" name="@MODULE_PACKAGE@.schema.Message" abstract="true">
+    <class table="messaging_messages" name="@MODULE_PACKAGE@.schema.Message">
        
         <id name="messageId" type="int" column="message_id"  unsaved-value="0">
 				<generator class="native" />
 		</id>
 		
-		<discriminator column="message_type" type="string"/>
-		
         <property name="content" type="java.lang.String"/>
         <property name="origin" type="java.lang.String"/>
         <property name="destination" type="java.lang.String"/>
         
-        <property name="dateSent" type="java.util.Date" column="date_sent" length="19"/>
-        <property name="dateReceived" type="java.util.Date" column="date_received" length="19"/>
+        <property name="date" type="java.util.Date" column="date_sent" length="19"/>
         <property name="status" type="int"/>
         
         <many-to-one name="sender" class="org.openmrs.Person">
@@ -26,11 +23,6 @@
 			<column name="recipient"></column>
 		</many-to-one>
 		
-		<property name="gatewayId" type="java.lang.String" column="gateway_id"/>
-		
-		<subclass name="@MODULE_PACKAGE@.sms.SmsMessage" discriminator-value="SMS"></subclass>
-    	<subclass name="@MODULE_PACKAGE@.twitter.TwitterMessage" discriminator-value="twittermess"></subclass>	
+		<property name="protocolId" type="java.lang.String" column="protocol_id"/>	
     </class>
-    
-    
 </hibernate-mapping>

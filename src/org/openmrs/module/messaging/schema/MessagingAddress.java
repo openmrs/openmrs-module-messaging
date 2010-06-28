@@ -21,7 +21,7 @@ import org.openmrs.PersonAttribute;
  * @see PersonAttribute
  * @see AddressFactory
  */
-public abstract class MessagingAddress extends BaseOpenmrsData {
+public class MessagingAddress extends BaseOpenmrsData {
 
 	public MessagingAddress(){}
 	
@@ -55,8 +55,16 @@ public abstract class MessagingAddress extends BaseOpenmrsData {
 	 */
 	protected Person person;
 	
+	/**
+	 * Boolean that represents whether or not this is the preferred
+	 * method of contact for a patient
+	 */
 	protected Boolean preferred = false;
 	
+	/**
+	 * The protocol that is used to send messages to this address
+	 */
+	protected String protocolId;
 	
 	/**
 	 * @return the address
@@ -99,14 +107,6 @@ public abstract class MessagingAddress extends BaseOpenmrsData {
 	public void setPerson(Person person) {
 		this.person = person;
 	}
-
-	public Integer getMessagingAddressId() {
-		return messagingAddressId;
-	}
-
-	public void setMessagingAddressId(Integer id) {
-		this.messagingAddressId = id;
-	}
 	
 	public Integer getId() {
 		return messagingAddressId;
@@ -130,7 +130,21 @@ public abstract class MessagingAddress extends BaseOpenmrsData {
 		return preferred;
 	}
 	
-	public abstract String getName();
-	
-	public abstract boolean requiresPassword();
+	public boolean equals(MessagingAddress other){
+		return this.messagingAddressId == other.getId();
+	}
+
+	/**
+	 * @param protocolId the protocolId to set
+	 */
+	public void setProtocolId(String protocolId) {
+		this.protocolId = protocolId;
+	}
+
+	/**
+	 * @return the protocolId
+	 */
+	public String getProtocolId() {
+		return protocolId;
+	}
 }

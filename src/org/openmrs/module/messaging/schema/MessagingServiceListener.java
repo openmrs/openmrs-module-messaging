@@ -8,11 +8,11 @@ package org.openmrs.module.messaging.schema;
  * 
  * @param <M> The message type that this listener will receive notifications on
  */
-public interface MessagingServiceListener<M extends Message> {
+public interface MessagingServiceListener {
 	
 	/**
 	 * This method is called when a MessagingGateway receives a message
 	 * @param message The message that was received
 	 */
-	public void messageRecieved(M message);
+	public void messageRecieved(Message message);
 }

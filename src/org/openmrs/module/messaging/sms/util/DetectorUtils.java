@@ -56,7 +56,7 @@ public class DetectorUtils {
 		ModemInfo mi = new ModemInfo("13173635376",gateway.getGatewayId(),"","",gateway.getStatus().toString(),gateway.getGatewayId());
 		try{
 			String number = parseCNUM(gateway.sendCustomATCommand("AT+CNUM"));
-			if(number !=null && !number.equals("")){
+			if(number != null && !number.equals("")){
 				number = number.substring(0,number.lastIndexOf("\""));
 				number = number.substring(number.lastIndexOf("\""));
 				mi.setNumber(number);

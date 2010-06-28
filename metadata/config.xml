@@ -16,22 +16,22 @@
 	
 	
 	<dwr>
-		<allow>
+		<allow>	
+			<convert  match="org.openmrs.module.messaging.web.dwr.AddressListItem" converter="bean"/>
 			<create creator="new" javascript="DWRMessagingService">
-				<param name="class" value="org.openmrs.module.messaging.web.DWRMessagingService"/>
-				<include method="getCompatibleAddresses"/>
+				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRContactInfoService"/>
+				<include method="getAddressesForCurrentUser"/>
+				<include method="deleteAddress"/>
+				<include method="saveOrUpdateAddressForCurrentUser"/>
 				<include method="requiresPassword"/>
 			</create>
 		</allow>
 
 		<signatures>
-			<![CDATA[
-				import org.openmrs.module.messaging.web.DWRMessagingService;
-				DWRHtmlFormEntryService.getCompatibleAddresses(String fromAddress,String personId);
-				DWRHtmlFormEntryService.requiresPassword(String addressType);
-			]]>
+			<![CDATA[]]>
 		</signatures>
 	</dwr>
+	
 	
 	<!-- /Messaging Module Properties -->
 	
@@ -51,18 +51,6 @@
 		<property>@MODULE_ID@.twitter.default.password</property>
 		<defaultValue></defaultValue>
 		<description>The default sender's password for the Twitter messaging service</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.google.voice.username</property>
-		<defaultValue></defaultValue>
-		<description>A google voice username for the server to use</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.google.voice.password</property>
-		<defaultValue></defaultValue>
-		<description>The matching password for the google voice username</description>
 	</globalProperty>
 	
 	<!-- Extension points -->

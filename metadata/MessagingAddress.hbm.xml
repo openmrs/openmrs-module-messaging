@@ -8,14 +8,13 @@
 			unsaved-value="0">
 				<generator class="native" />
 		</id>
-		
-		<discriminator column="address_type" type="string"/>
         
         <property name="address" type="java.lang.String"/>
         <property name="password" type="java.lang.String" />
         <many-to-one name="person" class="org.openmrs.Person" lazy="false"/>
         
         <property name="preferred" type="boolean" not-null="true" length="1"/>
+        <property name="protocolId" type="java.lang.String" column="protocol_id"/>	
                         
         <many-to-one name="creator" class="org.openmrs.User" not-null="true" column="creator"/>
 		<property name="dateCreated" type="java.util.Date"  column="date_created" not-null="true" length="19" />
@@ -27,8 +26,5 @@
 		<property name="dateVoided" type="java.util.Date" column="date_voided" length="19"/>
 		<property name="voided" type="boolean" not-null="true" length="1"/>
 		<property name="voidReason" type="java.lang.String" column="void_reason" length="255" />
-        
-        <subclass  name="@MODULE_PACKAGE@.sms.PhoneNumber" discriminator-value="phonenumber"/>
-   		<subclass name="@MODULE_PACKAGE@.twitter.TwitterAddress" discriminator-value="twitter"/>
     </class>
 </hibernate-mapping>

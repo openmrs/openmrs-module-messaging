@@ -5,7 +5,6 @@ import java.util.List;
 import org.openmrs.Person;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingGateway;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface MessagingAddressService extends OpenmrsService{
@@ -33,46 +32,12 @@ public interface MessagingAddressService extends OpenmrsService{
 	public MessagingAddress getMessagingAddress(String address);
 
 	/**
-	 * Returns all messages that the supplied gateway is able to send. This is
-	 * determined using the parameter M in MessagingGateway<M extends Message, A
-	 * extends MessagingAddress>
-	 * 
-	 * @param gateway
-	 *            The gateway
-	 * @return the messages for that gateway
-	 */
-	@Transactional(readOnly=true)
-	public List<MessagingAddress> getMessagingAddressesForGateway(MessagingGateway gateway);
-
-	/**
 	 * @param person
 	 *            The person
 	 * @return all messaging addresses for that person
 	 */
 	@Transactional(readOnly=true)
 	public List<MessagingAddress> getMessagingAddressesForPerson(Person person);
-
-	/**
-	 * @param person
-	 *            The person
-	 * @param gateway
-	 *            The gateway
-	 * @return all addresses for the person that the gateway can send to/from
-	 */
-	@Transactional(readOnly=true)
-	public List<MessagingAddress> getMessagingAddressesForPersonAndGateway(Person person, MessagingGateway gateway);
-	
-	@Transactional(readOnly=true)
-	public <A extends MessagingAddress> List<A> getMessagingAddressesForClass(Class<? extends A> addressClass);
-	
-	@Transactional(readOnly=true)
-	public List<MessagingAddress> getMessagingAddressesForTypeName(String typeName);
-	
-	@Transactional(readOnly=true)
-	public <A extends MessagingAddress> List<A> getMessagingAddressesForPersonAndClass(Person person, Class<? extends A> addressClass);
-	
-	@Transactional(readOnly=true)
-	public List<MessagingAddress> getMessagingAddressesForPersonAndTypeName(Person person, String typeName);
 
 	/**
 	 * This method performs a like query on MessagingAddress.address with
@@ -84,17 +49,6 @@ public interface MessagingAddressService extends OpenmrsService{
 	@Transactional(readOnly=true)
 	public List<MessagingAddress> findMessagingAddresses(String search);
 
-	/**
-	 * This method performs a like query on MessagingAddress.address with
-	 * wildcards before and after the search string
-	 * 
-	 * @param search The string to search for
-	 * @param gateway The gateway that handles the desired message type 
-	 * @return
-	 */
-	@Transactional(readOnly=true)
-	public List<MessagingAddress> findMessagingAddresses(String search, MessagingGateway gateway);
-	
 	/**
 	 * Gets the preferred messaging address of the person
 	 * @param person

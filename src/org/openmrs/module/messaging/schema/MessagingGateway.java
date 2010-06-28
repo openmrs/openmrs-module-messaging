@@ -1,25 +1,20 @@
 package org.openmrs.module.messaging.schema;
 
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
-import org.openmrs.module.messaging.util.ReflectionUtils;
+import org.openmrs.module.messaging.MessagingAddressService;
 
 /**
  * An abstract superclass that represents a service that can send and receive
- * messages. All methods in this class should be thread safe since it will be
- * used as a singleton, and could potentially be accessed by multiple threads.
- * 
- * @param <M>
- *            The type of messages that this service handles
+ * messages.
  */
-public abstract class MessagingGateway<M extends Message, A extends MessagingAddress> {
+public abstract class MessagingGateway {
 
-	protected CopyOnWriteArrayList<MessagingServiceListener> listeners;
-
+	protected MessagingAddressService addressService;
+	
+	protected MessageService messageService;
+	
 	/**
 	 * Sends a message to the address specified with the content specified.
 	 * Depending on the implementation, this method may throw exceptions due to
@@ -28,20 +23,26 @@ public abstract class MessagingGateway<M extends Message, A extends MessagingAdd
 	 * @param address
 	 * @param content
 	 */
-	public abstract void sendMessage(String address, String content) throws Exception;
+	public abstract void sendMessage(String address, String content, Protocol p)
+			throws Exception;
 
 	/**
 	 * Sends a message to the destination specified in
-	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateReceived} , and
-	 * {@link Message#origin} fields of {@link Message} if it is applicable to
-	 * that message. Implementations of this method need to be thread safe, and
-	 * should honor the {@link Message#priority} value if applicable to this
-	 * messaging service.
+	 * {@link Message#destination}. <br>
+	 * </br> Messages passed in to this address should have their destination,
+	 * origin, and This method should handle setting the {@link Message#origin}
+	 * of the {@link Message} if it is applicable to that message (like if the
+	 * message is being sent from the gateway default address). <br>
+	 * </br>Both person fields ({@link Message#sender} and
+	 * {@link Message#recipient}) of the message will be filled in by the 'save'
+	 * method, but will be left alone if they are already set. <br>
+	 * </br>Implementations of this method need to be thread safe, and should
+	 * honor the {@link Message#priority} value if applicable to this messaging
+	 * service.
 	 * 
 	 * @param message
 	 */
-	public abstract void sendMessage(M message) throws Exception;
+	public abstract void sendMessage(Message message) throws Exception;
 
 	/**
 	 * Sends a message to the destination specified in
@@ -59,7 +60,7 @@ public abstract class MessagingGateway<M extends Message, A extends MessagingAdd
 	 * @param delegate
 	 *            The delegate that will receive callbacks. This can be null.
 	 */
-	public abstract void sendMessage(M message, MessageDelegate delegate);
+	public abstract void sendMessage(Message message, MessageDelegate delegate);
 
 	/**
 	 * Sends a collection of messages to the destinations specified in
@@ -77,51 +78,16 @@ public abstract class MessagingGateway<M extends Message, A extends MessagingAdd
 	 * @param delegate
 	 *            The delegate that will receive callbacks. This can be null.
 	 */
-	public abstract void sendMessages(List<M> messages, MessageDelegate delegate);
-
-	/**
-	 * Sends one message to multiple addresses. Implementations of this method
-	 * need to handle the setting of {@link Message#dateSent},
-	 * {@link Message#dateReceived}, {@link Message#destination}, and
-	 * {@link Message#origin} when/if the messages are saved to the database.
-	 * Additionally, this method should be thread safe, tolerate a null
-	 * {@link MessageDelegate}, and honor the {@link Message#priority} if
-	 * applicable to this messaging service.
-	 * 
-	 * @param m
-	 * @param addresses
-	 */
-	public abstract void sendMessageToAddresses(M m, List<String> addresses,
-			MessageDelegate delegate);
-
-	/**
-	 * Registers a listener to receive notifications when a message is received
-	 * by this service. This method is thread safe.
-	 * 
-	 * @param listener
-	 *            The listener to register
-	 */
-	public void registerListener(MessagingServiceListener listener) {
-		listeners.addIfAbsent(listener);
-	}
-
-	/**
-	 * Unregisters a listener that was registered. This method is thread safe.
-	 * 
-	 * @param listener
-	 *            The listener to unregister
-	 */
-	public void unregisterListener(MessagingServiceListener listener) {
-		listeners.remove(listener);
-	}
+	public abstract void sendMessages(List<Message> messages, MessageDelegate delegate);
 
 	/**
 	 * Should return the default sender address of this messaging service. This
-	 * would most likely be the address from which OpenMRS sends messages.
+	 * would most likely be the address from which OpenMRS "sends" messages like
+	 * an official twitter feed.
 	 * 
 	 * @return the default address
 	 */
-	public abstract A getDefaultSenderAddress();
+	public abstract MessagingAddress getDefaultSenderAddress();
 
 	/**
 	 * Should return true if the messaging service has the ability to send
@@ -139,65 +105,65 @@ public abstract class MessagingGateway<M extends Message, A extends MessagingAdd
 	 */
 	public abstract boolean canReceive();
 
+	/**
+	 * Should perform all necessary operations to start the Gateway so that
+	 * either canSend or canReceive returns true (ideally both)
+	 */
 	public abstract void startup();
 
-	public abstract void shutdown();
-	
 	/**
-	 * Should return the display name of this messaging gateway.
-	 * This name will be used in UI and should be internationalized
+	 * Should perform all necessary operations to stop the Gateway. Both
+	 * canRecieve and canSend should return false.
+	 */
+	public abstract void shutdown();
+
+	/**
+	 * Should return the display name of this messaging gateway. This name will
+	 * be used in UI and should be internationalized
+	 * 
 	 * @return
 	 */
 	public abstract String getName();
-	
+
 	/**
 	 * Should return a short description of the messaging gateway
+	 * 
 	 * @return
 	 */
 	public abstract String getDescription();
-	
+
 	/**
-	 * Should return a unique id for this messaging gateway
+	 * Should return a unique id for this messaging gateway. Should also be
+	 * as short as possible, no spaces
+	 * 
 	 * @return
 	 */
 	public abstract String getGatewayId();
-	
-	public abstract AddressFactory<A> getAddressFactory();
-	
-	public abstract MessageFactory<M,A> getMessageFactory();
 
 	/**
-	 * Returns the class of the messages that this service handles
-	 * 
-	 * @return
+	 * Should return a boolean representing whether or not this gateway can send
+	 * messages from user addresses for the given protocol. Would return false if all messages
+	 * must be routed from a single origin, the default sender address. An example of this would be 
+	 * an SMS modem connected to the OpenMRS server - it's impossible to send SMS's from user's
+	 * phone numbers 
 	 */
-	public Class<?> getMessageClass() {
-		List<Class<?>> genericParameters = ReflectionUtils.getTypeArguments(
-				MessagingGateway.class, getClass());
-		for (Class<?> c : genericParameters) {
-			if (ReflectionUtils.classExtendsClass(c, Message.class)) {
-				return c;
-			}
-		}
-		return null;
-	}
+	public abstract boolean canSendFromUserAddresses(Protocol protocol);
 
 	/**
-	 * Returns the class of the messaging addresses that this service handles
+	 * Should return true if this gateway supports sending messages using the
+	 * provided protocol. With this method it is possible for gateways to
+	 * support more than one protocol at once.
 	 * 
+	 * @param protocol
 	 * @return
 	 */
-	public Class<?> getMessagingAddressClass() {
-		List<Class<?>> genericParameters = ReflectionUtils.getTypeArguments(
-				MessagingGateway.class, getClass());
-		for (Class<?> c : genericParameters) {
-			if (ReflectionUtils.classExtendsClass(c, MessagingAddress.class)) {
-				return c;
-			}
-		}
-		return null;
-	}
+	public abstract boolean supportsProtocol(Protocol protocol);
 	
-	public abstract boolean canSendFromUserAddresses();
+	protected void saveMessage(Message m){
+		// - set message sender if not set and can find an address for it
+		// - set message recipient if not set and can find an address for it
+		// - set date sent
+		// - save
+	}
 
 }

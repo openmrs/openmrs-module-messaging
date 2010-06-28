@@ -8,7 +8,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingGateway;
+import org.openmrs.module.messaging.schema.Protocol;
 
 public class MessagingAddressServiceImpl extends BaseOpenmrsService implements MessagingAddressService {
 
@@ -26,28 +26,20 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 		return dao.getMessagingAddress(addressId);
 	}
 	
-	public List<MessagingAddress> getMessagingAddressesForGateway(MessagingGateway gateway) {
-		return dao.getMessagingAddressesForGateway(gateway);
-	}
-	
 	public List<MessagingAddress> getMessagingAddressesForPerson(Person person) {
-		return dao.getMessagingAddressesForPerson(person);
-	}
-
-	public List<MessagingAddress> getMessagingAddressesForPersonAndGateway(Person person, MessagingGateway gateway) {
-		return dao.getMessagingAddressesForPersonAndGateway(person, gateway);
+		return dao.findMessagingAddresses(null,null,person);
 	}
 
 	public List<MessagingAddress> findMessagingAddresses(String search) {
-		return dao.findMessagingAddresses(search);
+		return dao.findMessagingAddresses(search,null,null);
 	}
-
-	public List<MessagingAddress> findMessagingAddresses(String search, MessagingGateway gateway) {
-		return dao.findMessagingAddresses(search,gateway);
-	}
-
+	
 	public MessagingAddress getPreferredMessagingAddressForPerson(Person person) {
 		return dao.getPreferredMessagingAddressForPerson(person);
+	}
+	
+	public List<MessagingAddress> findMessagingAddresses(String address, Protocol protocol, Person person){
+		return dao.findMessagingAddresses(address,protocol,person);
 	}
 	
 	public void saveMessagingAddress(MessagingAddress address) throws APIException {
@@ -73,21 +65,4 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 	public MessagingAddress getMessagingAddress(String address) {
 		return dao.getMessagingAddress(address);
 	}
-	
-	public <A extends MessagingAddress> List<A> getMessagingAddressesForClass(Class<? extends A> addressClass){
-		return dao.getMessagingAddressesForClass(addressClass);
-	}
-	
-	public List<MessagingAddress> getMessagingAddressesForTypeName(String typeName){
-		return dao.getMessagingAddressesForTypeName(typeName);
-	}
-	
-	public <A extends MessagingAddress> List<A> getMessagingAddressesForPersonAndClass(Person person, Class<? extends A> addressClass){
-		return dao.getMessagingAddressesForPersonAndClass(person, addressClass);
-	}
-	
-	public List<MessagingAddress> getMessagingAddressesForPersonAndTypeName(Person person, String typeName){
-		return dao.getMessagingAddressesForPersonAndTypeName(person, typeName);
-	}
-
 }

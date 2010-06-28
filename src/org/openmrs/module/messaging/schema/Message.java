@@ -2,6 +2,8 @@ package org.openmrs.module.messaging.schema;
 
 import java.util.Date;
 
+import javax.xml.soap.MessageFactory;
+
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.Person;
 
@@ -15,7 +17,7 @@ import org.openmrs.Person;
  * 
  * @see MessageFactory
  */
-public abstract class Message extends BaseOpenmrsObject{
+public class Message extends BaseOpenmrsObject{
 
 	protected Message(){}
 	
@@ -41,22 +43,17 @@ public abstract class Message extends BaseOpenmrsObject{
 	/**
 	 * The person that sent this message, can be null
 	 */
-	private Person sender;
+	protected Person sender;
 	
 	/**
 	 * The person who received this message, can be null
 	 */
-	private Person recipient;
+	protected Person recipient;
 
 	/**
 	 * The date that the message was sent
 	 */
-	protected Date dateSent;
-
-	/**
-	 * The date that this message was received
-	 */
-	protected Date dateReceived;
+	protected Date date;
 
 	/**
 	 * The priority of this message. Priorities are currently
@@ -70,9 +67,9 @@ public abstract class Message extends BaseOpenmrsObject{
 	protected Integer status;
 	
 	/**
-	 * The string Id of the gateway that sent this message
+	 * The string Id of the protocol with which to interpret this message
 	 */
-	private String gatewayId;
+	private String protocolId;
 
 	/**
 	 * Creates a message with only a destination and content. The date sent,
@@ -101,11 +98,10 @@ public abstract class Message extends BaseOpenmrsObject{
 	 * @param content
 	 *            the content of the message
 	 */
-	public Message(String destination, String origin, String content, int priority) {
+	public Message(String destination, String origin, String content) {
 		this.destination = destination;
 		this.origin =origin;
 		this.content = content;
-		this.priority = priority;
 	}
 
 	/**
@@ -153,29 +149,15 @@ public abstract class Message extends BaseOpenmrsObject{
 	/**
 	 * @return
 	 */
-	public Date getDateSent() {
-		return dateSent;
+	public Date getDate() {
+		return date;
 	}
 
 	/**
 	 * @param dateSent
 	 */
-	public void setDateSent(Date dateSent) {
-		this.dateSent = dateSent;
-	}
-
-	/**
-	 * @return
-	 */
-	public Date getDateReceived() {
-		return dateReceived;
-	}
-
-	/**
-	 * @param dateReceived
-	 */
-	public void setDateReceived(Date dateRecieved) {
-		this.dateReceived = dateRecieved;
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 	/**
@@ -262,12 +244,18 @@ public abstract class Message extends BaseOpenmrsObject{
 		}
 	}
 
-	public void setGatewayId(String gatewayId) {
-		this.gatewayId = gatewayId;
+	/**
+	 * @param protocolId the protocolId to set
+	 */
+	public void setProtocolId(String protocolId) {
+		this.protocolId = protocolId;
 	}
 
-	public String getGatewayId() {
-		return gatewayId;
+	/**
+	 * @return the protocolId
+	 */
+	public String getProtocolId() {
+		return protocolId;
 	}
 
 }

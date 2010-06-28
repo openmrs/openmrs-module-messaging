@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.api.APIException;
@@ -13,8 +14,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.Protocol;
 
 public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 
@@ -33,82 +33,33 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	public void setSessionFactory(SessionFactory sessionFactory) { 
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	public List<MessagingAddress> getAllMessagingAddresses() {
 		return sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class).list();
 	}
 	
 	public MessagingAddress getMessagingAddress(Integer addressId) {
-		return (MessagingAddress) sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class).add(Restrictions.eq("addressId", addressId)).uniqueResult();
-	}
-	
-	public List<MessagingAddress> getMessagingAddressesForGateway(MessagingGateway gateway) {
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessagingAddressClass());
-		return c.list();
-	}
-	
-	public <A extends MessagingAddress> List<A> getMessagingAddressesForClass(Class<? extends A> addressClass) {
-		Criteria c= sessionFactory.getCurrentSession().createCriteria(addressClass);
-		return c.list();
-	}
-	
-	public List<MessagingAddress> getMessagingAddressesForTypeName(String typeName) {
-		Class aClass = MessagingService.getInstance().getAddressClassForAddressTypeName(typeName);
-		if(aClass != null){
-			return getMessagingAddressesForClass(aClass);
-		}
-		return null;
-		
-	}
-	
-	public List<MessagingAddress> getMessagingAddressesForPerson(Person person) {
-		Criteria c= sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
-		c.add(Restrictions.eq("person", person));
-		return c.list();
-	}
-	
-	public List<MessagingAddress> getMessagingAddressesForPersonAndGateway(Person person, MessagingGateway gateway) {
-		Criteria c= sessionFactory.getCurrentSession().createCriteria(gateway.getMessagingAddressClass());
-		if(person !=null){
-			c.add(Restrictions.eq("person", person));
-		}
-		return c.list();
-	}
-	
-	public <A extends MessagingAddress> List<A> getMessagingAddressesForPersonAndClass(Person person, Class<? extends A> addressClass) {
-		Criteria c= sessionFactory.getCurrentSession().createCriteria(addressClass);
-		if(person !=null){
-			c.add(Restrictions.eq("person", person));
-		}
-		return c.list();
-	}
-	
-	public List<MessagingAddress> getMessagingAddressesForPersonAndTypeName(Person person, String typeName) {
-		Class aClass = MessagingService.getInstance().getAddressClassForAddressTypeName(typeName);
-		if(aClass != null){
-			return getMessagingAddressesForPersonAndClass(person,aClass);
-		}
-		return null;
-		
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<MessagingAddress> findMessagingAddresses(String search) {
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
-		c.add(Restrictions.like("address","%"+search+"%"));
-		return c.list();
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<MessagingAddress> findMessagingAddresses(String search, MessagingGateway gateway) {
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessagingAddressClass());
-		c.add(Restrictions.like("address","%"+search+"%"));
-		return c.list();
+		return (MessagingAddress) sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class).add(Restrictions.eq("messagingAddressId", addressId)).uniqueResult();
 	}
 
 	public MessagingAddress getPreferredMessagingAddressForPerson(Person person) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+
+	public List<MessagingAddress> findMessagingAddresses(String address, Protocol protocol, Person person) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
+		if(address != null && !address.equals("")){
+			c.add(Restrictions.like("address", address,MatchMode.ANYWHERE));
+		}
+		if(protocol != null){
+			c.add(Restrictions.eq("protocolId", protocol.getProtocolId()));
+		}
+		if(person != null){
+			c.add(Restrictions.eq("person", person));
+		}
+		return c.list();
 	}
 
 	//CRUD
@@ -126,13 +77,15 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 
 	public void saveMessagingAddress(MessagingAddress address) throws DAOException{
 		if(address.getPreferred()){
-			List<MessagingAddress> addresses = getMessagingAddressesForPerson(address.getPerson());
+			List<MessagingAddress> addresses = findMessagingAddresses(null,null,address.getPerson());
 			for(MessagingAddress ad:addresses){
-				ad.setPreferred(false);
-				saveMessagingAddress(ad);
+				if(!ad.equals(address)){
+					ad.setPreferred(false);
+					saveMessagingAddress(ad);
+				}
 			}
 		}
-		sessionFactory.getCurrentSession().save(address);
+		sessionFactory.getCurrentSession().saveOrUpdate(address);
 	}
 
 	public void unvoidMessagingAddress(MessagingAddress address) throws DAOException{

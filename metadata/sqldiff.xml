@@ -22,11 +22,11 @@
 		<sql>
 			CREATE TABLE IF NOT EXISTS messaging_addresses (
 				`address_id` int(11) NOT NULL auto_increment,
-				`address_type` varchar(40) NOT NULL,
 				`address` varchar(255) NOT NULL default '',
 				`password` varchar(255) default '',
 				`person` int(11) NOT NULL default 0,
 				`preferred` tinyint(1) NOT NULL default '0',
+				`protocol_id` varchar(255) NOT NULL default '',
 				`creator` int(11) NOT NULL default '0',
 				`date_created` datetime NOT NULL default '0000-00-00 00:00:00',
 				`changed_by` int(11) default NULL,
@@ -40,15 +40,13 @@
 
 			CREATE TABLE IF NOT EXISTS messaging_messages (
 				`message_id` int(11) NOT NULL auto_increment,
-				`message_type` varchar(40) NOT NULL,
 				`content` varchar(600) default '',
-				`gateway_id` varchar(255) NOT NULL default '',
+				`protocol_id` varchar(255) NOT NULL default '',
 				`origin` varchar(255) default '',
 				`sender` int(11) default NULL,
 				`recipient` int(11) default NULL,
 				`destination` varchar(255) default '',
-				`date_sent` datetime default NULL,
-				`date_received` datetime default NULL,
+				`date` datetime default NULL,
 				`status` int(11) default '0',
 				PRIMARY KEY (`message_id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;

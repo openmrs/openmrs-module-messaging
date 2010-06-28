@@ -10,9 +10,12 @@ import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.AddressFormattingException;
+import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessageDelegate;
+import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingGateway;
+import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.Protocol;
 import org.openmrs.module.messaging.sms.util.AllModemsDetector;
 import org.openmrs.module.messaging.sms.util.DetectorUtils;
 import org.smslib.AGateway;
@@ -21,10 +24,12 @@ import org.smslib.Service;
 import org.smslib.Service.ServiceStatus;
 import org.smslib.modem.SerialModemGateway;
 
-public class SmsModemGateway extends MessagingGateway<SmsMessage, PhoneNumber> {
+public class SmsModemGateway extends MessagingGateway {
 
-	public SmsModemGateway(){}
-	
+	public SmsModemGateway(MessagingService service){
+		//super(service);
+	}
+
 	private final Log log = LogFactory.getLog(getClass());
 	
 	protected boolean isStarted = false;
@@ -32,21 +37,7 @@ public class SmsModemGateway extends MessagingGateway<SmsMessage, PhoneNumber> {
  	protected Service service;
  	
  	protected List<ModemInfo> modems;
- 	 	
-	protected static PhoneNumberFactory phoneNumberFactory = new PhoneNumberFactory();
-	
-	protected static SmsMessageFactory smsMessageFactory = new SmsMessageFactory();
-	
-	@Override
-	public PhoneNumberFactory getAddressFactory() {
-		return phoneNumberFactory;
-	}
-	
-	@Override
-	public SmsMessageFactory getMessageFactory() {
-		return smsMessageFactory;
-	}
-	
+ 	
 	public List<ModemInfo> getActiveModems(){
 		return modems;
 	}
@@ -62,17 +53,11 @@ public class SmsModemGateway extends MessagingGateway<SmsMessage, PhoneNumber> {
 	}
 	
 	@Override
-	public PhoneNumber getDefaultSenderAddress() {
-		return new PhoneNumber("+13173635376",null);
+	public MessagingAddress getDefaultSenderAddress() {
+		return new MessagingAddress("+13173635376",null);
 	}
 	
-	@Override
-	public void sendMessage(String address, String content) throws Exception{
-		service.sendMessage(new OutboundMessage(address,content));
-	}
-	
-	@Override
-	public void sendMessage(SmsMessage message) throws Exception{
+	public void sendMessage(Message message) throws Exception{
 		//set the origin of the message
 		message.setOrigin(getDefaultSenderAddress().getAddress());
 		//set the recipient
@@ -84,26 +69,9 @@ public class SmsModemGateway extends MessagingGateway<SmsMessage, PhoneNumber> {
 		if(message.getSender() == null && Context.getAuthenticatedUser()!=null){
 			message.setSender(Context.getAuthenticatedUser().getPerson());
 		}
-		message.setDateSent(new Date());
-		message.setDateReceived(new Date());
-		message.setGatewayId(getGatewayId());
+		message.setDate(new Date());
 		service.sendMessage(new OutboundMessage(message.getDestination(),message.getContent()));
 		Context.getService(MessageService.class).saveMessage(message);
-	}
-	
-	@Override
-	public void sendMessage(SmsMessage message, MessageDelegate delegate) {
-		
-	}
-	
-	@Override
-	public void sendMessageToAddresses(SmsMessage m, List<String> addresses, MessageDelegate delegate) {
-		
-	}
-	
-	@Override
-	public void sendMessages(List<SmsMessage> messages, MessageDelegate delegate) {
-		
 	}
 	
 	@Override
@@ -153,8 +121,28 @@ public class SmsModemGateway extends MessagingGateway<SmsMessage, PhoneNumber> {
 	}
 
 	@Override
-	public boolean canSendFromUserAddresses() {
+	public boolean canSendFromUserAddresses(Protocol protocol) {
 		return false;
 	}
-	
+
+	@Override
+	public void sendMessage(String address, String content, Protocol p) throws Exception {
+		
+	}
+
+	@Override
+	public void sendMessage(Message message, MessageDelegate delegate) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendMessages(List<Message> messages, MessageDelegate delegate) {
+		
+	}
+
+	@Override
+	public boolean supportsProtocol(Protocol protocol) {
+		return false;
+	}
 }
