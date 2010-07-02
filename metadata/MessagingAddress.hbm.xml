@@ -4,16 +4,17 @@
 <hibernate-mapping>
     <class table="messaging_addresses" name="@MODULE_PACKAGE@.schema.MessagingAddress" abstract="true">
     
-        <id name="messagingAddressId" type="int" column="address_id" 
-			unsaved-value="0">
+        <id name="messagingAddressId" type="int" column="address_id"  unsaved-value="0">
 				<generator class="native" />
 		</id>
+        <property name="uuid" type="string" length="38" not-null="true" />
         
         <property name="address" type="java.lang.String"/>
         <property name="password" type="java.lang.String" />
         <many-to-one name="person" class="org.openmrs.Person" lazy="false"/>
         
         <property name="preferred" type="boolean" not-null="true" length="1"/>
+        <property name="findable" type="boolean" not-null="true" length="1"/>
         <property name="protocolId" type="java.lang.String" column="protocol_id"/>	
                         
         <many-to-one name="creator" class="org.openmrs.User" not-null="true" column="creator"/>

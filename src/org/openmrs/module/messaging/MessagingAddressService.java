@@ -90,4 +90,7 @@ public interface MessagingAddressService extends OpenmrsService{
 	@Transactional
 	public void unretireMessagingAddress(MessagingAddress address);
 	
+	@Transactional(readOnly=true)
+	public List<MessagingAddress> getPublicAddressesForPerson(Person p);
+	
 }

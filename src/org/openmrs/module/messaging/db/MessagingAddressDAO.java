@@ -53,4 +53,6 @@ public interface MessagingAddressDAO {
 	public MessagingAddress getMessagingAddress(String address);
 
 	public List<MessagingAddress> findMessagingAddresses(String address, Protocol protocol, Person person);
+
+	public List<MessagingAddress> getPublicAddressesForPerson(Person p);
 }

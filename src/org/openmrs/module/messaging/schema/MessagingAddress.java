@@ -38,7 +38,7 @@ public class MessagingAddress extends BaseOpenmrsData {
 		this.person = person;
 	}
 
-	protected Integer messagingAddressId;
+	private Integer messagingAddressId;
 
 	/**
 	 * The plain text address
@@ -66,6 +66,12 @@ public class MessagingAddress extends BaseOpenmrsData {
 	 */
 	protected String protocolId;
 	
+	/**
+	 * Represents whether or not this message can be found
+	 * in the OpenMRS address directory (i.e. other users can
+	 * find this address and send messages to it)
+	 */
+	private boolean findable;
 	/**
 	 * @return the address
 	 */
@@ -109,11 +115,11 @@ public class MessagingAddress extends BaseOpenmrsData {
 	}
 	
 	public Integer getId() {
-		return messagingAddressId;
+		return getMessagingAddressId();
 	}
 
 	public void setId(Integer id) {
-		this.messagingAddressId = id;
+		this.setMessagingAddressId(id);
 	}
 
 	/**
@@ -131,7 +137,7 @@ public class MessagingAddress extends BaseOpenmrsData {
 	}
 	
 	public boolean equals(MessagingAddress other){
-		return this.messagingAddressId == other.getId();
+		return this.getMessagingAddressId() == other.getId();
 	}
 
 	/**
@@ -146,5 +152,33 @@ public class MessagingAddress extends BaseOpenmrsData {
 	 */
 	public String getProtocolId() {
 		return protocolId;
+	}
+
+	/**
+	 * @param messagingAddressId the messagingAddressId to set
+	 */
+	public void setMessagingAddressId(Integer messagingAddressId) {
+		this.messagingAddressId = messagingAddressId;
+	}
+
+	/**
+	 * @return the messagingAddressId
+	 */
+	public Integer getMessagingAddressId() {
+		return messagingAddressId;
+	}
+
+	/**
+	 * @param findable the findable to set
+	 */
+	public void setFindable(boolean findable) {
+		this.findable = findable;
+	}
+
+	/**
+	 * @return the findable
+	 */
+	public boolean isFindable() {
+		return findable;
 	}
 }

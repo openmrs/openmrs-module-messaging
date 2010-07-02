@@ -109,4 +109,11 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		return (MessagingAddress) c.uniqueResult();
 	}
 
+	public List<MessagingAddress> getPublicAddressesForPerson(Person p) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
+		c.add(Restrictions.eq("person", p));
+		c.add(Restrictions.eq("findable",true));
+		return c.list();
+	}
+
 }
