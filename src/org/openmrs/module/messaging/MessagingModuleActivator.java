@@ -15,29 +15,23 @@ package org.openmrs.module.messaging;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.Activator;
+import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.messaging.schema.MessagingService;
 
 /**
  * This class contains the logic that is run every time this module
  * is either started or shutdown
  */
-public class MessagingModuleActivator implements Activator {
+public class MessagingModuleActivator extends BaseModuleActivator {
 
 	private Log log = LogFactory.getLog(this.getClass());
 
-	/**
-	 * @see org.openmrs.module.Activator#startup()
-	 */
-	public void startup() {
+	public void started() {
 		log.info("Starting Messaging Module");
-		MessagingService.getInstance().initGateways();
+		MessagingService.getInstance();
 	}
-	
-	/**
-	 *  @see org.openmrs.module.Activator#shutdown()
-	 */
-	public void shutdown() {
+
+	public void stopped() {
 		log.info("Shutting down Messaging Module");
 	}
 }
