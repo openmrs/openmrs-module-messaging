@@ -6,11 +6,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingGateway;
 import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.Protocol;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -19,17 +16,11 @@ public class ManageAddressesController {
 
 	@RequestMapping("/module/messaging/admin/manageAddresses")
 	public void populateModel(HttpServletRequest request){
-		if(Context.getAuthenticatedUser()!=null){
-			List<MessagingAddress> addresses = Context.getService(MessagingAddressService.class)
-												.getMessagingAddressesForPerson(Context.getAuthenticatedUser().getPerson());
-			request.setAttribute("addresses", addresses);
-			Set<MessagingGateway> gateways =  MessagingService.getInstance().getAllMessagingGateways();
-			List<String> gatewayTitles = new ArrayList<String>();
-			for(MessagingGateway gateway: gateways){
-				gatewayTitles.add(gateway.getName());
+			Set<Protocol> protocols=  MessagingService.getProtocols();
+			List<String> protocolTitles = new ArrayList<String>();
+			for(Protocol p: protocols){
+				protocolTitles.add(p.getProtocolId());
 			}
-			request.setAttribute("addressTypes", MessagingService.getInstance().getAddressTypes());
-		}
-	
+			request.setAttribute("protocols", protocolTitles);
 	}
 }
