@@ -1,11 +1,11 @@
 package org.openmrs.module.messaging.twitter;
 
 import org.openmrs.Person;
-import org.openmrs.module.messaging.schema.AddressFormattingException;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessageFormattingException;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
+import org.openmrs.module.messaging.schema.exception.MessageFormattingException;
 
 import winterwell.jtwitter.Twitter;
 
@@ -16,6 +16,9 @@ import winterwell.jtwitter.Twitter;
  */
 public class TwitterProtocol extends Protocol{
 
+	public static final String PROTOCOL_NAME = "Twitter";
+	public static final String PROTOCOL_ID = "twitter";
+	
 	private Twitter twitter;
 	
 	public TwitterProtocol(){
@@ -24,12 +27,12 @@ public class TwitterProtocol extends Protocol{
 	
 	@Override
 	public String getProtocolId() {
-		return "twitter";
+		return PROTOCOL_ID;
 	}
 	
 	@Override
 	public String getProtocolName() {
-		return "Twitter";
+		return PROTOCOL_NAME;
 	}
 	
 	/**
@@ -63,7 +66,9 @@ public class TwitterProtocol extends Protocol{
 		}else if(address.length() < 1){
 			throw new AddressFormattingException("Username is blank");
 		}else{
-			return new MessagingAddress(address,person);
+			MessagingAddress ma = new MessagingAddress(address,person);
+			ma.setProtocolId(PROTOCOL_ID);
+			return ma;
 		}
 	}
 
@@ -139,6 +144,11 @@ public class TwitterProtocol extends Protocol{
 		}
 		
 		return new Message(null,null,messageContent);
+	}
+
+	@Override
+	public boolean requiresPassword() {
+		return true;
 	}
 
 }

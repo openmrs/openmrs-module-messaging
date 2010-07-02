@@ -3,11 +3,11 @@ package org.openmrs.module.messaging.sms;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingConstants;
-import org.openmrs.module.messaging.schema.AddressFormattingException;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessageFormattingException;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
+import org.openmrs.module.messaging.schema.exception.MessageFormattingException;
 
 /**
  * A protocol for sending SMS messages
@@ -16,6 +16,7 @@ import org.openmrs.module.messaging.schema.Protocol;
  */
 public class SmsProtocol extends Protocol{
 
+	public static String PROTOCOL_ID = "sms";
 	/**
 	 * SmsAlphabet contains data about the 
 	 * 3 different possible alphabets that can
@@ -51,7 +52,7 @@ public class SmsProtocol extends Protocol{
 	
 	@Override
 	public String getProtocolId() {
-		return "sms";
+		return PROTOCOL_ID;
 	}
 	
 	@Override
@@ -79,7 +80,9 @@ public class SmsProtocol extends Protocol{
 			throw new AddressFormattingException("The phone number you entered was not valid. Either enter a number prefixed with a + "
 											   + "and your country code or enter a locally formatted number.");
 		}
-		return new MessagingAddress(getProperlyFormattedPhoneNumber(address), person);
+		MessagingAddress result = new MessagingAddress(getProperlyFormattedPhoneNumber(address), person);
+		result.setProtocolId(this.PROTOCOL_ID);
+		return result;
 	}
 	
 	/**
@@ -180,6 +183,11 @@ public class SmsProtocol extends Protocol{
 		}else{// concatenated SMS
 			return content.length() <= alphabet.getMaxConcatenatedLength() * maxNumberOfSms;
 		}
+	}
+
+	@Override
+	public boolean requiresPassword() {
+		return false;
 	}
 
 }
