@@ -113,5 +113,11 @@ public interface MessageService extends OpenmrsService{
 	 */
 	@Transactional
 	public void deleteMessage(Message message) throws APIException;
+	
+	@Transactional(readOnly=true)
+	public List<Message> getOutboxMessages();
+	
+	@Transactional(readOnly=true)
+	public List<Message> getOutboxMessagesByProtocol(Protocol p);
 
 }

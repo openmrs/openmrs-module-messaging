@@ -75,4 +75,12 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 	public List<Message> getMessagesForPersonAndProtocol(Person person, Protocol protocol) {
 		return dao.findMessagesWithPeople(protocol, person, person, null, null);
 	}
+
+	public List<Message> getOutboxMessages() {
+		return dao.getOutboxMessages();
+	}
+
+	public List<Message> getOutboxMessagesByProtocol(Protocol p) {
+		return dao.getOutboxMessagesByProtocol(p);
+	}
 }

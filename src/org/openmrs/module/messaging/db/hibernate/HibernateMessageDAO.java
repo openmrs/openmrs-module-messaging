@@ -10,6 +10,7 @@ import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
+import org.openmrs.module.messaging.schema.MessageStatus;
 import org.openmrs.module.messaging.schema.Protocol;
 
 public class HibernateMessageDAO implements MessageDAO {
@@ -85,6 +86,19 @@ public class HibernateMessageDAO implements MessageDAO {
 
 	public void saveMessage(Message message) {
 		sessionFactory.getCurrentSession().saveOrUpdate(message);
+	}
+
+	public List<Message> getOutboxMessages() {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
+		c.add(Restrictions.eq("status", MessageStatus.OUTBOX));
+		return c.list();
+	}
+
+	public List<Message> getOutboxMessagesByProtocol(Protocol p) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
+		c.add(Restrictions.eq("status", MessageStatus.OUTBOX));
+		c.add(Restrictions.eq("protocolId", p.getProtocolId()));
+		return c.list();
 	}
 	
 }

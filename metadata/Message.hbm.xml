@@ -8,12 +8,17 @@
 				<generator class="native" />
 		</id>
 		
+		<property name="uuid" type="string" length="38" not-null="true" />
+		
         <property name="content" type="java.lang.String"/>
         <property name="origin" type="java.lang.String"/>
         <property name="destination" type="java.lang.String"/>
-        
-        <property name="date" type="java.util.Date" column="date_sent" length="19"/>
-        <property name="status" type="int"/>
+        <property name="date" type="java.util.Date" length="19"/>
+        <property name="status">
+      		<type name="org.hibernate.type.EnumType">
+        		<param name="enumClass">@MODULE_PACKAGE@.schema.MessageStatus</param>
+     		</type>
+   		</property>
         
         <many-to-one name="sender" class="org.openmrs.Person">
 			<column name="sender"></column>

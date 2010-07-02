@@ -45,4 +45,8 @@ public interface MessageDAO {
 	 * @see MessageService#deleteMessage(Message)
 	 */
 	public void deleteMessage(Message message) throws APIException;
+
+	public List<Message> getOutboxMessages();
+
+	public List<Message> getOutboxMessagesByProtocol(Protocol p);
 }

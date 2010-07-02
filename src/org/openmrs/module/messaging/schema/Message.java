@@ -56,15 +56,9 @@ public class Message extends BaseOpenmrsObject{
 	protected Date date;
 
 	/**
-	 * The priority of this message. Priorities are currently
-	 * not persisted in the database
-	 */
-	protected Integer priority;
-
-	/**
 	 * The status of this message
 	 */
-	protected Integer status;
+	protected MessageStatus status;
 	
 	/**
 	 * The string Id of the protocol with which to interpret this message
@@ -163,28 +157,14 @@ public class Message extends BaseOpenmrsObject{
 	/**
 	 * @return
 	 */
-	public Integer getPriority() {
-		return priority;
-	}
-
-	/**
-	 * @param priority
-	 */
-	public void setPriority(Integer priority) {
-		this.priority = priority;
-	}
-
-	/**
-	 * @return
-	 */
-	public Integer getStatus() {
+	public MessageStatus getStatus() {
 		return status;
 	}
 
 	/**
 	 * @param status
 	 */
-	public void setStatus(Integer status) {
+	public void setStatus(MessageStatus status) {
 		this.status = status;
 	}
 	
@@ -256,6 +236,10 @@ public class Message extends BaseOpenmrsObject{
 	 */
 	public String getProtocolId() {
 		return protocolId;
+	}
+	
+	public Protocol getProtocol(){
+		return MessagingService.getProtocolById(protocolId);
 	}
 
 }
