@@ -17,19 +17,15 @@
 	
 	<dwr>
 		<allow>	
-			<convert  match="org.openmrs.module.messaging.web.dwr.AddressListItem" converter="bean"/>
-			<create creator="new" javascript="DWRMessagingService">
-				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRContactInfoService"/>
-				<include method="getAddressesForCurrentUser"/>
+			<convert  match="org.openmrs.module.messaging.schema.MessagingAddress" converter="bean"/>
+			<create creator="new" javascript="DWRMessagingAddressService">
+				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingAddressService"/>
+				<include method="getAllAddressesForCurrentUser"/>
 				<include method="deleteAddress"/>
 				<include method="saveOrUpdateAddressForCurrentUser"/>
 				<include method="requiresPassword"/>
 			</create>
 		</allow>
-
-		<signatures>
-			<![CDATA[]]>
-		</signatures>
 	</dwr>
 	
 	
