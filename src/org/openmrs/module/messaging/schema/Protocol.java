@@ -1,6 +1,8 @@
 package org.openmrs.module.messaging.schema;
 
 import org.openmrs.Person;
+import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
+import org.openmrs.module.messaging.schema.exception.MessageFormattingException;
 
 public abstract class Protocol {
 
@@ -58,5 +60,7 @@ public abstract class Protocol {
 	 * @return
 	 */
 	public abstract boolean addressIsValid(String address);
+	
+	public abstract boolean requiresPassword();
 
 }

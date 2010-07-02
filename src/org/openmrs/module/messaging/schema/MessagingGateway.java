@@ -1,7 +1,6 @@
 package org.openmrs.module.messaging.schema;
 
-import java.util.List;
-
+import org.openmrs.Person;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
 
@@ -15,71 +14,10 @@ public abstract class MessagingGateway {
 	
 	protected MessageService messageService;
 	
-	/**
-	 * Sends a message to the address specified with the content specified.
-	 * Depending on the implementation, this method may throw exceptions due to
-	 * improperly formatted addresses or messages.
-	 * 
-	 * @param address
-	 * @param content
-	 */
-	public abstract void sendMessage(String address, String content, Protocol p)
-			throws Exception;
+	public abstract void sendMessage(Message message);
 
-	/**
-	 * Sends a message to the destination specified in
-	 * {@link Message#destination}. <br>
-	 * </br> Messages passed in to this address should have their destination,
-	 * origin, and This method should handle setting the {@link Message#origin}
-	 * of the {@link Message} if it is applicable to that message (like if the
-	 * message is being sent from the gateway default address). <br>
-	 * </br>Both person fields ({@link Message#sender} and
-	 * {@link Message#recipient}) of the message will be filled in by the 'save'
-	 * method, but will be left alone if they are already set. <br>
-	 * </br>Implementations of this method need to be thread safe, and should
-	 * honor the {@link Message#priority} value if applicable to this messaging
-	 * service.
-	 * 
-	 * @param message
-	 */
-	public abstract void sendMessage(Message message) throws Exception;
-
-	/**
-	 * Sends a message to the destination specified in
-	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateReceived} , and
-	 * {@link Message#origin} fields of {@link Message} if it is applicable to
-	 * that message. The delegate provided will receive the callbacks specified
-	 * in the {@link MessageDelegate} interface. Implementations of this method
-	 * need to be thread safe, allow a null {@link MessageDelegate}, and honor
-	 * the {@link Message#priority} value if applicable to this messaging
-	 * service
-	 * 
-	 * @param message
-	 *            The message to be sent
-	 * @param delegate
-	 *            The delegate that will receive callbacks. This can be null.
-	 */
-	public abstract void sendMessage(Message message, MessageDelegate delegate);
-
-	/**
-	 * Sends a collection of messages to the destinations specified in
-	 * {@link Message#destination}. This method should handle the setting of the
-	 * {@link Message#dateSent}, {@link Message#dateReceived}, and
-	 * {@link Message#origin} fields of the {@link Message} if it is applicable
-	 * to that message. The delegate provided will receive the callbacks
-	 * specified in the {@link MessageDelegate} interface. Implementations of
-	 * this method need to be thread safe, allow a null {@link MessageDelegate},
-	 * and honor the {@link Message#priority} if applicable to this messaging
-	 * service.
-	 * 
-	 * @param messages
-	 *            The messages to be sent
-	 * @param delegate
-	 *            The delegate that will receive callbacks. This can be null.
-	 */
-	public abstract void sendMessages(List<Message> messages, MessageDelegate delegate);
-
+	public abstract boolean shouldSendMessage(Message m);
+	
 	/**
 	 * Should return the default sender address of this messaging service. This
 	 * would most likely be the address from which OpenMRS "sends" messages like
@@ -91,7 +29,7 @@ public abstract class MessagingGateway {
 
 	/**
 	 * Should return true if the messaging service has the ability to send
-	 * messages currently and return false otherwise.
+	 * messages
 	 * 
 	 * @return
 	 */
@@ -99,11 +37,13 @@ public abstract class MessagingGateway {
 
 	/**
 	 * Should return true if the messaging service has the ability to receive
-	 * messages currently and return false otherwise.
+	 * messages
 	 * 
 	 * @return
 	 */
 	public abstract boolean canReceive();
+	
+	public abstract boolean isActive();
 
 	/**
 	 * Should perform all necessary operations to start the Gateway so that
@@ -133,14 +73,6 @@ public abstract class MessagingGateway {
 	public abstract String getDescription();
 
 	/**
-	 * Should return a unique id for this messaging gateway. Should also be
-	 * as short as possible, no spaces
-	 * 
-	 * @return
-	 */
-	public abstract String getGatewayId();
-
-	/**
 	 * Should return a boolean representing whether or not this gateway can send
 	 * messages from user addresses for the given protocol. Would return false if all messages
 	 * must be routed from a single origin, the default sender address. An example of this would be 
@@ -157,13 +89,18 @@ public abstract class MessagingGateway {
 	 * @param protocol
 	 * @return
 	 */
-	public abstract boolean supportsProtocol(Protocol protocol);
+	public abstract boolean supportsProtocol(Protocol p);
 	
-	protected void saveMessage(Message m){
-		// - set message sender if not set and can find an address for it
-		// - set message recipient if not set and can find an address for it
-		// - set date sent
-		// - save
+	protected void receiveMessage(String toAddress, String fromAddress, String content, String protocolId){
+		Message m = new Message(toAddress,content);
+		m.setOrigin(fromAddress);
+		Person sender = addressService.getPersonForAddress(fromAddress);
+		Person recipient = addressService.getPersonForAddress(toAddress);
+		m.setSender(sender);
+		m.setRecipient(recipient);
+		m.setStatus(MessageStatus.RECEIVED);
+		m.setProtocolId(protocolId);
+		messageService.saveMessage(m);
 	}
 
 }

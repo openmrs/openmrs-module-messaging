@@ -6,6 +6,10 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.messaging.MessageService;
+import org.openmrs.module.messaging.sms.SmsProtocol;
+import org.openmrs.module.messaging.twitter.TwitterProtocol;
 
 /**
  * The Messaging Service is the main class in the Messaging framework. It is
@@ -17,25 +21,33 @@ import org.openmrs.Person;
  */
 public class MessagingService {
 	
-	protected static Log log = LogFactory.getLog(MessagingService.class);
+	private static Log log = LogFactory.getLog(MessagingService.class);
 	
-	protected static MessagingService instance;
+	private static MessagingService instance;
 	
-	protected Set<MessagingGateway> gateways;
-		
-	public void initGateways() {
-		for(MessagingGateway ms:gateways){
-				ms.startup();
-		}
+	private MessageService messageService;
+	
+	private static Set<Protocol> protocols;
+	
+	private GatewayManager manager;
+	
+	static{
+		protocols = new HashSet<Protocol>();
+		protocols.add(new SmsProtocol());
+		protocols.add(new TwitterProtocol());
 	}
 	
-	public MessagingService(){}
+	public MessagingService(){
+		this.messageService = Context.getService(MessageService.class);
+		manager = new GatewayManager();
+		manager.start();
+	}
 	
 	/**
 	 * TEMPORARY METHOD
 	 * This method returns the singleton instance of MessagingService.
 	 * Once the module startup() method is changed to be after the spring
-	 * applicationcontext is already initialized, we will move back to spring
+	 * application context is already initialized, we will move back to spring
 	 * dependency injection and bean management
 	 * @return
 	 */
@@ -44,67 +56,56 @@ public class MessagingService {
 			return instance;
 		}else{
 			instance = new MessagingService();
-			instance.setup();
 			return instance;
 		}
 	}
-	public void sendMessage(String message, String address, Protocol p){}
 	
-	public void sendMessageToPreferredAddress(String message, Person person){}
-	
-	public void setup(){
-		gateways = new HashSet<MessagingGateway>();
-		//gateways.add(new TwitterGateway(this));
-	}
-
-	public void registerListenerForPerson(MessagingServiceListener listener, Person person) {}
-	
-	public void registerListenerForProtocol(MessagingServiceListener listener, Protocol protocol ) {}
-	
-	public void registerListenerForGateway(MessagingServiceListener listener, MessagingGateway gateway) {}
-
-	public void registerListener(MessagingServiceListener listener) {}
-
-	//> service getter methods
-
-	/**
-	 * @return All messaging gateways
-	 */
-	public Set<MessagingGateway> getAllMessagingGateways() {
-		return gateways;
+	public void sendMessage(String message, String address, Protocol p) throws Exception{
+		Message m = p.createMessage(message, address, null);
+		sendMessage(m);
 	}
 	
-	/**
-	 * @return All Messaging Gateways that can send messages
-	 */
-	public Set<MessagingGateway> getActiveMessagingGateways(){
-		Set<MessagingGateway> gateways = new HashSet<MessagingGateway>();
-		for(MessagingGateway msg: gateways){
-			if(msg.canSend()){
-				gateways.add(msg);
+	public void sendMessage(Message message){
+		message.setStatus(MessageStatus.OUTBOX);
+		messageService.saveMessage(message);
+	}
+	
+	public void sendMessages(Set<Message> messages){
+		for(Message m: messages){
+			sendMessage(m);
+		}
+	}
+	
+	public void sendMessageToPreferredAddress(String message, Person person){
+		
+
+	}
+	
+	public static Set<Protocol> getProtocols(){
+		return protocols;
+	}
+	
+	public static Protocol getProtocolById(String protocolId){
+		Protocol result = null;
+		for(Protocol p: protocols){
+			if(p.getProtocolId().equals(protocolId)){
+				result = p;
 			}
 		}
-		return gateways;
+		return result;
 	}
 	
-	public Set<MessagingGateway> getSupportingGateways(Protocol p){
-		Set<MessagingGateway> gateways = new HashSet<MessagingGateway>();
-		for(MessagingGateway msg: gateways){
-			if(msg.supportsProtocol(p)){
-				gateways.add(msg);
+	public Set<Protocol> getActiveProtocols(){
+		Set<Protocol> results = new HashSet<Protocol>();
+		for(Protocol p: protocols){
+			if(canSendToProtocol(p)){
+				results.add(p);
 			}
 		}
-		return gateways;
+		return results;
 	}
 	
-	public Set<MessagingGateway> getActiveSupportingGateways(Protocol p){
-		Set<MessagingGateway> gateways = new HashSet<MessagingGateway>();
-		for(MessagingGateway msg: gateways){
-			if(msg.supportsProtocol(p) && msg.canSend()){
-				gateways.add(msg);
-			}
-		}
-		return gateways;
+	public boolean canSendToProtocol(Protocol p){
+		return manager.getActiveSupportingGateways(p).size() > 0;
 	}
-	
 }
