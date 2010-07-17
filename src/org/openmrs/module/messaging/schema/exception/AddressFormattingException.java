@@ -6,24 +6,7 @@ package org.openmrs.module.messaging.schema.exception;
  */
 @SuppressWarnings("serial")
 public class AddressFormattingException extends Exception {
-
-	/**
-	 * This description will be displayed to the user when 
-	 * this exception is thrown 
-	 */
-	private String description;
-
-	public void setDescription(String description) {
-		this.description = description;
+	public AddressFormattingException(String message){
+		super(message);
 	}
-
-	public AddressFormattingException(String description) {
-		super();
-		this.description = description;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-	
 }
