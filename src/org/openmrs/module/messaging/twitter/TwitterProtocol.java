@@ -83,14 +83,14 @@ public class TwitterProtocol extends Protocol{
 		try{
 			MessagingAddress to = createAddress(toAddress,null);
 		}catch(AddressFormattingException e){
-			e.setDescription(e.getDescription().replace("Username", "To-address"));
-			throw e;
+			AddressFormattingException f = new AddressFormattingException(e.getMessage().replace("Username", "To-address"));
+			throw f;
 		}
 		try{
 			MessagingAddress from = createAddress(fromAddress,null);
 		}catch(AddressFormattingException e){
-			e.setDescription(e.getDescription().replace("Username", "From-address"));
-			throw e;
+			AddressFormattingException f = new AddressFormattingException(e.getMessage().replace("Username", "From-address"));
+			throw f;
 		}
 		
 		if(!messageContentIsValid(messageContent)){
