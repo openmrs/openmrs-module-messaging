@@ -13,7 +13,7 @@
 	</help>
 
 	<diff>
-		<version>1.6</version>
+		<version>1.8</version>
 		<author>Dieterich Lawson</author>
 		<date>March 14th 2010</date>
 		<description>
@@ -50,7 +50,8 @@
 				`sender` int(11) default NULL,
 				`recipient` int(11) default NULL,
 				`date` datetime default NULL,
-				`status` varchar(30) default NULL,
+				`send_attempts` int(3) default 0,
+				`status` int(4) default NULL,
 				PRIMARY KEY (`message_id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 				

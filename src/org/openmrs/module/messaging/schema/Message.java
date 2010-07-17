@@ -22,6 +22,14 @@ public class Message extends BaseOpenmrsObject{
 	protected Message(){}
 	
 	private Integer messageId;
+	
+	/**
+	 * The number of times that the system has tried to send the message.
+	 * Once this number reaches the max_retries global property value,
+	 * the message will be marked as 'failed' and the system will not continue
+	 * to attempt to send it
+	 */
+	private Integer sendAttempts = 0;
 
 	// content
 	/**
@@ -58,7 +66,7 @@ public class Message extends BaseOpenmrsObject{
 	/**
 	 * The status of this message
 	 */
-	protected MessageStatus status;
+	private Integer status;
 	
 	/**
 	 * The string Id of the protocol with which to interpret this message
@@ -157,15 +165,15 @@ public class Message extends BaseOpenmrsObject{
 	/**
 	 * @return
 	 */
-	public MessageStatus getStatus() {
-		return status;
+	public MessageStatus getMessageStatus() {
+		return MessageStatus.getStatusByNumber(this.getStatus());
 	}
 
 	/**
 	 * @param status
 	 */
-	public void setStatus(MessageStatus status) {
-		this.status = status;
+	public void setMessageStatus(MessageStatus status) {
+		this.setStatus(status.getNumber());
 	}
 	
 	public void setMessageId(Integer messageId) {
@@ -240,6 +248,34 @@ public class Message extends BaseOpenmrsObject{
 	
 	public Protocol getProtocol(){
 		return MessagingService.getProtocolById(protocolId);
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public Integer getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param sendAttempts the sendAttempts to set
+	 */
+	public void setSendAttempts(Integer sendAttempts) {
+		this.sendAttempts = sendAttempts;
+	}
+
+	/**
+	 * @return the sendAttempts
+	 */
+	public Integer getSendAttempts() {
+		return sendAttempts;
 	}
 
 }
