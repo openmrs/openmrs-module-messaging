@@ -79,6 +79,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 		MessagingAddress address = getFromAddresses().get(0);
 		try {
 			googleVoice = new Voice(address.getAddress(),address.getPassword());
+			googleVoice.PRINT_TO_CONSOLE = false;
 		} catch (IOException e) {
 			log.error("Error starting the Google Voice Gateway",e);
 		}
