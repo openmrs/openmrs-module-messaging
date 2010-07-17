@@ -1,5 +1,7 @@
 package org.openmrs.module.messaging.schema;
 
+import java.util.List;
+
 import org.openmrs.Person;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
@@ -14,18 +16,16 @@ public abstract class MessagingGateway {
 	
 	protected MessageService messageService;
 	
-	public abstract void sendMessage(Message message);
+	public abstract void sendMessage(Message message) throws Exception;
 
 	public abstract boolean shouldSendMessage(Message m);
 	
 	/**
-	 * Should return the default sender address of this messaging service. This
-	 * would most likely be the address from which OpenMRS "sends" messages like
-	 * an official twitter feed.
+	 * Should return the list of addresses that this gateway sends from.
 	 * 
-	 * @return the default address
+	 * @return the addresses
 	 */
-	public abstract MessagingAddress getDefaultSenderAddress();
+	public abstract List<MessagingAddress> getFromAddresses();
 
 	/**
 	 * Should return true if the messaging service has the ability to send
@@ -47,13 +47,12 @@ public abstract class MessagingGateway {
 
 	/**
 	 * Should perform all necessary operations to start the Gateway so that
-	 * either canSend or canReceive returns true (ideally both)
+	 * isActive returns true
 	 */
 	public abstract void startup();
 
 	/**
-	 * Should perform all necessary operations to stop the Gateway. Both
-	 * canRecieve and canSend should return false.
+	 * Should perform all necessary operations to stop the Gateway. isActive should return false
 	 */
 	public abstract void shutdown();
 
@@ -73,15 +72,6 @@ public abstract class MessagingGateway {
 	public abstract String getDescription();
 
 	/**
-	 * Should return a boolean representing whether or not this gateway can send
-	 * messages from user addresses for the given protocol. Would return false if all messages
-	 * must be routed from a single origin, the default sender address. An example of this would be 
-	 * an SMS modem connected to the OpenMRS server - it's impossible to send SMS's from user's
-	 * phone numbers 
-	 */
-	public abstract boolean canSendFromUserAddresses(Protocol protocol);
-
-	/**
 	 * Should return true if this gateway supports sending messages using the
 	 * provided protocol. With this method it is possible for gateways to
 	 * support more than one protocol at once.
@@ -98,7 +88,7 @@ public abstract class MessagingGateway {
 		Person recipient = addressService.getPersonForAddress(toAddress);
 		m.setSender(sender);
 		m.setRecipient(recipient);
-		m.setStatus(MessageStatus.RECEIVED);
+		m.setMessageStatus(MessageStatus.RECEIVED);
 		m.setProtocolId(protocolId);
 		messageService.saveMessage(m);
 	}
