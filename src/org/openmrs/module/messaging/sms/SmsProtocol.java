@@ -108,7 +108,8 @@ public class SmsProtocol extends Protocol{
 
 	/**
 	 * Creates an SMS message. Validates message content using the default
-	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS).
+	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). If null safe for 'fromAddress',
+	 * the only parameter that is allowed to be null
 	 * 
 	 * @see org.openmrs.module.messaging.schema.Protocol#createMessage(java.lang.String,
 	 *      java.lang.String, java.lang.String)
@@ -118,20 +119,23 @@ public class SmsProtocol extends Protocol{
 		try{
 			MessagingAddress to = createAddress(toAddress,null);
 		}catch(AddressFormattingException e){
-			e.setDescription(e.getDescription().replace("phone number", "\"to\" number"));
-			throw e;
+			AddressFormattingException f = new AddressFormattingException(e.getMessage().replace("phone number", "\"to\" number"));
+			throw f;
 		}
-		try{
-			MessagingAddress from = createAddress(fromAddress,null);
-		}catch(AddressFormattingException e){
-			e.setDescription(e.getDescription().replace("phone number", "\"from\" number"));
-			throw e;
+		if (fromAddress != null && !fromAddress.equals("")) {
+			try {
+				MessagingAddress from = createAddress(fromAddress, null);
+			} catch (AddressFormattingException e) {
+				AddressFormattingException f = new AddressFormattingException(e.getMessage().replace("phone number", "\"from\" number"));
+				throw f;
+			}
 		}
 		if(!messageContentIsValid(messageContent)){
 			throw new MessageFormattingException("SMS message is too long.");
 		}
-		//validation complete, create the message
-		return new Message(toAddress,fromAddress,messageContent);
+		Message result = new Message(toAddress,fromAddress,messageContent);
+		result.setProtocolId(this.PROTOCOL_ID);
+		return result; 
 	}
 	
 	@Override
@@ -139,8 +143,10 @@ public class SmsProtocol extends Protocol{
 		if(!messageContentIsValid(messageContent)){
 			throw new MessageFormattingException("SMS message is too long.");
 		}
+		Message result = new Message(null,null,messageContent);
+		result.setProtocolId(this.PROTOCOL_ID);
 		//validation complete, create the message
-		return new Message(null,null,messageContent);
+		return result;
 	}
 	
 	/**
@@ -152,7 +158,9 @@ public class SmsProtocol extends Protocol{
 			throw new MessageFormattingException("SMS message is too long.");
 		}
 		//validation complete, create the message
-		return new Message(toAddress.getAddress(),fromAddress.getAddress(),messageContent);
+		Message result =new Message(toAddress.getAddress(),fromAddress.getAddress(),messageContent);
+		result.setProtocolId(this.PROTOCOL_ID);
+		return result;
 	}
 	
 
