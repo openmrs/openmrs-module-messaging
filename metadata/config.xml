@@ -49,6 +49,24 @@
 		<description>The default sender's password for the Twitter messaging service</description>
 	</globalProperty>
 	
+	<globalProperty>
+		<property>@MODULE_ID@.googlevoice.password</property>
+		<defaultValue></defaultValue>
+		<description>The server's Google voice password</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.googlevoice.username</property>
+		<defaultValue></defaultValue>
+		<description>The server's Google voice username</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.max.retry</property>
+		<defaultValue>3</defaultValue>
+		<description>The number of times that the system should try to send a message once it fails.</description>
+	</globalProperty>
+	
 	<!-- Extension points -->
 	
 	<extension>
