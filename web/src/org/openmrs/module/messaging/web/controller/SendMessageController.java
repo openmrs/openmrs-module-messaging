@@ -1,6 +1,5 @@
 package org.openmrs.module.messaging.web.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,12 +10,11 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.AddressFormattingException;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessageFormattingException;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingGateway;
 import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
 import org.openmrs.propertyeditor.PersonEditor;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
@@ -27,116 +25,122 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-public class SendMessageController{
+public class SendMessageController {
 
 	protected static final Log log = LogFactory.getLog(SendMessageController.class);
-	
+
 	@InitBinder
 	public void initBinder(WebDataBinder wdb) {
 		wdb.registerCustomEditor(Person.class, new PersonEditor());
 	}
-	
+
 	/**
-	 * Sends a message to the specified address
-	 * fromAddress, sender, recipient, and gateway are all optional
-	 * parameters. However, if an address is specified that more than one
-	 * gateway can send to, and a gateway is not specified, then an error is thrown
+	 * Sends a message (content) to the address specified in toAddress. If
+	 * neither the toAddress nor the fromAddress are already in the OpenMRS
+	 * system with an attached protocol, then a protocol must be supplied. All
+	 * parameters besides content, and toAddress, are optional. It is
+	 * possible to have a message that has a sender that does not own the
+	 * 'fromAddress' - e.g. The user is sending from a default OpenMRS address
+	 * like a mobile phone hooked up to the OpenMRS server. In this case the
+	 * 'sender' and 'fromAddress' would not match up.
+	 * 
+	 * @param content
+	 *            The content of the message
 	 * @param toAddressString
+	 *            The address to send the message to
 	 * @param fromAddressString
+	 *            The address that the message originates from
 	 * @param sender
+	 *            The sender of the message
 	 * @param recipient
-	 * @param gatewayName
+	 *            The recipient of the message
+	 * @param protocolId
+	 *            The protocol of the message
+	 * @param fromCurrentUser
+	 *            Is true if the message is from the current user - fills in the
+	 *            "sender" field with the currently authenticated user
+	 * @param returnUrl
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/module/messaging/sendMessage", method = RequestMethod.POST)
+	@RequestMapping(value = "/module/messaging/admin/sendMessage", method=RequestMethod.POST)
 	protected String sendMessage(
 			@RequestParam("content") String content,
 			@RequestParam("toAddress") String toAddressString,
-			@RequestParam(value="fromAddress",required=false) String fromAddressString,
-			@RequestParam(value="fromCurrentUser",required=false) Boolean fromCurrentUser,
-			@RequestParam(value="sender",required=false) Person sender,
-			@RequestParam(value="recipient",required=false) Person recipient,
-			@RequestParam(value="gateway",required=false) String gatewayName,
-			@RequestParam(value="returnUrl", required=false) String returnUrl,
-			HttpServletRequest request){
-		
-		//get the http session
-		HttpSession httpSession = request.getSession();
-		
-		if (returnUrl == null || returnUrl.equals(""))
-			returnUrl = "sendMessage.form";
+			@RequestParam(value = "fromAddress", required = false) String fromAddressString,
+			@RequestParam(value = "sender", required = false) Person sender,
+			@RequestParam(value = "recipient", required = false) Person recipient,
+			@RequestParam(value = "protocol", required = false) String protocolId,
+			@RequestParam(value = "returnUrl", required = false) String returnUrl,
+			HttpServletRequest request) {
 
-		returnUrl= "redirect:" + returnUrl;
-		
-		MessagingGateway mg = null;
-		//if the service parameter is specified, then use that
-		if(gatewayName != null){
-			mg = MessagingService.getInstance().getMessagingGatewayForName(gatewayName);			
-		}else{
-			//otherwise, attempt to infer it from the supplied address
-			List<MessagingGateway> gateways = MessagingService.getInstance().getMessagingGatewaysForAddress(toAddressString);
-			if(gateways.size() == 1){
-				mg = gateways.get(0);
-			}else{
-				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "No service specified to send the message");
-				return returnUrl;
-			}
+		// get the http session
+		HttpSession httpSession = request.getSession();
+		//setup the returnURL
+		if (returnUrl == null || returnUrl.equals("")){ 
+			returnUrl = "/module/messaging/admin/sendMessage.form";
 		}
-		
-		MessagingAddress toAddress = null;
-		MessagingAddress fromAddress = null;
+		returnUrl = "redirect:" + returnUrl;
+		MessagingAddressService addressService = Context.getService(MessagingAddressService.class);
 		Message message = null;
-		
-		//check the validity of the address
-		try{
-			toAddress = mg.getAddressFactory().createAddress(toAddressString,null);
-			if(fromAddressString!=null && !fromAddressString.equals("")){
-				fromAddress = mg.getAddressFactory().createAddress(fromAddressString,null);
-			}else if(fromCurrentUser){
-					List<MessagingAddress> fromAddresses = Context.getService(MessagingAddressService.class).getMessagingAddressesForPersonAndGateway(Context.getAuthenticatedUser().getPerson(), mg);
-					if(fromAddresses.size() == 1){
-						fromAddress = fromAddresses.get(0);
-					}else{
-						httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Current user has more than one address for that gateway. Please specify an address");
-						return returnUrl;
-					}
-			}
-			message = mg.getMessageFactory().createMessage(content, fromAddress, toAddress);
-			message.setSender(sender);
-			message.setRecipient(recipient);
-		}catch(MessageFormattingException e){
-			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
-			return returnUrl;
-		}catch(AddressFormattingException e){
-			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
+		//first we see if the addresses are already in the system
+		MessagingAddress toAddress = addressService.getMessagingAddress(toAddressString);
+		MessagingAddress fromAddress = addressService.getMessagingAddress(fromAddressString);
+		Protocol protocol = null;
+		//attempt to pull the protocol from the messaging addresses
+		if(toAddress != null) protocol = toAddress.getProtocol();
+		if(fromAddress != null) protocol = fromAddress.getProtocol();
+		//if pulling the protocol from the addresses didn't work, 
+		// then the protocol should have been passed in as a string
+		if(protocol == null) protocol = MessagingService.getProtocolById(protocolId);
+		//check to make sure that the supplied protocol exists...
+		if(protocol == null){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Non-existent protocol specified");
 			return returnUrl;
 		}
-		
-		if(!mg.canSend()){
-			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The "+mg.getName()+" service is not currently running");
-			return returnUrl;
-		}else{
+		//if the toAddress didn't exist in the system, create it
+		if(toAddress == null){
 			try{
-				mg.sendMessage(message);
-			}catch(Exception e){
-				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Message could not be sent : " + e.getMessage());
-				log.error("Could not send a message",e);
+				toAddress = protocol.createAddress(toAddressString, null);
+			}catch (AddressFormattingException e) {
+				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR,"To-address \""+toAddressString+"\" was badly formatted.");
 				return returnUrl;
 			}
-			httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Message sent successfully!");
+		}
+		// if the fromAddress didn't exist in the system, create it
+		if(fromAddress == null && fromAddressString!=null && !fromAddressString.equals("")){
+			try{
+				fromAddress = protocol.createAddress(fromAddressString, null);
+			}catch (AddressFormattingException e) {
+				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR,"From-address \""+toAddressString+"\" was badly formatted.");
+				return returnUrl;
+			}
+		}
+		//create the message itself
+		try{
+			message = protocol.createMessage(content, toAddressString,fromAddressString);
+		}catch(Exception e){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR,e.getMessage());
 			return returnUrl;
 		}
-	
+		//set the people involved
+		message.setSender(sender);
+		message.setRecipient(recipient);
+		//if it is possible to send the message, do so
+		if (!MessagingService.getInstance().canSendToProtocol(protocol)) {
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "There is not currently a gateway running that can send that type of message.");
+			return returnUrl;
+		} else {
+			MessagingService.getInstance().sendMessage(message);
+			httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Message placed in outbox.");
+			return returnUrl;
+		}
 	}
-	@RequestMapping(value="/module/messaging/admin/sendaMessage")
-    public void populateModel(HttpServletRequest request){
-    	ArrayList<String> services = new ArrayList<String>();
-    	for(MessagingGateway mg: MessagingService.getInstance().getAllMessagingGateways()){
-    		if(mg.canSend()){
-    			services.add(mg.getName());
-    		}
-    	}
-    	request.setAttribute("services", services);
-    }
+
+	@RequestMapping(value = "/module/messaging/admin/sendMessage")
+	public void populateModel(HttpServletRequest request) {
+		request.setAttribute("user",Context.getAuthenticatedUser().getPerson());
+		List<MessagingAddress> fromAddresses = Context.getService(MessagingAddressService.class).getMessagingAddressesForPerson(Context.getAuthenticatedUser().getPerson());
+		request.setAttribute("fromAddresses", fromAddresses);
+	}
 }

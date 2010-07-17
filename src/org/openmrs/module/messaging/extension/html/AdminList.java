@@ -18,7 +18,7 @@ public class AdminList extends AdministrationSectionExt{
 	@Override
 	public Map<String, String> getLinks() {
 		HashMap<String, String> links = new HashMap<String,String>();
-		links.put("module/messaging/admin/sendaMessage.form", "Send a Message");
+		links.put("module/messaging/admin/sendMessage.form", "Send a Message");
 		links.put("module/messaging/admin/manageAddresses.form", "Manage Your Messaging Addresses");
 		links.put("module/messaging/admin/manageGateways.form", "Manage Messaging Gateways");
 		return links;
