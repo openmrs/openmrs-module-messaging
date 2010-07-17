@@ -5,9 +5,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.AddressFormattingException;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
 import org.openmrs.propertyeditor.PersonEditor;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
@@ -39,17 +39,17 @@ public class AddAddressController {
 		if(person == null){
 			person = Context.getAuthenticatedUser().getPerson();
 		}
-		try {
-			a = MessagingService.getInstance().getAddressFactoryForAddressTypeName(addressType).createAddress(address, person);
-			if(password != null){
-				a.setPassword(password);
-			}
-			if(preferred != null){
-				a.setPreferred(preferred);
-			}
-		} catch (AddressFormattingException e) {
-			request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
-		}
+//		try {
+//			a = MessagingService.getInstance().getAddressFactoryForAddressTypeName(addressType).createAddress(address, person);
+//			if(password != null){
+//				a.setPassword(password);
+//			}
+//			if(preferred != null){
+//				a.setPreferred(preferred);
+//			}
+//		} catch (AddressFormattingException e) {
+//			request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR, e.getDescription());
+//		}
 		if (a != null) {
 			Context.getService(MessagingAddressService.class).saveMessagingAddress(a);
 		}

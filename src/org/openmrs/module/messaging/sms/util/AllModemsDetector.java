@@ -17,6 +17,7 @@ import org.smslib.modem.SerialModemGateway;
  * A commandline utility for detecting connected AT devices.
  * The detection workflow was taken from ComTest in SMSLib.
  * @author Alex Anderson alex@frontlinesms.com
+ * @author Dieterich Lawson (adapter)
  */
 public class AllModemsDetector{
 	public static void main(String[] args) {
