@@ -181,4 +181,8 @@ public class MessagingAddress extends BaseOpenmrsData {
 	public boolean isFindable() {
 		return findable;
 	}
+	
+	public Protocol getProtocol(){
+		return MessagingService.getProtocolById(protocolId);
+	}
 }
