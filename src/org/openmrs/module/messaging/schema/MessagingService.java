@@ -66,7 +66,7 @@ public class MessagingService {
 	}
 	
 	public void sendMessage(Message message){
-		message.setStatus(MessageStatus.OUTBOX);
+		message.setMessageStatus(MessageStatus.OUTBOX);
 		messageService.saveMessage(message);
 	}
 	

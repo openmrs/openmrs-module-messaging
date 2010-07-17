@@ -96,7 +96,7 @@ public class HibernateMessageDAO implements MessageDAO {
 
 	public List<Message> getOutboxMessagesByProtocol(Protocol p) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.eq("status", MessageStatus.OUTBOX));
+		c.add(Restrictions.or(Restrictions.eq("status", MessageStatus.OUTBOX.getNumber()),Restrictions.eq("status", MessageStatus.RETRYING.getNumber())));
 		c.add(Restrictions.eq("protocolId", p.getProtocolId()));
 		return c.list();
 	}
