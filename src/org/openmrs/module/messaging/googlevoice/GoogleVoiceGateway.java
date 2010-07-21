@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingConstants;
+import org.openmrs.module.messaging.schema.CredentialSet;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingGateway;
@@ -15,11 +16,15 @@ import org.openmrs.module.messaging.schema.Protocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
 
 import com.techventus.server.voice.Voice;
+import com.techventus.server.voice.datatypes.Phone;
 
 public class GoogleVoiceGateway extends MessagingGateway {
 
 	private Voice googleVoice;
 	private static Log log = LogFactory.getLog(GoogleVoiceGateway.class);
+	private List<MessagingAddress> phoneNumbers;
+	private CredentialSet currentCredentials;
+	
 	
 	@Override
 	public boolean canReceive() {
@@ -33,13 +38,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 
 	@Override
 	public List<MessagingAddress> getFromAddresses() {
-		Context.openSession();
-		String username = Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME);
-		String password= Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD);
-		Context.closeSession();
-		List<MessagingAddress> addresses = new ArrayList<MessagingAddress>();
-		addresses.add(new MessagingAddress(username, password,null));
-		return addresses;
+		return phoneNumbers;
 	}
 
 	@Override
@@ -58,12 +57,8 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	}
 
 	@Override
-	public void sendMessage(Message message) {
-		try {
-			googleVoice.sendSMS(message.getDestination(),message.getContent());
-		} catch (IOException e) {
-			log.error("Error sending SMS via Google Voice Gateway", e);
-		}
+	public void sendMessage(Message message) throws Exception{
+		googleVoice.sendSMS(message.getDestination(),message.getContent());
 	}
 
 	@Override
@@ -74,17 +69,51 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	@Override
 	public void shutdown() {}
 
+
+	
 	@Override
 	public void startup() {
-		MessagingAddress address = getFromAddresses().get(0);
+		//update the stored credentials
+		currentCredentials = getCredentials();
 		try {
-			googleVoice = new Voice(address.getAddress(),address.getPassword());
+			googleVoice = new Voice(currentCredentials.getUsername(),currentCredentials.getPassword());
+			//turn off GV logging
 			googleVoice.PRINT_TO_CONSOLE = false;
-		} catch (IOException e) {
+			//create the list of phone #s
+			phoneNumbers = new ArrayList<MessagingAddress>();
+			Phone[] phones = googleVoice.getSettings(false).getPhones();
+			for(Phone p: phones){
+				phoneNumbers.add(new MessagingAddress(p.getPhoneNumber(),null));
+			}
+		} catch (Exception e) {
 			log.error("Error starting the Google Voice Gateway",e);
 		}
 	}
 
+	/**
+	 * Returns a pair of strings. The first string is the username
+	 * and the second string is the password
+	 * @return
+	 */
+	private CredentialSet getCredentials(){
+		Context.openSession();
+		String username = Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME);
+		String password= Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD);
+		Context.closeSession();
+		CredentialSet credentials = new CredentialSet(username,password);
+		return credentials;
+	}
+	
+	public void updateCredentials(String username, String password){
+		this.currentCredentials = new CredentialSet(username, password);
+		try {
+			this.googleVoice = new Voice(username,password);
+		} catch (IOException e) {
+			log.error("Error updating Google Voice login info",e);
+		}
+	}
+
+	
 	@Override
 	public boolean supportsProtocol(Protocol p) {
 		return p.getProtocolId() == SmsProtocol.PROTOCOL_ID;
