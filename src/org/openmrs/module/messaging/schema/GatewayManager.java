@@ -15,7 +15,7 @@ import org.openmrs.module.messaging.twitter.TwitterGateway;
 public class GatewayManager extends Thread {
 
 	/** All the messaging gateways that this manager manages*/
-	private List<MessagingGateway> gateways;
+	private static List<MessagingGateway> gateways;
 	
 	private MessageService messageService;
 	
@@ -173,7 +173,7 @@ public class GatewayManager extends Thread {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <G extends MessagingGateway> G getGatewayByClass(Class<? extends G> gatewayClass){
+	public static <G extends MessagingGateway> G getGatewayByClass(Class<? extends G> gatewayClass){
 		for(MessagingGateway g: gateways){
 			if(g.getClass().equals(gatewayClass)){
 				return (G) g;
