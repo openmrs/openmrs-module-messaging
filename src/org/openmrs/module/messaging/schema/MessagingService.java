@@ -67,7 +67,9 @@ public class MessagingService {
 	
 	public void sendMessage(Message message){
 		message.setMessageStatus(MessageStatus.OUTBOX);
+		Context.openSession();
 		messageService.saveMessage(message);
+		Context.closeSession();
 	}
 	
 	public void sendMessages(Set<Message> messages){
