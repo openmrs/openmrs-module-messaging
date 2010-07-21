@@ -96,8 +96,9 @@ public class TwitterProtocol extends Protocol{
 		if(!messageContentIsValid(messageContent)){
 			throw new MessageFormattingException("Tweet is longer than 140 characters");
 		}
-		
-		return new Message(toAddress,fromAddress,messageContent);
+		Message result = new Message(toAddress,fromAddress,messageContent);
+		result.setProtocolId(this.PROTOCOL_ID);
+		return result;
 	}
 
 
