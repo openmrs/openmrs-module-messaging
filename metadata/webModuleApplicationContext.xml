@@ -18,8 +18,8 @@
 		<property name="mappings">
 			<props>
 				<prop key="module/messaging/admin/sendMessage.form">sendMessageController</prop>
-				<!--<prop key="**/messagesPatientDashboardTab.portlet">messagesPatientDashboardTab</prop>
-				<prop key="module/messaging/admin/manageGateways.form">manageGatewaysController</prop> -->
+				<prop key="**/messagesPatientDashboardTab.portlet">messagesPatientDashboardTab</prop>
+				<prop key="module/messaging/admin/manageGateways.form">manageGatewaysController</prop>
 				<prop key="module/messaging/admin/manageAddresses.form">manageAddressesController</prop>
 			</props>
 		</property>
@@ -30,6 +30,7 @@
 	
 	<!-- 
 	<bean id="manageGatewaysController" class="org.openmrs.module.messaging.web.controller.ManageGatewaysController" />
+	URL mappings -->
 	<bean id="messagesPatientDashboardTab" class="org.openmrs.module.messaging.web.controller.MessagingDashboardTabController" />
-URL mappings -->
+
 </beans>

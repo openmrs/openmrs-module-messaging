@@ -18,12 +18,23 @@
 	<dwr>
 		<allow>	
 			<convert  match="org.openmrs.module.messaging.schema.MessagingAddress" converter="bean"/>
+			<convert converter="bean" match="org.openmrs.module.messaging.web.model.MessageBean"/>
+						
 			<create creator="new" javascript="DWRMessagingAddressService">
 				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingAddressService"/>
 				<include method="getAllAddressesForCurrentUser"/>
+				<include method="getAllAddressesForPersonId"/>
+				<include method="getPublicAddressesForPersonId"/>
+				<include method="getPublicAddressesForCurrentUser"/>
 				<include method="deleteAddress"/>
+				<include method="saveOrUpdateAddress"/>
 				<include method="saveOrUpdateAddressForCurrentUser"/>
-				<include method="requiresPassword"/>
+			</create>
+			
+			<create creator="new" javascript="DWRModuleMessageService">
+				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRModuleMessageService"/>
+				<include method="getMessagesForPatient"/>
+				<include method="sendMessage"/>
 			</create>
 		</allow>
 	</dwr>
