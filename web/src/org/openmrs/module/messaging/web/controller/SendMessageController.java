@@ -13,6 +13,7 @@ import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingServiceImpl;
 import org.openmrs.module.messaging.schema.Protocol;
 import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
 import org.openmrs.propertyeditor.PersonEditor;
@@ -73,7 +74,7 @@ public class SendMessageController {
 			@RequestParam(value = "protocol", required = false) String protocolId,
 			@RequestParam(value = "returnUrl", required = false) String returnUrl,
 			HttpServletRequest request) {
-
+		MessagingService messagingService = Context.getService(MessagingService.class);
 		// get the http session
 		HttpSession httpSession = request.getSession();
 		//setup the returnURL
@@ -88,11 +89,11 @@ public class SendMessageController {
 		MessagingAddress fromAddress = addressService.getMessagingAddress(fromAddressString);
 		Protocol protocol = null;
 		//attempt to pull the protocol from the messaging addresses
-		if(toAddress != null) protocol = toAddress.getProtocol();
-		if(fromAddress != null) protocol = fromAddress.getProtocol();
+		if(toAddress != null) protocol = messagingService.getProtocolById(toAddress.getProtocolId());
+		if(fromAddress != null) protocol = messagingService.getProtocolById(fromAddress.getProtocolId());
 		//if pulling the protocol from the addresses didn't work, 
 		// then the protocol should have been passed in as a string
-		if(protocol == null) protocol = MessagingService.getProtocolById(protocolId);
+		if(protocol == null) protocol = messagingService.getProtocolById(protocolId);
 		//check to make sure that the supplied protocol exists...
 		if(protocol == null){
 			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Non-existent protocol specified");
@@ -126,12 +127,15 @@ public class SendMessageController {
 		//set the people involved
 		message.setSender(sender);
 		message.setRecipient(recipient);
+		if(message.getRecipient()== null){
+			message.setRecipient(addressService.getPersonForAddress(toAddressString));
+		}
 		//if it is possible to send the message, do so
-		if (!MessagingService.getInstance().canSendToProtocol(protocol)) {
+		if (!messagingService.canSendToProtocol(protocol)) {
 			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "There is not currently a gateway running that can send that type of message.");
 			return returnUrl;
 		} else {
-			MessagingService.getInstance().sendMessage(message);
+			messagingService.sendMessage(message);
 			httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Message placed in outbox.");
 			return returnUrl;
 		}
