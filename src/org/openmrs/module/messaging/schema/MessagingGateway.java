@@ -1,7 +1,5 @@
 package org.openmrs.module.messaging.schema;
 
-import java.util.List;
-
 import org.openmrs.Person;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
@@ -19,13 +17,6 @@ public abstract class MessagingGateway {
 	public abstract void sendMessage(Message message) throws Exception;
 
 	public abstract boolean shouldSendMessage(Message m);
-	
-	/**
-	 * Should return the list of addresses that this gateway sends from.
-	 * 
-	 * @return the addresses
-	 */
-	public abstract List<MessagingAddress> getFromAddresses();
 
 	/**
 	 * Should return true if the messaging service has the ability to send

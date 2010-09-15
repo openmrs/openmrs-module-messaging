@@ -1,8 +1,6 @@
 package org.openmrs.module.messaging.googlevoice;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,19 +8,16 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingConstants;
 import org.openmrs.module.messaging.schema.CredentialSet;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingGateway;
 import org.openmrs.module.messaging.schema.Protocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
 
 import com.techventus.server.voice.Voice;
-import com.techventus.server.voice.datatypes.Phone;
 
 public class GoogleVoiceGateway extends MessagingGateway {
 
 	private Voice googleVoice;
 	private static Log log = LogFactory.getLog(GoogleVoiceGateway.class);
-	private List<MessagingAddress> phoneNumbers;
 	private CredentialSet currentCredentials;
 	
 	
@@ -34,11 +29,6 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	@Override
 	public boolean canSend() {
 		return true;
-	}
-
-	@Override
-	public List<MessagingAddress> getFromAddresses() {
-		return phoneNumbers;
 	}
 
 	@Override
@@ -81,12 +71,6 @@ public class GoogleVoiceGateway extends MessagingGateway {
 			googleVoice = new Voice(currentCredentials.getUsername(),currentCredentials.getPassword());
 			//turn off GV logging
 			googleVoice.PRINT_TO_CONSOLE = false;
-			//create the list of phone #s
-			phoneNumbers = new ArrayList<MessagingAddress>();
-			Phone[] phones = googleVoice.getSettings(false).getPhones();
-			for(Phone p: phones){
-				phoneNumbers.add(new MessagingAddress(p.getPhoneNumber(),null));
-			}
 		} catch (Exception e) {
 			log.error("Error starting the Google Voice Gateway",e);
 		}
