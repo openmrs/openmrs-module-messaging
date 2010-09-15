@@ -1,113 +1,130 @@
 package org.openmrs.module.messaging.schema;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessageService;
-import org.openmrs.module.messaging.sms.SmsProtocol;
-import org.openmrs.module.messaging.twitter.TwitterProtocol;
 
 /**
- * The Messaging Service is the main class in the Messaging framework. It is
- * focused on cross-service functionality like sending to preferred messaging
- * addresses and listening across all messaging gateways.
- * 
- * @author Dieterich
+ * The MessagingService provides methods for sending messages and interacting
+ * with other parts of the messaging framework.
  * 
  */
-public class MessagingService {
-	
-	private static Log log = LogFactory.getLog(MessagingService.class);
-	
-	private static MessagingService instance;
-	
-	private MessageService messageService;
-	
-	private static Set<Protocol> protocols;
-	
-	private GatewayManager manager;
-	
-	static{
-		protocols = new HashSet<Protocol>();
-		protocols.add(new SmsProtocol());
-		protocols.add(new TwitterProtocol());
-	}
-	
-	public MessagingService(){
-		this.messageService = Context.getService(MessageService.class);
-		manager = new GatewayManager();
-		manager.start();
-	}
-	
+public interface MessagingService {
+
 	/**
-	 * TEMPORARY METHOD
-	 * This method returns the singleton instance of MessagingService.
-	 * Once the module startup() method is changed to be after the spring
-	 * application context is already initialized, we will move back to spring
-	 * dependency injection and bean management
+	 * A basic method for sending messages. Specify the message, destination,
+	 * and protocol, and the messaging module will take care of the rest. If you
+	 * provide an invalid message, address, or protocol, then an exception will
+	 * be thrown. <br/>
+	 * <br/>
+	 * If the address that you provide is owned by a person in OpenMRS, then the
+	 * message will be recorded as being 'to' that person. Otherwise the
+	 * {@link Message#recipient} field of the message will remain null. To set
+	 * the recipient of a message yourself, use the
+	 * {@link #sendMessage(Message)} method after constructing your own Message
+	 * object.
+	 * 
+	 * @param message
+	 *            The content of the message to be sent
+	 * @param address
+	 *            The destination of the message
+	 * @param protocolClass
+	 *            The protocol that the message uses
+	 * @throws Exception
+	 */
+	public void sendMessage(String message, String address,
+			Class<? extends Protocol> protocolClass) throws Exception;
+
+	/**
+	 * Sends a message. Create your own message object using one of the
+	 * {@link Protocol#createMessage(String)} methods, and then pass it to this
+	 * method. If you do not use the {@link Protocol} as a factory for creating
+	 * messages and instead create your own then you may end up with invalid
+	 * messages, which will cause errors.
+	 * 
+	 * @param message
+	 */
+	public void sendMessage(Message message);
+
+	/**
+	 * Sends a message to the provided person using their preferred address.
+	 * TODO: error handling
+	 * 
+	 * @param message
+	 * @param person
+	 */
+	public void sendMessageToPreferredAddress(String message, Person person);
+
+	/**
+	 * Queue multiple messages with this method.
+	 * 
+	 * @param messages
+	 */
+	public void sendMessages(Set<Message> messages);
+
+	/**
+	 * Returns the protocol with the provided ID. If there is no protocol with
+	 * that ID, null is returned.
+	 * 
+	 * @param protocolId
+	 * @return the protocol or null
+	 */
+	public Protocol getProtocolById(String protocolId);
+
+	/**
+	 * Returns the protocol of the provided class. If there is no protocol of
+	 * that class, null is returned.
+	 * 
+	 * @param clazz
+	 * @return the protocol or null
+	 */
+	public <P extends Protocol> P getProtocolByClass(Class<? extends P> clazz);
+
+	/**
+	 * @return All protocols
+	 */
+	public List<Protocol> getProtocols();
+
+	/**
+	 * @return A list of the protocols that have at least one active gateway.
+	 */
+	public List<Protocol> getActiveProtocols();
+
+	/**
+	 * Checks to see if there is at least one active gateway that can carry this
+	 * protocol.
+	 * 
+	 * @param p
 	 * @return
 	 */
-	public static MessagingService getInstance(){
-		if(instance != null){
-			return instance;
-		}else{
-			instance = new MessagingService();
-			return instance;
-		}
-	}
-	
-	public void sendMessage(String message, String address, Protocol p) throws Exception{
-		Message m = p.createMessage(message, address, null);
-		sendMessage(m);
-	}
-	
-	public void sendMessage(Message message){
-		message.setMessageStatus(MessageStatus.OUTBOX);
-		Context.openSession();
-		messageService.saveMessage(message);
-		Context.closeSession();
-	}
-	
-	public void sendMessages(Set<Message> messages){
-		for(Message m: messages){
-			sendMessage(m);
-		}
-	}
-	
-	public void sendMessageToPreferredAddress(String message, Person person){
-		
+	public boolean canSendToProtocol(Protocol p);
 
-	}
-	
-	public static Set<Protocol> getProtocols(){
-		return protocols;
-	}
-	
-	public static Protocol getProtocolById(String protocolId){
-		Protocol result = null;
-		for(Protocol p: protocols){
-			if(p.getProtocolId().equals(protocolId)){
-				result = p;
-			}
-		}
-		return result;
-	}
-	
-	public Set<Protocol> getActiveProtocols(){
-		Set<Protocol> results = new HashSet<Protocol>();
-		for(Protocol p: protocols){
-			if(canSendToProtocol(p)){
-				results.add(p);
-			}
-		}
-		return results;
-	}
-	
-	public boolean canSendToProtocol(Protocol p){
-		return manager.getActiveSupportingGateways(p).size() > 0;
-	}
+	/**
+	 * Adds a message listener. Currently the only supported listeners are
+	 * incoming message listeners that are notified when a message is received.
+	 * 
+	 * @param listener
+	 */
+	public void registerListener(IncomingMessageListener listener);
+
+	/**
+	 * Removes a message listener
+	 * 
+	 * @param listener
+	 */
+	public void unregisterListener(IncomingMessageListener listener);
+
+	/**
+	 * Notifies all message listeners of an event. Currently, this method calls
+	 * the messageReceived method on all IncomingMessageListeners. The
+	 * functionality of this method will change as new listener types are
+	 * introduced. This method should generally NOT be called by other modules,
+	 * and is for messaging module internal use only.
+	 * 
+	 * @param message
+	 *            The message that was received
+	 */
+	public void notifyListeners(Message message);
+
 }
