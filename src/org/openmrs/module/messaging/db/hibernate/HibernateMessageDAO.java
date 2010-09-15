@@ -6,16 +6,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessageStatus;
+import org.openmrs.module.messaging.schema.MessagingService;
 import org.openmrs.module.messaging.schema.Protocol;
 
 public class HibernateMessageDAO implements MessageDAO {
 
 	protected Log log = LogFactory.getLog(getClass());
+	
+	private MessagingService messagingService;
 	
 	/**
 	 * Hibernate session factory
@@ -31,6 +35,13 @@ public class HibernateMessageDAO implements MessageDAO {
 		this.sessionFactory = sessionFactory;
 	}
 	
+	/**
+	 * @param messagingService the messagingService to set
+	 */
+	public void setMessagingService(MessagingService messagingService) {
+		this.messagingService = messagingService;
+	}
+	
 	public List<Message> getAllMessages(){
 		return sessionFactory.getCurrentSession().createCriteria(Message.class).list();
 	}
@@ -44,11 +55,15 @@ public class HibernateMessageDAO implements MessageDAO {
 		if(protocol !=null){
 			c.add(Restrictions.eq("protocolId",protocol.getProtocolId()));
 		}
-		if(toAddress!= null && !toAddress.equals("")){
-			c.add(Restrictions.eq("origin", toAddress));
-		}
-		if(fromAddress!= null && !fromAddress.equals("")){
-			c.add(Restrictions.eq("destination", fromAddress));
+		if(toAddress.equals(fromAddress) && (toAddress != null && !toAddress.equals(""))){
+			c.add(Restrictions.or(Restrictions.eq("origin",toAddress), Restrictions.eq("destination",toAddress)));
+		}else{
+			if(toAddress!= null && !toAddress.equals("")){
+				c.add(Restrictions.eq("destination", toAddress));
+			}
+			if(fromAddress!= null && !fromAddress.equals("")){
+				c.add(Restrictions.eq("origin", fromAddress));
+			}
 		}
 		if(content!= null && !content.equals("")){
 			c.add(Restrictions.like("content", "%"+content+"%"));
@@ -58,17 +73,23 @@ public class HibernateMessageDAO implements MessageDAO {
 		}
 		return c.list();
 	}
+	
+	
 
 	public List<Message> findMessagesWithPeople(Protocol protocol, Person sender, Person recipient, String content, Integer status){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
 		if(protocol !=null){
 			c.add(Restrictions.eq("protocolId",protocol.getProtocolId()));
 		}
-		if(sender!= null){
-			c.add(Restrictions.eq("sender", sender));
-		}
-		if(recipient!= null){
-			c.add(Restrictions.eq("recipient", recipient));
+		if(sender.equals(recipient) && sender != null){
+			c.add(Restrictions.or(Restrictions.eq("sender",sender), Restrictions.eq("recipient",recipient)));
+		}else{
+			if(sender!= null){
+				c.add(Restrictions.eq("sender", sender));
+			}
+			if(recipient!= null){
+				c.add(Restrictions.eq("recipient", recipient));
+			}
 		}
 		if(content!= null && !content.equals("")){
 			c.add(Restrictions.like("content", "%"+content+"%"));
@@ -76,6 +97,7 @@ public class HibernateMessageDAO implements MessageDAO {
 		if(status != null){
 			c.add(Restrictions.eq("status", status));
 		}
+		c.addOrder(Order.asc("date"));
 		return c.list();
 	}
 
@@ -86,11 +108,15 @@ public class HibernateMessageDAO implements MessageDAO {
 
 	public void saveMessage(Message message) {
 		sessionFactory.getCurrentSession().saveOrUpdate(message);
+		//if the message is newly received, notify all the incoming message listeners
+		//if(message.getId() <=0 && message.getMessageStatus() == MessageStatus.RECEIVED){
+			//messagingService.notifyListeners(message);
+		//}
 	}
 
 	public List<Message> getOutboxMessages() {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.eq("status", MessageStatus.OUTBOX));
+		c.add(Restrictions.eq("status", MessageStatus.OUTBOX.getNumber()));
 		return c.list();
 	}
 
