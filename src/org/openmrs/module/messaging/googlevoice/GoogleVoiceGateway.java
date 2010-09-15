@@ -67,7 +67,9 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	}
 
 	@Override
-	public void shutdown() {}
+	public void shutdown() {
+		googleVoice = null;
+	}
 
 
 	
