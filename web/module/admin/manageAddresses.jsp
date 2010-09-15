@@ -37,7 +37,7 @@
   <tr>
   	<td>Type</td>
   	<td>
-  		<select id="protocolId" onchange="selectChanged()">
+  		<select id="protocolId">
 			<c:forEach var="protocolName" items="${protocols}">
 				<option value="${protocolName}">${protocolName}</option>
 			</c:forEach>
@@ -47,10 +47,6 @@
     <td>
     	<input id="address" type="text" size="20"/>
 		<span id="messagingAddressId" style="display:none">-1</span>
-    </td>
-    <td id="passwordLabel" style="display:none">Password</td>
-    <td>
-    	<input id="password" type="password" size="20" style="display:none"/>
     </td>
     <td>Preferred</td>
     <td><input id="preferred" type="checkbox"/></td>
@@ -120,12 +116,12 @@
 	
 	function clearAddress() {
 	 	viewed = -1;
-		dwr.util.setValues({ messagingAddressId:-1, protocolId:null, address:null, password:null, preferred:null, findable:null, dateCreated:null });
+		dwr.util.setValues({ messagingAddressId:-1, protocolId:null, address:null, preferred:null, findable:null, dateCreated:null });
 		document.getElementById("editSpan").innerHTML = "<h3>Add an Address</h3>";
 	}
 
 	function writeAddress() {
-		  var address = { messagingAddressId:viewed, protocolId:null, address:null, password:null, preferred:null, findable:null, dateCreated:null };
+		  var address = { messagingAddressId:viewed, protocolId:null, address:null, preferred:null, findable:null, dateCreated:null };
 		  dwr.util.getValues(address);
 		  dwr.engine.beginBatch();
 		  DWRMessagingAddressService.saveOrUpdateAddressForCurrentUser(address);
@@ -133,22 +129,4 @@
 		  dwr.engine.endBatch();
 		  clearAddress();
 	}
-
-	function selectChanged(){
-		var select = document.getElementById("protocolId");
-		passwordRequired(select.options[select.selectedIndex].value);
-	}
-	
-	function passwordRequired(addressType){
-		DWRMessagingAddressService.requiresPassword(addressType,function(required) {
-			if(required){
-				document.getElementById("password").style.display = "inline";
-				document.getElementById("passwordLabel").style.display = "inline";
-			}else{
-				document.getElementById("password").style.display = "none";
-				document.getElementById("passwordLabel").style.display = "none";
-			}
-		});
-	}
-			
 </script>
