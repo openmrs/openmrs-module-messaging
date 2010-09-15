@@ -8,7 +8,7 @@ import org.openmrs.Person;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingServiceImpl;
 import org.openmrs.module.messaging.schema.Protocol;
 
 public interface MessagingAddressDAO {

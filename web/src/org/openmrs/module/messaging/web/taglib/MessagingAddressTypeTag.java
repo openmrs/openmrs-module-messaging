@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingServiceImpl;
 
 public class MessagingAddressTypeTag extends TagSupport {
 

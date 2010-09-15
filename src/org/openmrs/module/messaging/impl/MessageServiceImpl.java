@@ -8,7 +8,6 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingGateway;
 import org.openmrs.module.messaging.schema.Protocol;
 
 public class MessageServiceImpl extends BaseOpenmrsService implements MessageService {
