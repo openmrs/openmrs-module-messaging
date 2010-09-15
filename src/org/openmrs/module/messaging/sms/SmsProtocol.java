@@ -57,7 +57,7 @@ public class SmsProtocol extends Protocol{
 	
 	@Override
 	public String getProtocolName() {
-		return "Phone Number";
+		return "SMS";
 	}
 
 	/** 
@@ -136,17 +136,6 @@ public class SmsProtocol extends Protocol{
 		Message result = new Message(toAddress,fromAddress,messageContent);
 		result.setProtocolId(this.PROTOCOL_ID);
 		return result; 
-	}
-	
-	@Override
-	public Message createMessage(String messageContent) throws MessageFormattingException {
-		if(!messageContentIsValid(messageContent)){
-			throw new MessageFormattingException("SMS message is too long.");
-		}
-		Message result = new Message(null,null,messageContent);
-		result.setProtocolId(this.PROTOCOL_ID);
-		//validation complete, create the message
-		return result;
 	}
 	
 	/**

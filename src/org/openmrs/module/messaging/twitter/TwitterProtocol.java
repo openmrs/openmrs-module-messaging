@@ -139,15 +139,6 @@ public class TwitterProtocol extends Protocol{
 	}
 
 	@Override
-	public Message createMessage(String messageContent) throws MessageFormattingException {
-		if(!messageContentIsValid(messageContent)){
-			throw new MessageFormattingException("Tweet is longer than 140 characters");
-		}
-		
-		return new Message(null,null,messageContent);
-	}
-
-	@Override
 	public boolean requiresPassword() {
 		return true;
 	}
