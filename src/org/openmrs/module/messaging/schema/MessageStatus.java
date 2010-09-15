@@ -27,7 +27,5 @@ public enum MessageStatus{
 		 */
 		public int getNumber() {
 			return number;
-		}
-		
-		
+		}	
 }

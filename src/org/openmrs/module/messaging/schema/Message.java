@@ -17,17 +17,18 @@ import org.openmrs.Person;
  * 
  * @see MessageFactory
  */
-public class Message extends BaseOpenmrsObject{
+public class Message extends BaseOpenmrsObject {
 
-	protected Message(){}
-	
+	protected Message() {
+	}
+
 	private Integer messageId;
-	
+
 	/**
-	 * The number of times that the system has tried to send the message.
-	 * Once this number reaches the max_retries global property value,
-	 * the message will be marked as 'failed' and the system will not continue
-	 * to attempt to send it
+	 * The number of times that the system has tried to send the message. Once
+	 * this number reaches the max_retries global property value, the message
+	 * will be marked as 'failed' and the system will not continue to attempt to
+	 * send it
 	 */
 	private Integer sendAttempts = 0;
 
@@ -47,12 +48,12 @@ public class Message extends BaseOpenmrsObject{
 	 * The address that the message was sent/is being sent to
 	 */
 	protected String destination;
-	
+
 	/**
 	 * The person that sent this message, can be null
 	 */
 	protected Person sender;
-	
+
 	/**
 	 * The person who received this message, can be null
 	 */
@@ -67,17 +68,15 @@ public class Message extends BaseOpenmrsObject{
 	 * The status of this message
 	 */
 	private Integer status;
-	
+
 	/**
 	 * The string Id of the protocol with which to interpret this message
 	 */
 	private String protocolId;
 
 	/**
-	 * Creates a message with only a destination and content. The date sent,
-	 * date received, and origin are all filled in automatically at the time of
-	 * sending. Origin is set to the relevant address of the currently
-	 * authenticated user.
+	 * Creates a message with only a destination and content. The date and
+	 * origin are all filled in automatically at the time of sending.
 	 * 
 	 * @param destination
 	 *            the destination of the message
@@ -85,15 +84,14 @@ public class Message extends BaseOpenmrsObject{
 	 *            the content of the message
 	 */
 	public Message(String destination, String content) {
-		this.destination= destination;
+		this.destination = destination;
 		this.content = content;
 	}
 
 	/**
-	 * Creates a message with a destination, origin, priority, and content. The date
-	 * sent, date received, and origin are all filled in automatically at the
-	 * time of sending. Origin is set to the relevant address of the currently
-	 * authenticated user
+	 * Creates a message with a destination, origin, priority, and content. The
+	 * date and origin are all filled in automatically at
+	 * the time of sending.
 	 * 
 	 * @param destination
 	 *            where the message is going
@@ -102,12 +100,12 @@ public class Message extends BaseOpenmrsObject{
 	 */
 	public Message(String destination, String origin, String content) {
 		this.destination = destination;
-		this.origin =origin;
+		this.origin = origin;
 		this.content = content;
 	}
 
 	/**
-	 * @return
+	 * @return the text content of the message
 	 */
 	public String getContent() {
 		return content;
@@ -120,9 +118,6 @@ public class Message extends BaseOpenmrsObject{
 		this.content = content;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getOrigin() {
 		return origin;
 	}
@@ -175,7 +170,7 @@ public class Message extends BaseOpenmrsObject{
 	public void setMessageStatus(MessageStatus status) {
 		this.setStatus(status.getNumber());
 	}
-	
+
 	public void setMessageId(Integer messageId) {
 		this.messageId = messageId;
 	}
@@ -183,7 +178,7 @@ public class Message extends BaseOpenmrsObject{
 	public Integer getMessageId() {
 		return messageId;
 	}
-	
+
 	public void setId(Integer messageId) {
 		this.messageId = messageId;
 	}
@@ -207,7 +202,7 @@ public class Message extends BaseOpenmrsObject{
 	public Person getRecipient() {
 		return recipient;
 	}
-	
+
 	/**
 	 * @return The sender's name if the sender is set. Otherwise it returns the
 	 *         address of origin
@@ -233,7 +228,8 @@ public class Message extends BaseOpenmrsObject{
 	}
 
 	/**
-	 * @param protocolId the protocolId to set
+	 * @param protocolId
+	 *            the protocolId to set
 	 */
 	public void setProtocolId(String protocolId) {
 		this.protocolId = protocolId;
@@ -245,13 +241,10 @@ public class Message extends BaseOpenmrsObject{
 	public String getProtocolId() {
 		return protocolId;
 	}
-	
-	public Protocol getProtocol(){
-		return MessagingService.getProtocolById(protocolId);
-	}
 
 	/**
-	 * @param status the status to set
+	 * @param status
+	 *            the status to set
 	 */
 	public void setStatus(Integer status) {
 		this.status = status;
@@ -265,7 +258,8 @@ public class Message extends BaseOpenmrsObject{
 	}
 
 	/**
-	 * @param sendAttempts the sendAttempts to set
+	 * @param sendAttempts
+	 *            the sendAttempts to set
 	 */
 	public void setSendAttempts(Integer sendAttempts) {
 		this.sendAttempts = sendAttempts;
