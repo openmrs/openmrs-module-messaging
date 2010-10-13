@@ -1,308 +1,130 @@
 package org.openmrs.module.messaging.schema;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.nuntium.NuntiumGateway;
-import org.openmrs.module.messaging.sms.PhoneNumber;
-import org.openmrs.module.messaging.sms.SmsModemGateway;
-import org.openmrs.module.messaging.twitter.TwitterAddress;
-import org.openmrs.module.messaging.twitter.TwitterGateway;
 
 /**
- * The Messaging Service is the main singleton in the Messaging framework. It is
- * focused on cross-service functionality like sending to preferred messaging
- * addresses and listening across all messaging gateways.
- * 
- * @author Dieterich
+ * The MessagingService provides methods for sending messages and interacting
+ * with other parts of the messaging framework.
  * 
  */
-public class MessagingService {
-	
-	protected static Log log = LogFactory.getLog(MessagingService.class);
-	
-	protected static MessagingService instance;
-	
-	protected static HashMap<String,Class> addressTypes;
-	
-	static{
-		addressTypes = new HashMap<String, Class>();
-		addressTypes.put("Phone Number", PhoneNumber.class);
-		addressTypes.put("Twitter Username", TwitterAddress.class);
-	}
-	
-	protected CopyOnWriteArraySet<MessagingGateway> gateways;
-	
-	//for Hibernate only
-	public void setGateways(Set gateways){
-		this.gateways = new CopyOnWriteArraySet<MessagingGateway>(gateways);
-		log.info("Services initialized: ");
-		for(MessagingGateway ms: this.gateways){
-			log.info("service: " + ms.getName());
-		}
-		
-	}
-	
-	public void initGateways() {
-		for(MessagingGateway ms:gateways){
-			try {
-				ms.startup();
-			} catch (Throwable t) {
-				log.error("Unable to initialize gateway: " + ms.getName(), t);
-			}
-		}
-	}
-	
-	public MessagingService(){}
-	
+public interface MessagingService {
+
 	/**
-	 * TEMPORARY METHOD
-	 * This method returns the singleton instance of MessagingService.
-	 * Once the module startup() method is changed to be after the spring
-	 * applicationcontext is already initialized, we will move back to spring
-	 * dependency injection and bean management
-	 * @return
-	 */
-	public static MessagingService getInstance(){
-		if(instance != null){
-			return instance;
-		}else{
-			instance = new MessagingService();
-			HashSet<MessagingGateway> s = new HashSet<MessagingGateway>();
-			s.add(new SmsModemGateway());
-			s.add(new TwitterGateway());
-			s.add(new NuntiumGateway());
-			instance.setGateways(s);
-			return instance;
-		}
-	}
-
-
-
-	public void sendMessageViaPreferredMethod(Person destination, Message m) {}
-
-	public void registerListenerForPerson(MessagingServiceListener listener, Person p) {}
-
-	public void registerListener(MessagingServiceListener listener) {}
-
-	//> service getter methods
-	
-	/**
-	 * Returns the messaging service singleton for the provided class
+	 * A basic method for sending messages. Specify the message, destination,
+	 * and protocol, and the messaging module will take care of the rest. If you
+	 * provide an invalid message, address, or protocol, then an exception will
+	 * be thrown. <br/>
+	 * <br/>
+	 * If the address that you provide is owned by a person in OpenMRS, then the
+	 * message will be recorded as being 'to' that person. Otherwise the
+	 * {@link Message#recipient} field of the message will remain null. To set
+	 * the recipient of a message yourself, use the
+	 * {@link #sendMessage(Message)} method after constructing your own Message
+	 * object.
 	 * 
-	 * @param messagingGatewayClass
-	 * @return
+	 * @param message
+	 *            The content of the message to be sent
+	 * @param address
+	 *            The destination of the message
+	 * @param protocolClass
+	 *            The protocol that the message uses
+	 * @throws Exception
 	 */
-	public <S extends MessagingGateway> S getMessagingGateway(Class<? extends S> messagingGatewayClass) {
-		for (MessagingGateway mService : gateways) {
-			if (mService.getClass().equals(messagingGatewayClass)) {
-				return (S) mService;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * @param name
-	 * @return a messaging gateway that has a name that matches the parameter
-	 */
-	public MessagingGateway getMessagingGatewayForName(String name) {
-		for (MessagingGateway mService : gateways) {
-			if (mService.getName().equalsIgnoreCase(name)) {
-				return mService;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * @param id
-	 * @return a messaging gateway that has an id that matches the parameter
-	 */
-	public MessagingGateway getMessagingGatewayForId(String id) {
-		for (MessagingGateway mService : gateways) {
-			if (mService.getGatewayId().equalsIgnoreCase(id)) {
-				return mService;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * @return All messaging gateways
-	 */
-	public Set<MessagingGateway> getAllMessagingGateways() {
-		return gateways;
-	}
-	
-	/**
-	 * @return All Messaging Gateways that can send messages
-	 */
-	public Set<MessagingGateway> getActiveMessagingGateways(){
-		Set<MessagingGateway> gways = new HashSet<MessagingGateway>();
-		for(MessagingGateway msg: gateways){
-			if(msg.canSend()){
-				gways.add(msg);
-			}
-		}
-		return gways;
-	}
-	
-	
-	/**
-	 * @param m
-	 * @return A list of all messaging gateways that can send that type of message
-	 */
-	public List<MessagingGateway> getMessagingGatewaysForMessage(Message m){
-		List<MessagingGateway> gateways= new ArrayList<MessagingGateway>();
-		//search through all the messaging gateways
-		for(MessagingGateway ms: getAllMessagingGateways()){
-			//if the gateway deals with the proper class
-			if(ms.getMessageClass().equals(m.getClass())){
-					gateways.add(ms);
-			}
-		}
-		return gateways;
-	}
-	
-	/**
-	 * @param a
-	 * @return A list of all messaging gateways that can send to that type of address
-	 */
-	public List<MessagingGateway> getMessagingGatewaysForAddress(MessagingAddress a){
-		List<MessagingGateway> gateways= new ArrayList<MessagingGateway>();
-		for(MessagingGateway ms: getAllMessagingGateways()){
-			if(ms.getMessagingAddressClass().equals(a.getClass())){
-					gateways.add(ms);
-			}
-		}
-		return gateways;
-	}
-	
-	public List<MessagingGateway> getMessagingGatewaysForAddress(String address){
-		MessagingAddress a = Context.getService(MessagingAddressService.class).getMessagingAddress(address);
-		if(a!=null){
-			return getMessagingGatewaysForAddress(a);
-		}else{
-			return new ArrayList<MessagingGateway>();
-		}
-	}
-	
-	/**
-	 * @param messagingGatewayClass the gateway's class
-	 * @return The address factory for that gateway
-	 */
-	public AddressFactory getAddressFactoryForGateway(Class messagingGatewayClass) {
-		try{
-			return getMessagingGateway(messagingGatewayClass).getAddressFactory();
-		}catch(Exception e){
-			return null;
-		}
-	}
-	
-	/**
-	 * @param messagingGatewayClass the gateway's class
-	 * @return the message factory for that gateway
-	 */
-	public MessageFactory getMessageFactoryForGateway(Class messagingGatewayClass) {
-		try{
-			return getMessagingGateway(messagingGatewayClass).getMessageFactory();
-		}catch(Exception e){
-			return null;
-		}
-	}
-	
-	/**
-	 * @return All message factories
-	 */
-	public Set<MessageFactory> getMessageFactories(){
-		HashSet<MessageFactory> factories = new HashSet<MessageFactory>();
-		for(MessagingGateway service:gateways){
-			factories.add(service.getMessageFactory());
-		}
-		return factories;
-	}
-	
-	/**
-	 * @return All address factories
-	 */
-	public Set<AddressFactory> getAddressFactories(){
-		HashSet<AddressFactory> factories = new HashSet<AddressFactory>();
-		for(MessagingGateway service:gateways){
-			factories.add(service.getAddressFactory());
-		}
-		return factories;
-	}
+	public void sendMessage(String message, String address,
+			Class<? extends Protocol> protocolClass) throws Exception;
 
 	/**
-	 * @param name
-	 * @return The address factory that supports the address type represented by the parameter
+	 * Sends a message. Create your own message object using one of the
+	 * {@link Protocol#createMessage(String)} methods, and then pass it to this
+	 * method. If you do not use the {@link Protocol} as a factory for creating
+	 * messages and instead create your own then you may end up with invalid
+	 * messages, which will cause errors.
+	 * 
+	 * @param message
 	 */
-	public AddressFactory getAddressFactoryForAddressTypeName(String name){
-		for(AddressFactory af: getAddressFactories()){
-			try {
-				if(((MessagingAddress) af.getAddressClass().newInstance()).getName().equalsIgnoreCase(name)){
-					return af;
-				}
-			} catch (Exception e) {}
-		}
-		return null;
-	}
-	
+	public void sendMessage(Message message);
+
 	/**
-	 * Returns the class of the address type that matches the provided name
-	 * @param name
+	 * Sends a message to the provided person using their preferred address.
+	 * TODO: error handling
+	 * 
+	 * @param message
+	 * @param person
+	 */
+	public void sendMessageToPreferredAddress(String message, Person person);
+
+	/**
+	 * Queue multiple messages with this method.
+	 * 
+	 * @param messages
+	 */
+	public void sendMessages(Set<Message> messages);
+
+	/**
+	 * Returns the protocol with the provided ID. If there is no protocol with
+	 * that ID, null is returned.
+	 * 
+	 * @param protocolId
+	 * @return the protocol or null
+	 */
+	public Protocol getProtocolById(String protocolId);
+
+	/**
+	 * Returns the protocol of the provided class. If there is no protocol of
+	 * that class, null is returned.
+	 * 
+	 * @param clazz
+	 * @return the protocol or null
+	 */
+	public <P extends Protocol> P getProtocolByClass(Class<? extends P> clazz);
+
+	/**
+	 * @return All protocols
+	 */
+	public List<Protocol> getProtocols();
+
+	/**
+	 * @return A list of the protocols that have at least one active gateway.
+	 */
+	public List<Protocol> getActiveProtocols();
+
+	/**
+	 * Checks to see if there is at least one active gateway that can carry this
+	 * protocol.
+	 * 
+	 * @param p
 	 * @return
 	 */
-	public Class getAddressClassForAddressTypeName(String name){
-		for(AddressFactory af: getAddressFactories()){
-			try {
-				if(((MessagingAddress) af.getAddressClass().newInstance()).getName().equalsIgnoreCase(name)){
-					return af.getAddressClass();
-				}
-			} catch (Exception e) {}
-		
-		}
-		return null;
-	}
-	
+	public boolean canSendToProtocol(Protocol p);
+
 	/**
-	 * @param addressClass
-	 * @return The address factory that produces the provided addresses
+	 * Adds a message listener. Currently the only supported listeners are
+	 * incoming message listeners that are notified when a message is received.
+	 * 
+	 * @param listener
 	 */
-	public AddressFactory getAddressFactoryForAddressClass(Class addressClass){
-		for(AddressFactory af: getAddressFactories()){
-			if(addressClass.equals(af.getAddressClass())){
-				return af;
-			}
-		}
-		return null;
-	}
-	
+	public void registerListener(IncomingMessageListener listener);
+
 	/**
-	 * @return all possible address types
+	 * Removes a message listener
+	 * 
+	 * @param listener
 	 */
-	public Set<String> getAddressTypes(){
-		HashSet<String> set = new HashSet<String>();
-		for(AddressFactory af: getAddressFactories()){
-			try {
-				Class maClass =  af.getAddressClass();
-				MessagingAddress ma = (MessagingAddress) maClass.newInstance();
-				String name = ma.getName();
-				set.add(name);
-			} catch (Exception e) {
-				System.out.println("Shit");
-			}
-		}
-		return set;
-	}
+	public void unregisterListener(IncomingMessageListener listener);
+
+	/**
+	 * Notifies all message listeners of an event. Currently, this method calls
+	 * the messageReceived method on all IncomingMessageListeners. The
+	 * functionality of this method will change as new listener types are
+	 * introduced. This method should generally NOT be called by other modules,
+	 * and is for messaging module internal use only.
+	 * 
+	 * @param message
+	 *            The message that was received
+	 */
+	public void notifyListeners(Message message);
+
 }

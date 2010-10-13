@@ -37,29 +37,35 @@ There were no phones detected
 	<input type="submit" value="Detect" />
 </form>
 </div>
+
 <br/>
 <div id="twitterBoxHeader" class="boxHeader">Twitter</div>
 <div id="twitterBox" class="box">
-Default Twitter address: ${twitterUsername}<br/><br/>
-Change the default Twitter address:
-<form method="post" action="<openmrs:contextPath/>/module/messaging/changeDefaultTwitterCreds.form">
+Twitter username: ${twitterUsername}<br/><br/>
+Change the Twitter login:
+<form method="post" action="<openmrs:contextPath/>/module/messaging/changeTwitterCreds.form">
 	Username:  <input type="text" name="username"/><br/>
 	Password:  <input type="password" name="password1"/><br/>
 	Confirm Password:  <input type="password" name="password2"/><br/>
 	<input type="submit" value="Save Changes" />
 </form>
 <br/><br/>
-Twitter service status: ${twitterServiceStatus}
+Twitter gateway status: ${twitterStatus}
 </div>
-<br/>
 
-<div class="boxHeader">Nuntium</div>
-<div class="box">
-<form method="post" action="<openmrs:contextPath/>/module/messaging/saveNuntiumSettings.form">
-	Username: <input type="text" name="username" value="${nuntiumUsername}" /><br/>
-	Password: <input type="password" name="password" value="${nuntiumPassword}" /><br/>
+<br/>
+<div id="googleVoiceBoxHeader" class="boxHeader">Google Voice</div>
+<div id="googleVoiceBox" class="box">
+Google Voice username: ${googleVoiceUsername}<br/><br/>
+Change the Google Voice login:
+<form method="post" action="<openmrs:contextPath/>/module/messaging/changeGoogleVoiceCreds.form">
+	Username:  <input type="text" name="username"/><br/>
+	Password:  <input type="password" name="password1"/><br/>
+	Confirm Password:  <input type="password" name="password2"/><br/>
 	<input type="submit" value="Save Changes" />
 </form>
+<br/><br/>
+Google Voice gateway status: ${googleVoiceStatus}
 </div>
 
 <%@ include file="/WEB-INF/template/footer.jsp" %>

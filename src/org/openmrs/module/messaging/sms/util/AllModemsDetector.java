@@ -17,8 +17,10 @@ import org.smslib.modem.SerialModemGateway;
  * A commandline utility for detecting connected AT devices.
  * The detection workflow was taken from ComTest in SMSLib.
  * @author Alex Anderson alex@frontlinesms.com
+ * @author Dieterich Lawson (adapter)
  */
 public class AllModemsDetector{
+	
 	public static void main(String[] args) {
 		AllModemsDetector amd = new AllModemsDetector();
 		ATDeviceDetector[] detectors = amd.detectBlocking();
@@ -49,7 +51,7 @@ public class AllModemsDetector{
 		Enumeration<CommPortIdentifier> ports = CommPortIdentifier.getPortIdentifiers();
 		while(ports.hasMoreElements()) {
 			CommPortIdentifier port = ports.nextElement();
-			if(port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+			if(port.getPortType() == CommPortIdentifier.PORT_SERIAL && port.getName().contains("dev/tty.modem")) {
 				ATDeviceDetector d = new ATDeviceDetector(port);
 				detectors.add(d);
 				d.start();
@@ -83,7 +85,7 @@ public class AllModemsDetector{
 	/** Prints a report to {@link System#out} detailing the devices that were detected. */
 	protected static Service detectModems(ATDeviceDetector[] completedDetectors) {
 		// All detectors are finished, so print a report
-		Service s = new Service();
+		Service s = Service.getInstance();
 		log.info("------- Beginning modem detection -------");
 		//if the system is a linux system, turn on serial polling
 		if(System.getProperty("os.name").contains("nux")){
@@ -92,7 +94,7 @@ public class AllModemsDetector{
 		}
 		for(ATDeviceDetector d : completedDetectors) {
 			log.info("----");
-			log.info("PORT   : " + d.getPortIdentifier().getName());
+			log.info("PORT DETECTION SUCCESSFUL  : " + d.getPortIdentifier().getName());
 			if(d.isDetected()) {
 				log.info("SERIAL : " + d.getSerial());
 				log.info("BAUD   : " + d.getMaxBaudRate());
@@ -106,10 +108,12 @@ public class AllModemsDetector{
 				}
 				smg.setInbound(true);
 				smg.setOutbound(true);
-				smg.setProtocol(Protocols.TEXT);
+				smg.setProtocol(Protocols.PDU);
+				smg.getATHandler().setStorageLocations("SMMTE");
 			} else {
-				log.error("DETECTION FAILED " + d.getException().getStackTrace());
+				log.error("PORT DETECTION FAILED :  " +d.getPortIdentifier().getName(),d.getException());
 			}
+			log.info("----");
 		}
 		if(s.getGateways().size() !=0){
 			log.info("Attempting to start service");

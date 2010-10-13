@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.MessagingAddress;
+import org.openmrs.module.messaging.schema.MessagingServiceImpl;
 
 public class MessagingAddressTypeTag extends TagSupport {
 
@@ -24,11 +25,11 @@ public class MessagingAddressTypeTag extends TagSupport {
 			address = Context.getService(MessagingAddressService.class).getMessagingAddress(addressId);
 		}
 		if(address !=null){
-			try {
-				pageContext.getOut().write(address.getName());
-			} catch (IOException e) {
-				log.error("Unable to write address type to output", e);
-			}
+//			try {
+//				pageContext.getOut().write(MessagingService.getInstance().getAddressFactoryForAddressClass(address.getClass()).getAddressTypeName());
+//			} catch (IOException e) {
+//				log.error("Unable to write address type to output", e);
+//			}
 		}
 		reset();
 		return SKIP_BODY;

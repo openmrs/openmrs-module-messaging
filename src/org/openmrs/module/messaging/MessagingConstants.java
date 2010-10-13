@@ -10,8 +10,8 @@ public final class MessagingConstants {
 	public static final String GP_DEFAULT_COUNTRY_CODE = "messaging.sms.default.country.code";
 	public static final String GP_DEFAULT_TWITTER_UNAME= "messaging.twitter.default.username";
 	public static final String GP_DEFAULT_TWITTER_PASSWORD = "messaging.twitter.default.password";
-	public static final String GP_GOOGLE_VOICE_UNAME= "messaging.google.voice.username";
-	public static final String GP_GOOGLE_VOICE_PWORD = "messaging.google.voice.password";
-	public static final String GP_NUNTIUM_USERNAME = "messaging.nuntium.username";
-	public static final String GP_NUNTIUM_PASSWORD = "messaging.nuntium.password";
+	public static final String GP_GOOGLE_VOICE_UNAME= "messaging.googlevoice.username";
+	public static final String GP_GOOGLE_VOICE_PWORD = "messaging.googlevoice.password";
+	public static final String GP_MAX_RETRIES = "messaging.max.retry";
+	
 }

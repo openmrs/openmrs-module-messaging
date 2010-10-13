@@ -11,7 +11,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.MessagingServiceImpl;
 
 public class MessagingServiceTag extends TagSupport {
 
@@ -28,12 +28,12 @@ public class MessagingServiceTag extends TagSupport {
 			message = Context.getService(MessageService.class).getMessage(messageId);
 		}
 		if (message != null) {
-			String name = MessagingService.getInstance().getMessagingGatewayForId(message.getGatewayId()).getName();
-			try {
-				pageContext.getOut().write(name);
-			} catch (IOException e) {
-				log.error("Unable to print message's service name to output",e);
-			}
+//			String name = MessagingService.getInstance().getMessagingGatewayForId(message.getGatewayId()).getName();
+//			try {
+//				pageContext.getOut().write(name);
+//			} catch (IOException e) {
+//				log.error("Unable to print message's service name to output",e);
+//			}
 
 		}
 		if(service != null){

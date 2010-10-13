@@ -8,7 +8,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingGateway;
+import org.openmrs.module.messaging.schema.Protocol;
 
 public class MessageServiceImpl extends BaseOpenmrsService implements MessageService {
 
@@ -27,56 +27,40 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 	}
 	
 	public List<Message> getMessagesToPerson(Person recipient) {
-		return dao.getMessagesToPerson(recipient);
+		return dao.findMessagesWithPeople(null, recipient,null, null, null);
 	}
 	
 	public List<Message> getMessagesFromPerson(Person sender) {
-		return dao.getMessagesFromPerson(sender);
+		return dao.findMessagesWithPeople(null, null,sender, null, null);
 	}
 	
 	public List<Message> getMessagesToOrFromPerson(Person person) {
-		return dao.getMessagesToOrFromPerson(person);
+		return dao.findMessagesWithPeople(null, person,person, null, null);
 	}
 	
 	public List<Message> getMessagesToAddress(String address) {
-		return dao.getMessagesToAddress(address);
+		return dao.findMessagesWithAddresses(null, address, null, null, null);
 	}
 
 	public List<Message> getMessagesFromAddress(String address) {
-		return dao.getMessagesFromAddress(address);
+		return dao.findMessagesWithAddresses(null, null, address, null, null);
 	}
 
 	public List<Message> getMessagesToOrFromAddress(String address) {
-		return dao.getMessagesToOrFromAddress(address);
+		return dao.findMessagesWithAddresses(null, address, address, null, null);
 	}
 	
-	public List<Message> getMessagesForGateway(MessagingGateway gateway) {
-		return dao.getMessagesForGateway(gateway);
-	}
-	
-	public List<Message> getMessagesToPersonUsingGateway(MessagingGateway gateway, Person recipient) {
-		return dao.getMessagesToPersonUsingGateway(gateway, recipient);
-	}
-	
-	public List<Message> getMessagesFromPersonUsingGateway(MessagingGateway gateway, Person sender) {
-		return dao.getMessagesFromPersonUsingGateway(gateway, sender);
-	}
-	
-	public List<Message> getMessagesToOrFromPersonUsingGateway(MessagingGateway gateway, Person person) {
-		return dao.getMessagesToOrFromPersonUsingGateway(gateway,person);
-	}
-
 	public List<Message> findMessages(String content) {
-		return dao.findMessages(content);
+		return dao.findMessagesWithAddresses(null, null, null, content, null);
 	}
 	
-	public List<Message> findMessagesWithAdresses(MessagingGateway gateway, String toAddress, String fromAddress, String content, Integer status) {
-		return dao.findMessagesWithAddresses(gateway,toAddress,fromAddress,content,status);
+	public List<Message> findMessagesWithAdresses(Protocol protocol, String toAddress, String fromAddress, String content, Integer status) {
+		return dao.findMessagesWithAddresses(protocol,toAddress,fromAddress,content,status);
 	}
 
 
-	public List<Message> findMessagesWithPeople(MessagingGateway gateway, Person sender, Person recipient, String content, Integer status) {
-		return dao.findMessagesWithPeople(gateway, sender, recipient, content, status);
+	public List<Message> findMessagesWithPeople(Protocol protocol, Person sender, Person recipient, String content, Integer status) {
+		return dao.findMessagesWithPeople(protocol, sender, recipient, content, status);
 	}
 
 	public void deleteMessage(Message message) throws APIException {
@@ -85,5 +69,17 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 
 	public void saveMessage(Message message) throws APIException {
 		dao.saveMessage(message);
+	}
+
+	public List<Message> getMessagesForPersonAndProtocol(Person person, Protocol protocol) {
+		return dao.findMessagesWithPeople(protocol, person, person, null, null);
+	}
+
+	public List<Message> getOutboxMessages() {
+		return dao.getOutboxMessages();
+	}
+
+	public List<Message> getOutboxMessagesByProtocol(Protocol p) {
+		return dao.getOutboxMessagesByProtocol(p);
 	}
 }

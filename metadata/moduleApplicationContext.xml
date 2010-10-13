@@ -1,32 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-	 
-	 <!-- 
-	<bean id="messagingService" class="org.openmrs.module.messaging.schema.MessagingService">
-		<property name="gateways">
-			<set>
-				<ref bean="smsGateway" />
-				<ref bean="twitterGateway" />
-			</set>
-		</property>
-	</bean>
-
-	<bean id="smsGateway" class="org.openmrs.module.messaging.sms.SmsModemGateway">
-		<property name="smsMessageFactory" ref="smsMessageFactory" />
-		<property name="phoneNumberFactory" ref="phoneNumberFactory" />
-	</bean>
-
-	<bean id="twitterGateway" class="org.openmrs.module.messaging.twitter.TwitterGateway">
-		<property name="twitterMessageFactory" ref="twitterMessageFactory" />
-		<property name="twitterAddressFactory" ref="twitterAddressFactory" />
-	</bean>
-
-	<bean id="smsMessageFactory" class="org.openmrs.module.messaging.sms.SmsMessageFactory" />
-	<bean id="phoneNumberFactory" class="org.openmrs.module.messaging.sms.PhoneNumberFactory" />
-	<bean id="twitterMessageFactory" class="org.openmrs.module.messaging.twitter.TwitterMessageFactory" />
-	<bean id="twitterAddressFactory" class="org.openmrs.module.messaging.twitter.TwitterAddressFactory" />
-	 -->
 <!-- Database Access -->
 	<bean parent="serviceContext">
 		<property name="moduleService">
@@ -38,7 +12,8 @@
 						<bean class="@MODULE_PACKAGE@.impl.MessageServiceImpl">
 							<property name="messageDAO">
 								<bean class="@MODULE_PACKAGE@.db.hibernate.HibernateMessageDAO">
-									<property name="sessionFactory"><ref bean="sessionFactory"/></property>	
+									<property name="sessionFactory"><ref bean="sessionFactory"/></property>
+									<!-- <property name="messagingService"><ref bean="messagingService"/></property>-->	
 								</bean>
 							</property>	
 						</bean>
@@ -68,6 +43,26 @@
 								</bean>
 							</property>	
 						</bean>
+					</property>
+					<property name="preInterceptors">
+                        <ref bean="serviceInterceptors" />
+					</property>
+					<property name="transactionAttributeSource">
+						<bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<bean parent="serviceContext" >
+		<property name="moduleService">
+			<list>
+				<value>@MODULE_PACKAGE@.schema.MessagingService</value> 
+				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager"><ref bean="transactionManager"/></property>
+					<property name="target">
+						<bean class="@MODULE_PACKAGE@.schema.MessagingServiceImpl"/>
 					</property>
 					<property name="preInterceptors">
                         <ref bean="serviceInterceptors" />

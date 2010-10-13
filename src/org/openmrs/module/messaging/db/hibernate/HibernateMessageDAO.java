@@ -6,15 +6,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingGateway;
+import org.openmrs.module.messaging.schema.MessageStatus;
+import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.schema.Protocol;
 
 public class HibernateMessageDAO implements MessageDAO {
 
 	protected Log log = LogFactory.getLog(getClass());
+	
+	private MessagingService messagingService;
 	
 	/**
 	 * Hibernate session factory
@@ -30,6 +35,13 @@ public class HibernateMessageDAO implements MessageDAO {
 		this.sessionFactory = sessionFactory;
 	}
 	
+	/**
+	 * @param messagingService the messagingService to set
+	 */
+	public void setMessagingService(MessagingService messagingService) {
+		this.messagingService = messagingService;
+	}
+	
 	public List<Message> getAllMessages(){
 		return sessionFactory.getCurrentSession().createCriteria(Message.class).list();
 	}
@@ -38,77 +50,20 @@ public class HibernateMessageDAO implements MessageDAO {
 		return (Message) sessionFactory.getCurrentSession().createCriteria(Message.class).add(Restrictions.eq("messageId",messageId)).list();
 	}
 	
-	public List<Message> getMessagesFromPerson(Person sender){
+	public List<Message> findMessagesWithAddresses(Protocol protocol, String toAddress,String fromAddress, String content,Integer status){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.eq("sender", sender));
-		return c.list();
-	}
-	
-	public List<Message> getMessagesToPerson(Person recipient){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.eq("recipient", recipient));
-		return c.list();
-	}
-	
-	public List<Message> getMessagesToOrFromPerson(Person person){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.or(Restrictions.eq("sender", person),Restrictions.eq("recipient", person)));
-		return c.list();
-
-	}
-	
-	public List<Message> getMessagesFromAddress(String address){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.eq("origin", address));
-		return c.list();
-	}
-
-	public List<Message> getMessagesToAddress(String address){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.eq("destination", address));
-		return c.list();
-	}
-
-	public List<Message> getMessagesToOrFromAddress(String address){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.or(Restrictions.eq("destination", address),Restrictions.eq("origin", address)));
-		return c.list();
-	}
-	
-	public List<Message> getMessagesForGateway(MessagingGateway gateway){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessageClass());
-		c.add(Restrictions.eq("gatewayId",gateway.getGatewayId()));
-		return c.list();
-	}
-	
-
-	public List<Message> getMessagesToPersonUsingGateway(MessagingGateway gateway, Person recipient){
-		return findMessagesWithPeople(gateway,null,recipient,null,null);
-	}
-
-	public List<Message> getMessagesFromPersonUsingGateway(MessagingGateway gateway, Person sender){
-		return findMessagesWithPeople(gateway,sender,null,null,null);
-	}
-
-	public List<Message> getMessagesToOrFromPersonUsingGateway(MessagingGateway gateway, Person person){
-		return findMessagesWithPeople(gateway, person, person, null, null);
-	}
-
-	public List<Message> findMessages(String content){
-		return findMessagesWithAddresses(null,null,null,content,null);
-	}
-	
-	public List<Message> findMessagesWithAddresses(MessagingGateway gateway, String toAddress,String fromAddress, String content,Integer status){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		if(gateway !=null){
-			c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessageClass());
-			c.add(Restrictions.eq("gatewayId",gateway.getGatewayId()));
+		if(protocol !=null){
+			c.add(Restrictions.eq("protocolId",protocol.getProtocolId()));
 		}
-		if(toAddress!= null && !toAddress.equals("")){
-			c.add(Restrictions.eq("origin", toAddress));
-		}
-		if(fromAddress!= null && !fromAddress.equals("")){
-			c.add(Restrictions.eq("destination", fromAddress));
+		if(toAddress.equals(fromAddress) && (toAddress != null && !toAddress.equals(""))){
+			c.add(Restrictions.or(Restrictions.eq("origin",toAddress), Restrictions.eq("destination",toAddress)));
+		}else{
+			if(toAddress!= null && !toAddress.equals("")){
+				c.add(Restrictions.eq("destination", toAddress));
+			}
+			if(fromAddress!= null && !fromAddress.equals("")){
+				c.add(Restrictions.eq("origin", fromAddress));
+			}
 		}
 		if(content!= null && !content.equals("")){
 			c.add(Restrictions.like("content", "%"+content+"%"));
@@ -118,18 +73,23 @@ public class HibernateMessageDAO implements MessageDAO {
 		}
 		return c.list();
 	}
+	
+	
 
-	public List<Message> findMessagesWithPeople(MessagingGateway gateway, Person sender, Person recipient, String content, Integer status){
+	public List<Message> findMessagesWithPeople(Protocol protocol, Person sender, Person recipient, String content, Integer status){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		if(gateway !=null){
-			c = sessionFactory.getCurrentSession().createCriteria(gateway.getMessageClass());
-			c.add(Restrictions.eq("gatewayId",gateway.getGatewayId()));
+		if(protocol !=null){
+			c.add(Restrictions.eq("protocolId",protocol.getProtocolId()));
 		}
-		if(sender!= null){
-			c.add(Restrictions.eq("sender", sender));
-		}
-		if(recipient!= null){
-			c.add(Restrictions.eq("recipient", recipient));
+		if(sender.equals(recipient) && sender != null){
+			c.add(Restrictions.or(Restrictions.eq("sender",sender), Restrictions.eq("recipient",recipient)));
+		}else{
+			if(sender!= null){
+				c.add(Restrictions.eq("sender", sender));
+			}
+			if(recipient!= null){
+				c.add(Restrictions.eq("recipient", recipient));
+			}
 		}
 		if(content!= null && !content.equals("")){
 			c.add(Restrictions.like("content", "%"+content+"%"));
@@ -137,6 +97,7 @@ public class HibernateMessageDAO implements MessageDAO {
 		if(status != null){
 			c.add(Restrictions.eq("status", status));
 		}
+		c.addOrder(Order.asc("date"));
 		return c.list();
 	}
 
@@ -147,6 +108,23 @@ public class HibernateMessageDAO implements MessageDAO {
 
 	public void saveMessage(Message message) {
 		sessionFactory.getCurrentSession().saveOrUpdate(message);
+		//if the message is newly received, notify all the incoming message listeners
+		//if(message.getId() <=0 && message.getMessageStatus() == MessageStatus.RECEIVED){
+			//messagingService.notifyListeners(message);
+		//}
+	}
+
+	public List<Message> getOutboxMessages() {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
+		c.add(Restrictions.eq("status", MessageStatus.OUTBOX.getNumber()));
+		return c.list();
+	}
+
+	public List<Message> getOutboxMessagesByProtocol(Protocol p) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
+		c.add(Restrictions.or(Restrictions.eq("status", MessageStatus.OUTBOX.getNumber()),Restrictions.eq("status", MessageStatus.RETRYING.getNumber())));
+		c.add(Restrictions.eq("protocolId", p.getProtocolId()));
+		return c.list();
 	}
 	
 }

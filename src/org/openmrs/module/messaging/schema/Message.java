@@ -2,6 +2,8 @@ package org.openmrs.module.messaging.schema;
 
 import java.util.Date;
 
+import javax.xml.soap.MessageFactory;
+
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.Person;
 
@@ -15,11 +17,20 @@ import org.openmrs.Person;
  * 
  * @see MessageFactory
  */
-public abstract class Message extends BaseOpenmrsObject{
+public class Message extends BaseOpenmrsObject {
 
-	protected Message(){}
-	
+	protected Message() {
+	}
+
 	private Integer messageId;
+
+	/**
+	 * The number of times that the system has tried to send the message. Once
+	 * this number reaches the max_retries global property value, the message
+	 * will be marked as 'failed' and the system will not continue to attempt to
+	 * send it
+	 */
+	private Integer sendAttempts = 0;
 
 	// content
 	/**
@@ -37,48 +48,35 @@ public abstract class Message extends BaseOpenmrsObject{
 	 * The address that the message was sent/is being sent to
 	 */
 	protected String destination;
-	
+
 	/**
 	 * The person that sent this message, can be null
 	 */
-	private Person sender;
-	
+	protected Person sender;
+
 	/**
 	 * The person who received this message, can be null
 	 */
-	private Person recipient;
+	protected Person recipient;
 
 	/**
 	 * The date that the message was sent
 	 */
-	protected Date dateSent;
-
-	/**
-	 * The date that this message was received
-	 */
-	protected Date dateReceived;
-
-	/**
-	 * The priority of this message. Priorities are currently
-	 * not persisted in the database
-	 */
-	protected Integer priority;
+	protected Date date;
 
 	/**
 	 * The status of this message
 	 */
-	protected Integer status;
-	
-	/**
-	 * The string Id of the gateway that sent this message
-	 */
-	private String gatewayId;
+	private Integer status;
 
 	/**
-	 * Creates a message with only a destination and content. The date sent,
-	 * date received, and origin are all filled in automatically at the time of
-	 * sending. Origin is set to the relevant address of the currently
-	 * authenticated user.
+	 * The string Id of the protocol with which to interpret this message
+	 */
+	private String protocolId;
+
+	/**
+	 * Creates a message with only a destination and content. The date and
+	 * origin are all filled in automatically at the time of sending.
 	 * 
 	 * @param destination
 	 *            the destination of the message
@@ -86,30 +84,28 @@ public abstract class Message extends BaseOpenmrsObject{
 	 *            the content of the message
 	 */
 	public Message(String destination, String content) {
-		this.destination= destination;
+		this.destination = destination;
 		this.content = content;
 	}
 
 	/**
-	 * Creates a message with a destination, origin, priority, and content. The date
-	 * sent, date received, and origin are all filled in automatically at the
-	 * time of sending. Origin is set to the relevant address of the currently
-	 * authenticated user
+	 * Creates a message with a destination, origin, priority, and content. The
+	 * date and origin are all filled in automatically at
+	 * the time of sending.
 	 * 
 	 * @param destination
 	 *            where the message is going
 	 * @param content
 	 *            the content of the message
 	 */
-	public Message(String destination, String origin, String content, int priority) {
+	public Message(String destination, String origin, String content) {
 		this.destination = destination;
-		this.origin =origin;
+		this.origin = origin;
 		this.content = content;
-		this.priority = priority;
 	}
 
 	/**
-	 * @return
+	 * @return the text content of the message
 	 */
 	public String getContent() {
 		return content;
@@ -122,9 +118,6 @@ public abstract class Message extends BaseOpenmrsObject{
 		this.content = content;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getOrigin() {
 		return origin;
 	}
@@ -153,59 +146,31 @@ public abstract class Message extends BaseOpenmrsObject{
 	/**
 	 * @return
 	 */
-	public Date getDateSent() {
-		return dateSent;
+	public Date getDate() {
+		return date;
 	}
 
 	/**
 	 * @param dateSent
 	 */
-	public void setDateSent(Date dateSent) {
-		this.dateSent = dateSent;
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 	/**
 	 * @return
 	 */
-	public Date getDateReceived() {
-		return dateReceived;
-	}
-
-	/**
-	 * @param dateReceived
-	 */
-	public void setDateReceived(Date dateRecieved) {
-		this.dateReceived = dateRecieved;
-	}
-
-	/**
-	 * @return
-	 */
-	public Integer getPriority() {
-		return priority;
-	}
-
-	/**
-	 * @param priority
-	 */
-	public void setPriority(Integer priority) {
-		this.priority = priority;
-	}
-
-	/**
-	 * @return
-	 */
-	public Integer getStatus() {
-		return status;
+	public MessageStatus getMessageStatus() {
+		return MessageStatus.getStatusByNumber(this.getStatus());
 	}
 
 	/**
 	 * @param status
 	 */
-	public void setStatus(Integer status) {
-		this.status = status;
+	public void setMessageStatus(MessageStatus status) {
+		this.setStatus(status.getNumber());
 	}
-	
+
 	public void setMessageId(Integer messageId) {
 		this.messageId = messageId;
 	}
@@ -213,7 +178,7 @@ public abstract class Message extends BaseOpenmrsObject{
 	public Integer getMessageId() {
 		return messageId;
 	}
-	
+
 	public void setId(Integer messageId) {
 		this.messageId = messageId;
 	}
@@ -237,7 +202,7 @@ public abstract class Message extends BaseOpenmrsObject{
 	public Person getRecipient() {
 		return recipient;
 	}
-	
+
 	/**
 	 * @return The sender's name if the sender is set. Otherwise it returns the
 	 *         address of origin
@@ -262,12 +227,49 @@ public abstract class Message extends BaseOpenmrsObject{
 		}
 	}
 
-	public void setGatewayId(String gatewayId) {
-		this.gatewayId = gatewayId;
+	/**
+	 * @param protocolId
+	 *            the protocolId to set
+	 */
+	public void setProtocolId(String protocolId) {
+		this.protocolId = protocolId;
 	}
 
-	public String getGatewayId() {
-		return gatewayId;
+	/**
+	 * @return the protocolId
+	 */
+	public String getProtocolId() {
+		return protocolId;
+	}
+
+	/**
+	 * @param status
+	 *            the status to set
+	 */
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public Integer getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param sendAttempts
+	 *            the sendAttempts to set
+	 */
+	public void setSendAttempts(Integer sendAttempts) {
+		this.sendAttempts = sendAttempts;
+	}
+
+	/**
+	 * @return the sendAttempts
+	 */
+	public Integer getSendAttempts() {
+		return sendAttempts;
 	}
 
 }

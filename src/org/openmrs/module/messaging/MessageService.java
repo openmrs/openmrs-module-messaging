@@ -3,11 +3,10 @@ package org.openmrs.module.messaging;
 import java.util.List;
 
 import org.openmrs.Person;
-import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingGateway;
+import org.openmrs.module.messaging.schema.Protocol;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface MessageService extends OpenmrsService{
@@ -46,6 +45,9 @@ public interface MessageService extends OpenmrsService{
 	@Transactional(readOnly=true)
 	public List<Message> getMessagesToOrFromPerson(Person person);
 	
+	
+	public List<Message> getMessagesForPersonAndProtocol(Person person, Protocol protocol);
+	
 	/**
 	 * @param address
 	 * @return all messages sent from the supplied address 
@@ -68,45 +70,6 @@ public interface MessageService extends OpenmrsService{
 	public List<Message> getMessagesToOrFromAddress(String address);
 	
 	/**
-	 * Returns all messages of the message type that is handled
-	 * by the provided gateway.
-	 * @param gateway
-	 * @return
-	 */
-	@Transactional(readOnly=true)
-	public List<Message> getMessagesForGateway(MessagingGateway gateway);
-	
-	/**
-	 * Returns all messages of the message type that is handled
-	 * by the provided gateway that were sent to "recipient"
-	 * @param gateway
-	 * @param recipient
-	 * @return
-	 */
-	@Transactional(readOnly=true)
-	public List<Message> getMessagesToPersonUsingGateway(MessagingGateway gateway, Person recipient);
-	
-	/**
-	 * Returns all messages of the message type that is handled
-	 * by the provided gateway that were sent by "sender"
-	 * @param gateway
-	 * @param sender
-	 * @return
-	 */
-	@Transactional(readOnly=true)
-	public List<Message> getMessagesFromPersonUsingGateway(MessagingGateway gateway, Person sender);
-	
-	/**
-	 * Returns all messages that were sent to or from
-	 * 'person' by the supplied gateway
-	 * @param gateway
-	 * @param person
-	 * @return
-	 */
-	@Transactional(readOnly=true)
-	public List<Message> getMessagesToOrFromPersonUsingGateway(MessagingGateway gateway, Person person);
-	
-	/**
 	 * Performs a like query on the Message.content field
 	 * using wildcards on each side of the search text.
 	 * @param content
@@ -117,7 +80,7 @@ public interface MessageService extends OpenmrsService{
 	
 	/**
 	 * Any of the parameters can be null
-	 * @param gateway the gateway that handles the message type that you want
+	 * @param protocol the protocol of the message
 	 * @param toAddress the address that the message was sent to
 	 * @param fromAddress the address that the message was sent from
 	 * @param content the content of the message (performs a like query)
@@ -125,11 +88,11 @@ public interface MessageService extends OpenmrsService{
 	 * @return
 	 */
 	@Transactional(readOnly=true)
-	public List<Message> findMessagesWithAdresses(MessagingGateway gateway, String toAddress,String fromAddress, String content,Integer status);
+	public List<Message> findMessagesWithAdresses(Protocol protocol, String toAddress,String fromAddress, String content,Integer status);
 	
 	/**
 	 * Any of the parameters can be null
-	 * @param gateway the gateway that handles the message type that you want
+	 * @param protocol the protocol of the message
 	 * @param sender the person that the message was sent to
 	 * @param recipient the person that the message was sent by
 	 * @param content the content of the message (performs a like query)
@@ -137,7 +100,7 @@ public interface MessageService extends OpenmrsService{
 	 * @return
 	 */
 	@Transactional(readOnly=true)
-	public List<Message> findMessagesWithPeople(MessagingGateway gateway, Person sender, Person recipient, String content, Integer status);
+	public List<Message> findMessagesWithPeople(Protocol protocol, Person sender, Person recipient, String content, Integer status);
 	
 	/**
 	 * Create or update message
@@ -150,5 +113,11 @@ public interface MessageService extends OpenmrsService{
 	 */
 	@Transactional
 	public void deleteMessage(Message message) throws APIException;
+	
+	@Transactional(readOnly=true)
+	public List<Message> getOutboxMessages();
+	
+	@Transactional(readOnly=true)
+	public List<Message> getOutboxMessagesByProtocol(Protocol p);
 
 }
