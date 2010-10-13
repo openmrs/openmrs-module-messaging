@@ -21,6 +21,7 @@
 				<prop key="**/messagesPatientDashboardTab.portlet">messagesPatientDashboardTab</prop>
 				<prop key="module/messaging/admin/manageGateways.form">manageGatewaysController</prop>
 				<prop key="module/messaging/admin/manageAddresses.form">manageAddressesController</prop>
+				<prop key="module/messaging/nuntium/incoming.form">nuntiumController</prop>
 			</props>
 		</property>
 	</bean>

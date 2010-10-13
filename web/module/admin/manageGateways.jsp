@@ -2,6 +2,59 @@
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <h2>Manage Messaging Gateways</h2><br/>
+
+<div id="nuntiumBoxHeader" class="boxHeader">Nuntium</div>
+<div id="nuntiumBox" class="box" style="padding:4px">
+<p>
+Nuntium is an open source and free platform -developed by InSTEDD- that allows applications to send and receive all type of messages. <a href="http://code.google.com/p/nuntium/" target="_blank">Learn more...</a><br/>
+</p>
+
+<form method="post" action="<openmrs:contextPath/>/module/messaging/changeNuntiumCreds.form">
+<p>
+Enabled:<br/>
+Yes <input type="radio" name="enabled" value="yes" ${nuntiumEnabledChecked} onclick="showNuntiumEnabledBox()"/>
+No <input type="radio" name="enabled" value="no" ${nuntiumDisabledChecked} onclick="hideNuntiumEnabledBox()" />
+</p>
+<div id="nuntiumEnabledBox" <% if (!((Boolean)request.getAttribute("nuntiumEnabled"))) {%> style="display:none" <%}%>>
+	<div style="margin-left:20px">
+		<p>
+		URL:<br/>
+		<input type="text" name="url" value="${nuntiumUrl}" size="60" />
+		</p>
+		<p>
+		Account:<br/>
+		<input type="text" name="account" value="${nuntiumAccount}" size="20"/>
+		</p>
+		<p>
+		Application:<br/>
+		<input type="text" name="application" value="${nuntiumApplication}" size="20"/>
+		</p>
+		<p>
+		Password:<br/>
+		<input type="password" name="password" size="20"/>
+		</p>
+	</div>
+	<p>
+	Configure your Nuntium Application interface to be an HTTP POST callback to:
+	<pre style="margin-left:20px">${nuntiumCallbackUrl}</pre>
+	with the given user and password:
+	</p>
+	<div style="margin-left:20px">
+		<p>
+		Callback user:<br/>
+		<input type="text" name="callbackUser" value="${nuntiumCallbackUser}" size="20"/>
+		</p>
+		<p>
+		Callback password:<br/>
+		<input type="password" name="callbackPassword" size="20"/>
+		</p>
+	</div>
+</div>
+<input type="submit" value="Save Changes" />
+</form>
+</div>
+
+<br/>
 <div id="phonesBoxHeader" class="boxHeader">Phones and Modems</div>
 <div id="phonesBox" class="box">
 <c:choose>
@@ -67,5 +120,14 @@ Change the Google Voice login:
 <br/><br/>
 Google Voice gateway status: ${googleVoiceStatus}
 </div>
+
+<script>
+function showNuntiumEnabledBox() {
+	document.getElementById('nuntiumEnabledBox').style.display = '';
+}
+function hideNuntiumEnabledBox() {
+	document.getElementById('nuntiumEnabledBox').style.display = 'none';
+}
+</script>
 
 <%@ include file="/WEB-INF/template/footer.jsp" %>

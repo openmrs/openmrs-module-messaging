@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="web/src"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.6.0 (MacOS X Default)">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="owner.project.facets" value="jst.java"/>
 		</attributes>
@@ -19,11 +19,13 @@
 	<classpathentry kind="lib" path="lib/commons-net-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/jsmpp-2.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/jtwitter.jar"/>
-	<classpathentry kind="lib" path="lib-common/spring-2.5.6.jar"/>
+	<classpathentry kind="lib" path="lib-common/spring-2.5.6.jar" sourcepath="/home/asterite/.m2/repository/org/springframework/spring/2.5.6/spring-2.5.6-sources.jar"/>
 	<classpathentry kind="lib" path="lib-common/spring-test.jar"/>
-	<classpathentry kind="lib" path="lib-common/spring-webmvc.jar"/>
+	<classpathentry kind="lib" path="lib-common/spring-webmvc.jar" sourcepath="/home/asterite/.m2/repository/org/springframework/spring-webmvc/2.5.6/spring-webmvc-2.5.6-sources.jar"/>
 	<classpathentry kind="lib" path="lib-common/jsp-api.jar"/>
 	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/openmrs-1.7.x"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openmrs-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openmrs-web"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/openmrs-webapp"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

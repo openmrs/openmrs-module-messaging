@@ -11,7 +11,7 @@ import org.openmrs.module.messaging.schema.exception.MessageFormattingException;
  * 
  */
 public abstract class Protocol {
-
+	
 	/**
 	 * This method should return the unique string ID of the protocol <br>
 	 * </br> e.g. "sms" or "twitter"
