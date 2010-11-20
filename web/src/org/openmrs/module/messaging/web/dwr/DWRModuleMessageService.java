@@ -18,7 +18,6 @@ import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
-import org.openmrs.module.messaging.schema.MessagingServiceImpl;
 import org.openmrs.module.messaging.schema.Protocol;
 import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
 import org.openmrs.module.messaging.web.model.MessageBean;
@@ -44,6 +43,11 @@ public class DWRModuleMessageService {
 		addressService = Context.getService(MessagingAddressService.class);
 	}
 	
+	/**
+	 * Returns all messages to or from a patient in the form of a list of {@link MessageBean}s.
+	 * @param patientId
+	 * @return
+	 */
 	public List<MessageBean> getMessagesForPatient(Integer patientId){
 		//retreive the patient
 		Patient p = Context.getService(PatientService.class).getPatient(patientId);
@@ -84,6 +88,11 @@ public class DWRModuleMessageService {
 	
 	private boolean isTooFarApart(long lastTime, Date thisTime){
 		return Math.abs(thisTime.getTime() - lastTime) > MAX_TIME_DISTANCE;
+	}
+	
+	
+	public String sendMessage(String content, String toAddress, String protocolId){
+		return sendMessage(content,toAddress,null,null,null,protocolId,false);
 	}
 	
 	public String sendMessage(String content, String toAddressString, String fromAddressString, Integer recipientId, Integer senderId, String protocolId, boolean isFromCurrentUser){
@@ -131,6 +140,7 @@ public class DWRModuleMessageService {
 		message.setSender(ps.getPerson(senderId));
 		message.setRecipient(ps.getPerson(recipientId));
 		message.setDate(new Date());
+		//if people were not passed in, try to pull the people from the addresses
 		if(message.getRecipient() == null){
 			message.setRecipient(addressService.getPersonForAddress(toAddressString));
 		}

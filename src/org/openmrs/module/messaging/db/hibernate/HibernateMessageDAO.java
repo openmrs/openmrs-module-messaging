@@ -9,6 +9,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessageStatus;
@@ -18,9 +19,7 @@ import org.openmrs.module.messaging.schema.Protocol;
 public class HibernateMessageDAO implements MessageDAO {
 
 	protected Log log = LogFactory.getLog(getClass());
-	
-	private MessagingService messagingService;
-	
+
 	/**
 	 * Hibernate session factory
 	 */
@@ -33,13 +32,6 @@ public class HibernateMessageDAO implements MessageDAO {
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) { 
 		this.sessionFactory = sessionFactory;
-	}
-	
-	/**
-	 * @param messagingService the messagingService to set
-	 */
-	public void setMessagingService(MessagingService messagingService) {
-		this.messagingService = messagingService;
 	}
 	
 	public List<Message> getAllMessages(){
@@ -109,9 +101,9 @@ public class HibernateMessageDAO implements MessageDAO {
 	public void saveMessage(Message message) {
 		sessionFactory.getCurrentSession().saveOrUpdate(message);
 		//if the message is newly received, notify all the incoming message listeners
-		//if(message.getId() <=0 && message.getMessageStatus() == MessageStatus.RECEIVED){
-			//messagingService.notifyListeners(message);
-		//}
+		if(message.getId() <=0 && message.getMessageStatus() == MessageStatus.RECEIVED){
+			Context.getService(MessagingService.class).notifyListeners(message);
+		}
 	}
 
 	public List<Message> getOutboxMessages() {

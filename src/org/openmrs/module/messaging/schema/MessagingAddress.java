@@ -18,6 +18,12 @@ public class MessagingAddress extends BaseOpenmrsData {
 
 	public MessagingAddress() {
 	}
+	
+	public MessagingAddress(String address, Person person) {
+		super();
+		this.address = address;
+		this.person = person;
+	}
 
 	public MessagingAddress(String address, String password, Person person) {
 		super();
@@ -26,12 +32,7 @@ public class MessagingAddress extends BaseOpenmrsData {
 		this.person = person;
 	}
 
-	public MessagingAddress(String address, Person person) {
-		super();
-		this.address = address;
-		this.person = person;
-	}
-
+ 
 	private Integer messagingAddressId;
 
 	/**

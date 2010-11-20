@@ -13,12 +13,6 @@ import org.openmrs.module.messaging.schema.exception.MessageFormattingException;
 public abstract class Protocol {
 
 	/**
-	 * This method should return the unique string ID of the protocol <br>
-	 * </br> e.g. "sms" or "twitter"
-	 */
-	public abstract String getProtocolId();
-
-	/**
 	 * This method should return the display name of the protocol. This will be
 	 * used in the UI and should be internationalized if necessary <br>
 	 * </br> e.g. "SMS" or "Twitter"
@@ -80,5 +74,9 @@ public abstract class Protocol {
 	public abstract boolean addressIsValid(String address);
 
 	public abstract boolean requiresPassword();
+	
+	public String getProtocolId(){
+		return getClass().getName();
+	}
 
 }

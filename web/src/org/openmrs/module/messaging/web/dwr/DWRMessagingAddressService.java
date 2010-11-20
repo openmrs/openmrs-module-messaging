@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.MessagingAddress;
@@ -18,34 +17,57 @@ public class DWRMessagingAddressService {
 	Log log = LogFactory.getLog(getClass());
 	
 	private MessagingAddressService addressService;
-	private PersonService personService;
 	
 	public DWRMessagingAddressService(){
 		addressService = Context.getService(MessagingAddressService.class);
-		personService= Context.getPersonService();
 	}
 
+	/**
+	 * Returns all messaging addresses for the person ID supplied.
+	 * @param personId The numeric database ID of the person in question
+	 * @return
+	 */
 	public List<MessagingAddress> getAllAddressesForPersonId(Integer personId){
 		return addressService.getMessagingAddressesForPerson(Context.getPersonService().getPerson(personId));
 	}
 	
+	/**
+	 * Returns only the 'public' messaging addresses for the person ID supplied.
+	 * @param personId The numeric database ID of the person in question
+	 * @return
+	 */
 	public List<MessagingAddress> getPublicAddressesForPersonId(Integer personId){
 		return addressService.getPublicAddressesForPerson(Context.getPersonService().getPerson(personId));
 	}
 	
+	/**
+	 * Returns all messaging addresses for the currently authenticated user.
+	 */
 	public List<MessagingAddress> getAllAddressesForCurrentUser(){
 		return addressService.getMessagingAddressesForPerson(Context.getAuthenticatedUser().getPerson());
 	}
 	
+	/**
+	 * Returns only public messaging addresses for the currently authenticated user.
+	 */
 	public List<MessagingAddress> getPublicAddressesForCurrentUser(){
 		return addressService.getPublicAddressesForPerson(Context.getAuthenticatedUser().getPerson());
 	}
 	
+	/**
+	 * Deletes an address
+	 * @param id The id of the address to delete
+	 */
 	public void deleteAddress(Integer id){
 		MessagingAddress ma = Context.getService(MessagingAddressService.class).getMessagingAddress(id);
 		Context.getService(MessagingAddressService.class).deleteMessagingAddress(ma);
 	}
 	
+	/**
+	 * Validates and saves a messaging address.
+	 * @param address The address to save or update
+	 * @param personId The if of the person that this address is for (can be null if you aren't creating a new address) 
+	 */
 	public void saveOrUpdateAddress(MessagingAddress address, Integer personId){
 		Protocol protocol = Context.getService(MessagingService.class).getProtocolById(address.getProtocolId());
 		MessagingAddress ma = null;
@@ -69,6 +91,10 @@ public class DWRMessagingAddressService {
 		Context.getService(MessagingAddressService.class).saveMessagingAddress(ma);
 	}
 	
+	/**
+	 * Saves an address and associates it with the currently authenticated user
+	 * @param address
+	 */
 	public void saveOrUpdateAddressForCurrentUser(MessagingAddress address){
 		saveOrUpdateAddress(address,Context.getAuthenticatedUser().getPerson().getId());
 	}

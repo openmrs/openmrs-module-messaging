@@ -16,10 +16,27 @@ import com.techventus.server.voice.Voice;
 
 public class GoogleVoiceGateway extends MessagingGateway {
 
+	/**
+	 * The object that allows control of a google voice account
+	 */
 	private Voice googleVoice;
-	private static Log log = LogFactory.getLog(GoogleVoiceGateway.class);
-	private CredentialSet currentCredentials;
 	
+	/**
+	 * The credentials of the currently logged in user
+	 */
+	private CredentialSet currentCredentials;
+
+	/**
+	 * Boolean indicating whether or not this gateway is connected to Twitter
+	 */
+	private volatile boolean isActive = false;
+	
+	/**
+	 * Boolean used for starting and stopping the activity-checking thread
+	 */
+	private volatile boolean stopThread = false;
+
+	private static Log log = LogFactory.getLog(GoogleVoiceGateway.class);
 	
 	@Override
 	public boolean canReceive() {
@@ -43,7 +60,11 @@ public class GoogleVoiceGateway extends MessagingGateway {
 
 	@Override
 	public boolean isActive() {
-		return googleVoice != null && googleVoice.isLoggedIn();
+		return isActive;
+	}
+
+	private void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 
 	@Override
@@ -52,16 +73,10 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	}
 
 	@Override
-	public boolean shouldSendMessage(Message m) {
-		return false;
-	}
-
-	@Override
 	public void shutdown() {
 		googleVoice = null;
+		stopThread();
 	}
-
-
 	
 	@Override
 	public void startup() {
@@ -74,6 +89,45 @@ public class GoogleVoiceGateway extends MessagingGateway {
 		} catch (Exception e) {
 			log.error("Error starting the Google Voice Gateway",e);
 		}
+		startActivityCheckingThread();
+	}
+	
+	/**
+	 * Starts a thread that polls twitter every 2 seconds to see if the gateway
+	 * is still connected.
+	 */
+	private void startActivityCheckingThread() {
+		stopThread = false;
+		Thread activeCheckingThread = new Thread(new Runnable() {
+			public void run() {
+				while (!stopThread) {
+					if (googleVoice != null) {
+						try {
+							if (googleVoice.isLoggedIn()) {
+								setActive(true);
+								System.out.println("Google voice was active");
+							}else{
+								setActive(false);
+								System.out.println("Google voice was inactive");
+							}
+						} catch (Throwable t) {
+							setActive(false);
+						}
+						try {
+							Thread.sleep(2000);
+						} catch (InterruptedException e) {
+							log.error("Error sleeping in Google Voice activity checking thread",e);
+						}
+					}
+				}
+				System.out.println("Stopping the thread");
+			}
+		});
+		activeCheckingThread.start();
+	}
+
+	private void stopThread() {
+		stopThread = true;
 	}
 
 	/**
@@ -102,7 +156,12 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	
 	@Override
 	public boolean supportsProtocol(Protocol p) {
-		return p.getProtocolId() == SmsProtocol.PROTOCOL_ID;
+		return p.getProtocolId() == SmsProtocol.class.getName();
+	}
+
+	@Override
+	public void recieveMessages() {
+		//do nothing
 	}
 
 }

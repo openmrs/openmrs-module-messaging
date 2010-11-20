@@ -13,7 +13,6 @@ import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessagingAddress;
 import org.openmrs.module.messaging.schema.MessagingService;
-import org.openmrs.module.messaging.schema.MessagingServiceImpl;
 import org.openmrs.module.messaging.schema.Protocol;
 import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
 import org.openmrs.propertyeditor.PersonEditor;

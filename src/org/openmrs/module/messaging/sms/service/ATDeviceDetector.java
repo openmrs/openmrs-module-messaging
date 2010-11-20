@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.sms.util;
+package org.openmrs.module.messaging.sms.service;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -50,6 +50,7 @@ class ATDeviceDetector extends Thread {
 	}
 	
 	public void run() {
+		log.info("Beginning detection on port " + portIdentifier);
 		for(int baud : BAUD_RATES) {
 			SerialPort serialPort = null;
 			InputStream in = null;
@@ -67,8 +68,6 @@ class ATDeviceDetector extends Thread {
 				in = serialPort.getInputStream();
 				out = serialPort.getOutputStream();
 				serialPort.enableReceiveTimeout(1000);
-				
-				log.info("LOOPING.");
 				
 				// discard all data currently waiting on the input stream
 				DetectorUtils.readAll(in);

@@ -1,6 +1,6 @@
 package org.openmrs.module.messaging.schema;
 
-import org.openmrs.Person;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
 
@@ -10,13 +10,13 @@ import org.openmrs.module.messaging.MessagingAddressService;
  */
 public abstract class MessagingGateway {
 
-	protected MessagingAddressService addressService;
+	protected MessagingAddressService addressService = Context.getService(MessagingAddressService.class);
 	
-	protected MessageService messageService;
+	protected MessageService messageService = Context.getService(MessageService.class);
 	
 	public abstract void sendMessage(Message message) throws Exception;
-
-	public abstract boolean shouldSendMessage(Message m);
+	
+	public abstract void recieveMessages();
 
 	/**
 	 * Should return true if the messaging service has the ability to send
@@ -34,6 +34,10 @@ public abstract class MessagingGateway {
 	 */
 	public abstract boolean canReceive();
 	
+	/**
+	 * Returns true if the gateway is currently active
+	 * @return
+	 */
 	public abstract boolean isActive();
 
 	/**
@@ -71,17 +75,5 @@ public abstract class MessagingGateway {
 	 * @return
 	 */
 	public abstract boolean supportsProtocol(Protocol p);
-	
-	protected void receiveMessage(String toAddress, String fromAddress, String content, String protocolId){
-		Message m = new Message(toAddress,content);
-		m.setOrigin(fromAddress);
-		Person sender = addressService.getPersonForAddress(fromAddress);
-		Person recipient = addressService.getPersonForAddress(toAddress);
-		m.setSender(sender);
-		m.setRecipient(recipient);
-		m.setMessageStatus(MessageStatus.RECEIVED);
-		m.setProtocolId(protocolId);
-		messageService.saveMessage(m);
-	}
 
 }

@@ -16,7 +16,6 @@ import org.openmrs.module.messaging.schema.exception.MessageFormattingException;
  */
 public class SmsProtocol extends Protocol{
 
-	public static String PROTOCOL_ID = "sms";
 	/**
 	 * SmsAlphabet contains data about the 
 	 * 3 different possible alphabets that can
@@ -51,11 +50,6 @@ public class SmsProtocol extends Protocol{
 	}
 	
 	@Override
-	public String getProtocolId() {
-		return PROTOCOL_ID;
-	}
-	
-	@Override
 	public String getProtocolName() {
 		return "SMS";
 	}
@@ -81,7 +75,7 @@ public class SmsProtocol extends Protocol{
 											   + "and your country code or enter a locally formatted number.");
 		}
 		MessagingAddress result = new MessagingAddress(getProperlyFormattedPhoneNumber(address), person);
-		result.setProtocolId(this.PROTOCOL_ID);
+		result.setProtocolId(getProtocolId());
 		return result;
 	}
 	
@@ -134,7 +128,7 @@ public class SmsProtocol extends Protocol{
 			throw new MessageFormattingException("SMS message is too long.");
 		}
 		Message result = new Message(toAddress,fromAddress,messageContent);
-		result.setProtocolId(this.PROTOCOL_ID);
+		result.setProtocolId(getProtocolId());
 		return result; 
 	}
 	
@@ -148,7 +142,7 @@ public class SmsProtocol extends Protocol{
 		}
 		//validation complete, create the message
 		Message result =new Message(toAddress.getAddress(),fromAddress.getAddress(),messageContent);
-		result.setProtocolId(this.PROTOCOL_ID);
+		result.setProtocolId(getProtocolId());
 		return result;
 	}
 	

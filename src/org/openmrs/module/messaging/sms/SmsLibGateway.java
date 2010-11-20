@@ -1,38 +1,39 @@
 package org.openmrs.module.messaging.sms;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessageService;
-import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessageStatus;
 import org.openmrs.module.messaging.schema.MessagingGateway;
 import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.sms.service.ServiceManager;
+import org.openmrs.module.messaging.sms.service.exception.ServiceStateException;
+import org.openmrs.module.messaging.web.model.ModemBean;
 import org.smslib.AGateway;
-import org.smslib.GatewayException;
-import org.smslib.IInboundMessageNotification;
 import org.smslib.IOutboundMessageNotification;
 import org.smslib.InboundMessage;
 import org.smslib.OutboundMessage;
 import org.smslib.Service;
-import org.smslib.Message.MessageTypes;
+import org.smslib.InboundMessage.MessageClasses;
 import org.smslib.OutboundMessage.MessageStatuses;
 import org.smslib.Service.ServiceStatus;
-import org.smslib.http.ClickatellHTTPGateway;
 
 public class SmsLibGateway extends MessagingGateway implements IOutboundMessageNotification {
 
 	private static Log log = LogFactory.getLog(SmsLibGateway.class);
 	private Map<String, Message> sentMessages;
-
+	
+	private ServiceManager serviceManager;
+	
 	public SmsLibGateway(){
 		sentMessages = new HashMap<String, Message>();
+		serviceManager = new ServiceManager();
 	}
 	
 	@Override
@@ -70,16 +71,34 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 		sentMessages.put(om.getId(), message);
 		Service.getInstance().queueMessage(om);
 	}
-
-	@Override
-	public boolean shouldSendMessage(Message m) {
-		return false;
+	
+	public void recieveMessages(){
+		List<InboundMessage> inboundMessages = new ArrayList<InboundMessage>();
+		try {
+			Service.getInstance().readMessages(inboundMessages,MessageClasses.READ);
+		} catch (Throwable e) {
+			log.error("Error reading messages from phone", e);
+		}
+		for(InboundMessage iMessage: inboundMessages){
+			Message m = new Message(Service.getInstance().getGateway(iMessage.getGatewayId()).getFrom(), iMessage.getText());
+			m.setSender(addressService.getPersonForAddress("+"+iMessage.getOriginator()));
+			m.setOrigin("+"+iMessage.getOriginator());
+			m.setMessageStatus(MessageStatus.RECEIVED);
+			m.setDate(iMessage.getDate());
+			m.setProtocolId(SmsProtocol.class.getName());
+			messageService.saveMessage(m);
+			try {
+				Service.getInstance().deleteMessage(iMessage);
+			} catch (Exception e) {
+				log.error("Error deleting message from phone",e);
+			}
+		}	
 	}
 
 	@Override
 	public void shutdown() {
 		try {
-			Service.getInstance().stopService();
+			serviceManager.teardownService();
 		} catch (Exception e) {
 			log.error("Error shutting down the SMSLib service.",e);
 		}
@@ -87,56 +106,30 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 
 	@Override
 	public void startup() {
-		//detect the modems
-		//AllModemsDetector.getService();
-		if(Service.getInstance() != null && (Service.getInstance().getServiceStatus() == ServiceStatus.STARTED || Service.getInstance().getServiceStatus() == ServiceStatus.STARTING)){
-			return;
+		try{
+			serviceManager.initializeService();
+			log.info("SmsLib gateway has been started with "+ Service.getInstance().getGateways().size() + " subgateways.");
+		}catch(ServiceStateException e){
+			log.error("Error initializing service",e);
 		}
-		ClickatellHTTPGateway gateway = new ClickatellHTTPGateway("clickatel", "3258971", "dieterich.lawson", "martyr441");
-		gateway.setOutbound(true);
-		gateway.setSecure(true);
-		try {
-			Service.getInstance().addGateway(gateway);
-			log.info("Clickatell gateway added successfully");
-		} catch (GatewayException e1) {
-			log.error("Unable to add Clickatel gateway",e1);
+	}
+	
+	public List<ModemBean> redetectModems() throws ServiceStateException{
+		serviceManager.teardownService();
+		serviceManager.initializeService();
+		return serviceManager.getDetectedModemBeans();
+	}
+	
+	public List<ModemBean> getCurrentlyConnectedModems(boolean update){
+		if(update){
+			return serviceManager.updateModemBeans();
 		}
-		
-		try {
-			Service.getInstance().startService();
-		} catch (Exception  e2) {
-			log.error("Unable to start service", e2);
-		}
-		log.info("SmsLib gateway has "+ Service.getInstance().getGateways().size() + " subgateways.");
-		// set the message receiver to save the messages to the database
-		Service.getInstance().setInboundMessageNotification(new IInboundMessageNotification() {
-			
-					private MessageService messageService = Context.getService(MessageService.class);
-					private MessagingAddressService addressService = Context.getService(MessagingAddressService.class);
-
-					public void process(AGateway gateway, MessageTypes messageType, InboundMessage message) {
-						// TODO: Figure out how to get recipient number
-						Context.openSession();
-						Message m = new Message(gateway.getFrom(), message.getText());
-						m.setSender(addressService.getPersonForAddress("+"+message.getOriginator()));
-						m.setOrigin("+"+message.getOriginator());
-						m.setMessageStatus(MessageStatus.RECEIVED);
-						m.setDate(new Date());
-						m.setProtocolId(SmsProtocol.PROTOCOL_ID);
-						messageService.saveMessage(m);
-						try {
-							Service.getInstance().deleteMessage(message);
-						} catch (Exception e) {
-							log.error("Error deleting message from phone",e);
-						}
-						Context.closeSession();
-					}
-				});
+		return serviceManager.getDetectedModemBeans();
 	}
 
 	@Override
 	public boolean supportsProtocol(Protocol p) {
-		return p.getProtocolId().equals(SmsProtocol.PROTOCOL_ID);
+		return p.getProtocolId().equals(SmsProtocol.class.getName());
 	}
 
 	/**

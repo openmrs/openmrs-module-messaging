@@ -17,17 +17,11 @@ import winterwell.jtwitter.Twitter;
 public class TwitterProtocol extends Protocol{
 
 	public static final String PROTOCOL_NAME = "Twitter";
-	public static final String PROTOCOL_ID = "twitter";
 	
 	private Twitter twitter;
 	
 	public TwitterProtocol(){
 		twitter = new Twitter();
-	}
-	
-	@Override
-	public String getProtocolId() {
-		return PROTOCOL_ID;
 	}
 	
 	@Override
@@ -67,7 +61,7 @@ public class TwitterProtocol extends Protocol{
 			throw new AddressFormattingException("Username is blank");
 		}else{
 			MessagingAddress ma = new MessagingAddress(address,person);
-			ma.setProtocolId(PROTOCOL_ID);
+			ma.setProtocolId(getProtocolId());
 			return ma;
 		}
 	}
@@ -97,7 +91,7 @@ public class TwitterProtocol extends Protocol{
 			throw new MessageFormattingException("Tweet is longer than 140 characters");
 		}
 		Message result = new Message(toAddress,fromAddress,messageContent);
-		result.setProtocolId(this.PROTOCOL_ID);
+		result.setProtocolId(this.getProtocolId());
 		return result;
 	}
 

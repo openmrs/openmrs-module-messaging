@@ -14,11 +14,11 @@
 	</description>
 	<activator>@MODULE_PACKAGE@.MessagingModuleActivator</activator>
 	
-	
 	<dwr>
 		<allow>	
-			<convert  match="org.openmrs.module.messaging.schema.MessagingAddress" converter="bean"/>
+			<convert converter="bean" match="org.openmrs.module.messaging.schema.MessagingAddress" />
 			<convert converter="bean" match="org.openmrs.module.messaging.web.model.MessageBean"/>
+			<convert converter="bean" match="org.openmrs.module.messaging.web.model.ModemBean"/>
 						
 			<create creator="new" javascript="DWRMessagingAddressService">
 				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingAddressService"/>
@@ -35,6 +35,19 @@
 				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRModuleMessageService"/>
 				<include method="getMessagesForPatient"/>
 				<include method="sendMessage"/>
+			</create>
+			
+			<create creator="new" javascript="DWRGatewayStatusService">
+				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRGatewayStatusService"/>
+				<include method="isGatewayActive"/>
+				<include method="startGateway"/>
+				<include method="stopGateway"/>
+			</create>
+			
+			<create creator="new" javascript="DWRSmsLibGatewayService">
+				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRSmsLibGatewayService"/>
+				<include method="redetectModems"/>
+				<include method="getConnectedModems"/>
 			</create>
 		</allow>
 	</dwr>

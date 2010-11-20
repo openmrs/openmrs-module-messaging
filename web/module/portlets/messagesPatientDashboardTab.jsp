@@ -141,7 +141,6 @@ Manage Addresses
 	var colors = ["red","#32CD32","blue","#FFD700","orchid","aqua","purple"];
 	
 	function init(){
-		//dwr.util.useLoadingMessage();
 		dwr.engine.beginBatch();
 		fillMessageList();
 		fillAddressesTable();
@@ -152,22 +151,22 @@ Manage Addresses
 	function fillAddressesTable() {
 		//call the DWR service to get all the addresses for the patient that is being viewed
 		DWRMessagingAddressService.getAllAddressesForPersonId(${patient.patientId},function(addresses) {
-		// Delete all the rows except for the "pattern" row
-		dwr.util.removeAllRows("addressbody", { filter:function(tr) {return (tr.id != "pattern");}});
-		var address, id;
-		// iterate through the addresses, cloning the pattern row
-		// and placing each addresses values into that row
-		for (var i = 0; i < addresses.length; i++) {
-			address = addresses[i];
-		    id = address.messagingAddressId;
-		    dwr.util.cloneNode("pattern", { idSuffix:id });
-		    dwr.util.setValue("tableType" + id, address.protocolId);
-		    dwr.util.setValue("tableAddress" + id, address.address);
-		    dwr.util.setValue("tableDateCreated" + id, "");
-		    dwr.util.setValue("tablePreferred" + id, address.preferred?"*":"");
-		    $("pattern" + id).style.display = "table-row";
-		    addressCache[id] = address;
-		}
+			// Delete all the rows except for the "pattern" row
+			dwr.util.removeAllRows("addressbody", { filter:function(tr) {return (tr.id != "pattern");}});
+			var address, id;
+			// iterate through the addresses, cloning the pattern row
+			// and placing each addresses values into that row
+			for (var i = 0; i < addresses.length; i++) {
+				address = addresses[i];
+			    id = address.messagingAddressId;
+			    dwr.util.cloneNode("pattern", { idSuffix:id });
+			    dwr.util.setValue("tableType" + id, address.protocolId.substring(address.protocolId.lastIndexOf(".")+1).replace("Protocol",""));
+			    dwr.util.setValue("tableAddress" + id, address.address);
+			    dwr.util.setValue("tableDateCreated" + id, "");
+			    dwr.util.setValue("tablePreferred" + id, address.preferred?"*":"");
+			    $("pattern" + id).style.display = "table-row";
+			    addressCache[id] = address;
+			}
 		});
 	}
 	
@@ -197,8 +196,9 @@ Manage Addresses
 	//resets the editing area
 	function clearAddress() {
 	 	viewed = -1;
-		dwr.util.setValues({ messagingAddressId:-1, protocolId:null, address:null, preferred:null, dateCreated:null });
+		dwr.util.setValues({ messagingAddressId:-1, address:null, preferred:null, dateCreated:null });
 		$("editSpan").innerHTML = "<h3>Add an Address</h3>";
+		
 	}
 
 	function writeAddress() {

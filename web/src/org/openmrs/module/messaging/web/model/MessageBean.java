@@ -8,10 +8,19 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessagingService;
 
-public class MessageBean implements Serializable{
-	
+/**
+ * MessageBean is a class for sending message objects over ajax. It's very
+ * similar to a Message, except all data is in text form and there is an
+ * additional 'colornumber' that specifies what color the sender's name should
+ * be.
+ * 
+ * @author dieterichlawson
+ * 
+ */
+public class MessageBean implements Serializable {
+
 	private static final long serialVersionUID = 6998333130334839317L;
-	
+
 	private String text;
 	private String sender;
 	private boolean fromOpenMRS;
@@ -20,22 +29,25 @@ public class MessageBean implements Serializable{
 	private String time;
 	private Integer id;
 	private String protocolName;
-	
-	public MessageBean(){
-		id=-1;
+
+	public MessageBean() {
+		id = -1;
 	}
-	
-	public MessageBean(Message message){
+
+	public MessageBean(Message message) {
 		this.setId(message.getId());
 		this.text = message.getContent();
 		this.sender = message.getDisplayOrigin();
-		this.setProtocolName(Context.getService(MessagingService.class).getProtocolById(message.getProtocolId()).getProtocolName());
-		if (message.getDate() != null){
-			this.date = DateFormat.getDateInstance(DateFormat.SHORT).format(message.getDate());
-			this.time = DateFormat.getTimeInstance(DateFormat.SHORT).format(message.getDate());
+		this.setProtocolName(Context.getService(MessagingService.class)
+				.getProtocolById(message.getProtocolId()).getProtocolName());
+		if (message.getDate() != null) {
+			this.date = DateFormat.getDateInstance(DateFormat.SHORT).format(
+					message.getDate());
+			this.time = DateFormat.getTimeInstance(DateFormat.SHORT).format(
+					message.getDate());
 		}
 	}
-	
+
 	public String getText() {
 		return text;
 	}
@@ -85,7 +97,8 @@ public class MessageBean implements Serializable{
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -97,16 +110,19 @@ public class MessageBean implements Serializable{
 	public Integer getId() {
 		return id;
 	}
-	
-	public void setDateAndTime(Date date){
-		if(date != null){
-			this.date = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
-			this.time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
+
+	public void setDateAndTime(Date date) {
+		if (date != null) {
+			this.date = DateFormat.getDateInstance(DateFormat.SHORT).format(
+					date);
+			this.time = DateFormat.getTimeInstance(DateFormat.SHORT).format(
+					date);
 		}
 	}
 
 	/**
-	 * @param protocolName the protocolName to set
+	 * @param protocolName
+	 *            the protocolName to set
 	 */
 	public void setProtocolName(String protocolName) {
 		this.protocolName = protocolName;
@@ -119,5 +135,4 @@ public class MessageBean implements Serializable{
 		return protocolName;
 	}
 
-	
 }
