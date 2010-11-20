@@ -13,7 +13,6 @@
 							<property name="messageDAO">
 								<bean class="@MODULE_PACKAGE@.db.hibernate.HibernateMessageDAO">
 									<property name="sessionFactory"><ref bean="sessionFactory"/></property>
-									<!-- <property name="messagingService"><ref bean="messagingService"/></property>-->	
 								</bean>
 							</property>	
 						</bean>
@@ -54,7 +53,10 @@
 			</list>
 		</property>
 	</bean>
-	
+
+<!--  Gateway Manager -->	
+	<bean id="gatewayManager" class="org.openmrs.module.messaging.schema.GatewayManager"/>
+
 	<bean parent="serviceContext" >
 		<property name="moduleService">
 			<list>
@@ -62,7 +64,9 @@
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="@MODULE_PACKAGE@.schema.MessagingServiceImpl"/>
+						<bean class="@MODULE_PACKAGE@.schema.MessagingServiceImpl">
+							<property name="gatewayManager"><ref bean="gatewayManager"/></property>
+						</bean>
 					</property>
 					<property name="preInterceptors">
                         <ref bean="serviceInterceptors" />

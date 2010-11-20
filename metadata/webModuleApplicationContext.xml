@@ -14,7 +14,7 @@
 	<context:component-scan base-package="org.openmrs.module.messaging" />
 
 	<bean id="messagingMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-		<property name="order"><value>1</value></property>
+		<property name="order"><value>2</value></property>
 		<property name="mappings">
 			<props>
 				<prop key="module/messaging/admin/sendMessage.form">sendMessageController</prop>
@@ -24,13 +24,12 @@
 			</props>
 		</property>
 	</bean>
-	
+		
 	<bean id="manageAddressesController" class="org.openmrs.module.messaging.web.controller.ManageAddressesController" />
 	<bean id="sendMessageController" class="org.openmrs.module.messaging.web.controller.SendMessageController" />
-	
-	<!-- 
-	<bean id="manageGatewaysController" class="org.openmrs.module.messaging.web.controller.ManageGatewaysController" />
-	URL mappings -->
+	<bean id="manageGatewaysController" class="org.openmrs.module.messaging.web.controller.ManageGatewaysController" >
+		<property name="gatewayManager"><ref bean="gatewayManager"/></property>
+	</bean>
 	<bean id="messagesPatientDashboardTab" class="org.openmrs.module.messaging.web.controller.MessagingDashboardTabController" />
 
 </beans>

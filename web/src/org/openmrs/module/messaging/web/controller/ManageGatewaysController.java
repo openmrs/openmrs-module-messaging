@@ -6,8 +6,8 @@ import javax.servlet.http.HttpSession;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingConstants;
-import org.openmrs.module.messaging.MessagingModuleActivator;
 import org.openmrs.module.messaging.googlevoice.GoogleVoiceGateway;
+import org.openmrs.module.messaging.schema.GatewayManager;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
 import org.openmrs.module.messaging.twitter.TwitterGateway;
 import org.openmrs.web.WebConstants;
@@ -25,16 +25,30 @@ import com.techventus.server.voice.Voice;
 @Controller
 public class ManageGatewaysController {
 
+	private GatewayManager gatewayManager;
+	
+	/**
+	 * For Spring only
+	 * @param manager
+	 */
+	public void setGatewayManager(GatewayManager manager){
+		this.gatewayManager = manager;
+	}
+	
 	@RequestMapping("/module/messaging/admin/manageGateways")
-	public void populateModel(HttpServletRequest request){	
-		request.setAttribute("twitterUsername", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_UNAME));
-		request.setAttribute("twitterPassword", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_PASSWORD));
-		String twitterStatus = MessagingModuleActivator.manager.getGatewayByClass(TwitterGateway.class).isActive()? "Active":"Inactive";
-		request.setAttribute("twitterStatus", twitterStatus);
-		request.setAttribute("googleVoiceUsername", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME));
-		request.setAttribute("googleVoicePassword", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD));
-		String gvStatus = MessagingModuleActivator.manager.getGatewayByClass(GoogleVoiceGateway.class).isActive()? "Active":"Inactive";
-		request.setAttribute("googleVoiceStatus", gvStatus);
+	public void populateModel(HttpServletRequest request){
+		if(gatewayManager.getGatewayByClass(TwitterGateway.class) != null){
+			request.setAttribute("twitterUsername", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_UNAME));
+			request.setAttribute("twitterPassword", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_PASSWORD));
+			String twitterStatus = gatewayManager.getGatewayByClass(TwitterGateway.class).isActive()? "Active":"Inactive";
+			request.setAttribute("twitterStatus", twitterStatus);
+		}
+		if(gatewayManager.getGatewayByClass(GoogleVoiceGateway.class) != null){
+			request.setAttribute("googleVoiceUsername", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME));
+			request.setAttribute("googleVoicePassword", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD));
+			String gvStatus = gatewayManager.getGatewayByClass(GoogleVoiceGateway.class).isActive()? "Active":"Inactive";
+			request.setAttribute("googleVoiceStatus", gvStatus);
+		}
 	}
 	
 	@RequestMapping(value="/module/messaging/changeTwitterCreds", method=RequestMethod.POST)
@@ -54,7 +68,7 @@ public class ManageGatewaysController {
 				Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_UNAME, username));
 				Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_PASSWORD, password1));
 				//update the gateway itself
-				MessagingModuleActivator.manager.getGatewayByClass(TwitterGateway.class).updateCredentials(username, password1);
+				gatewayManager.getGatewayByClass(TwitterGateway.class).updateCredentials(username, password1);
 				httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Credentials saved");
 			}else{
 				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The credentials provided were not a valid twitter login");
@@ -85,7 +99,7 @@ public class ManageGatewaysController {
 				Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME, username));
 				Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD, password1));
 				//update the gateway itself
-				MessagingModuleActivator.manager.getGatewayByClass(GoogleVoiceGateway.class).updateCredentials(username, password1);
+				gatewayManager.getGatewayByClass(GoogleVoiceGateway.class).updateCredentials(username, password1);
 				//tell the user it worked
 				httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Credentials saved");
 			} catch (Exception e) {
@@ -101,7 +115,7 @@ public class ManageGatewaysController {
 	@RequestMapping("/module/messaging/detectModems")
 	public String addAddress(@RequestParam(value = "returnUrl", required = false) String returnUrl) {
 		
-		MessagingModuleActivator.manager.getGatewayByClass(SmsLibGateway.class).startup();
+		gatewayManager.getGatewayByClass(SmsLibGateway.class).startup();
 		
 		if (returnUrl == null)
 			returnUrl = "admin/manageGateways.form";
