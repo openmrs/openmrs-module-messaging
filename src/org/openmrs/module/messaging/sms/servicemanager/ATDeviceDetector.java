@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.sms.service;
+package org.openmrs.module.messaging.sms.servicemanager;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;

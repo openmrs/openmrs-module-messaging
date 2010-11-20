@@ -12,8 +12,8 @@ import org.openmrs.module.messaging.schema.Message;
 import org.openmrs.module.messaging.schema.MessageStatus;
 import org.openmrs.module.messaging.schema.MessagingGateway;
 import org.openmrs.module.messaging.schema.Protocol;
-import org.openmrs.module.messaging.sms.service.ServiceManager;
-import org.openmrs.module.messaging.sms.service.exception.ServiceStateException;
+import org.openmrs.module.messaging.sms.servicemanager.SmsServiceManager;
+import org.openmrs.module.messaging.sms.servicemanager.exception.ServiceStateException;
 import org.openmrs.module.messaging.web.model.ModemBean;
 import org.smslib.AGateway;
 import org.smslib.IOutboundMessageNotification;
@@ -29,11 +29,11 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 	private static Log log = LogFactory.getLog(SmsLibGateway.class);
 	private Map<String, Message> sentMessages;
 	
-	private ServiceManager serviceManager;
+	private SmsServiceManager serviceManager;
 	
 	public SmsLibGateway(){
 		sentMessages = new HashMap<String, Message>();
-		serviceManager = new ServiceManager();
+		serviceManager = new SmsServiceManager();
 	}
 	
 	@Override

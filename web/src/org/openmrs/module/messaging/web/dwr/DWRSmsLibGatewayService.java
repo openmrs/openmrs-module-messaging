@@ -5,7 +5,7 @@ import java.util.List;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.schema.MessagingService;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
-import org.openmrs.module.messaging.sms.service.exception.ServiceStateException;
+import org.openmrs.module.messaging.sms.servicemanager.exception.ServiceStateException;
 import org.openmrs.module.messaging.web.model.ModemBean;
 
 public class DWRSmsLibGatewayService {

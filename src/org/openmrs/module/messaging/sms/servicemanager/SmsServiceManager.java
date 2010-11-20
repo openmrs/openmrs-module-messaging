@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.sms.service;
+package org.openmrs.module.messaging.sms.servicemanager;
 
 import gnu.io.CommPortIdentifier;
 
@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.messaging.sms.service.exception.ServiceStateException;
+import org.openmrs.module.messaging.sms.servicemanager.exception.ServiceStateException;
 import org.openmrs.module.messaging.web.model.ModemBean;
 import org.smslib.AGateway;
 import org.smslib.GatewayException;
@@ -26,15 +26,15 @@ import org.smslib.modem.SerialModemGateway;
  * @author Alex Anderson alex@frontlinesms.com
  * @author Dieterich Lawson
  */
-public class ServiceManager {
+public class SmsServiceManager {
 
-	private static final Log log = LogFactory.getLog(ServiceManager.class);
+	private static final Log log = LogFactory.getLog(SmsServiceManager.class);
 
 	private ATDeviceDetector[] detectors;
 	
 	private List<ModemBean> detectedModems;
 
-	public ServiceManager() {
+	public SmsServiceManager() {
 		// if the system is a linux system, turn on serial polling
 		if (System.getProperty("os.name").contains("nux")) {
 			log.info("Computer is running linux. To make RXTX work properly, we must turning on serial polling");

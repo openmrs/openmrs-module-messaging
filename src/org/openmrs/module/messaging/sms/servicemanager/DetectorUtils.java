@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.sms.service;
+package org.openmrs.module.messaging.sms.servicemanager;
 
 import java.io.IOException;
 import java.io.InputStream;
