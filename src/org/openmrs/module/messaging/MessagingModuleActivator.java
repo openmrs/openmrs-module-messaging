@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
-import org.openmrs.module.messaging.schema.GatewayManager;
 import org.openmrs.scheduler.SchedulerException;
 import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.util.OpenmrsConstants;
@@ -34,19 +33,14 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 	
 	private static String TASK_NAME="Messaging Module Gateway Manager";
 	
-	public static GatewayManager manager;
+	/**
+	 * A boolean used to protect against multiple started() calls
+	 */
+	private boolean startedCalled = false;
 	
 	public void started() {
 		log.info("Started Messaging Module");
-		//create the singleton gateway manager
-		//TODO: there should be a better way of doing this
-		//This method is called twice.
-		if(manager == null){
-			manager = new GatewayManager();
-			createGatewayManagerTask();
-		}else{
-			log.info("I SEE YOU TRYING TO CALL STARTED() TWICE!!");
-		}
+		if(!startedCalled) createGatewayManagerTask();
 	}
 
 	public void willStop() {
@@ -68,8 +62,8 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 			dispatchMessagesTaskDef.setDescription("Handles the dispatching of messages for the Messaging Module.");
 			dispatchMessagesTaskDef.setStartOnStartup(true);
 			dispatchMessagesTaskDef.setStartTime(null);
-			dispatchMessagesTaskDef.setRepeatInterval(2L);
-			dispatchMessagesTaskDef.setTaskClass("org.openmrs.module.messaging.schema.DispatchMessagesTask");
+			dispatchMessagesTaskDef.setRepeatInterval(5L);
+			dispatchMessagesTaskDef.setTaskClass("org.openmrs.module.messaging.schedulertask.DispatchMessagesTask");
 			try {
 				Context.getSchedulerService().scheduleTask(dispatchMessagesTaskDef);
 			} catch (SchedulerException e) {
@@ -77,6 +71,7 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 			}
 		}
 		Context.closeSession();
+		startedCalled=true;
 	}
 	
 	

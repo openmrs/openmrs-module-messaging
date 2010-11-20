@@ -73,23 +73,18 @@ public interface MessagingService {
 	public Protocol getProtocolById(String protocolId);
 
 	/**
+	 * @return All protocols
+	 */
+	public List<Protocol> getProtocols();
+	
+	/**
 	 * Returns the protocol of the provided class. If there is no protocol of
 	 * that class, null is returned.
 	 * 
 	 * @param clazz
 	 * @return the protocol or null
 	 */
-	public <P extends Protocol> P getProtocolByClass(Class<? extends P> clazz);
-
-	/**
-	 * @return All protocols
-	 */
-	public List<Protocol> getProtocols();
-
-	/**
-	 * @return A list of the protocols that have at least one active gateway.
-	 */
-	public List<Protocol> getActiveProtocols();
+	public <P extends Protocol> P getProtocolByClass(Class<P> clazz);
 
 	/**
 	 * Checks to see if there is at least one active gateway that can carry this
@@ -126,5 +121,17 @@ public interface MessagingService {
 	 *            The message that was received
 	 */
 	public void notifyListeners(Message message);
+	
+	/**
+	 * This method should never be used outside of the messaging module.
+	 * @return the Gateway Manager
+	 */
+	public GatewayManager getGatewayManager();
+	
+	/**
+	 * For use by Spring only
+	 * @param gatewayManager
+	 */
+	public void setGatewayManager(GatewayManager gatewayManager);
 
 }

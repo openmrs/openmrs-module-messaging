@@ -13,7 +13,6 @@ import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
-import org.openmrs.module.messaging.MessagingModuleActivator;
 import org.openmrs.module.messaging.sms.SmsProtocol;
 import org.openmrs.module.messaging.twitter.TwitterProtocol;
 
@@ -35,10 +34,19 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	private CopyOnWriteArrayList<IncomingMessageListener> listeners;
 	
 	/**
-	 * Sets up the Messaging Service by creating all the protocols
+	 * The object that handles all gateway management tasks
 	 */
+	private GatewayManager gatewayManager;
+	
 	public MessagingServiceImpl(){
+		//setup the listeners
 		listeners = new CopyOnWriteArrayList<IncomingMessageListener>();
+		// add a trial listener
+		listeners.add(new IncomingMessageListener() {	
+			public void messageRecieved(Message message) {
+				log.info("INCOMING MESSAGE RECIEVED: "+ message.getContent() + ". SENDER: "+ message.getOrigin());
+			}
+		});
 		//initialize the protocols
 		protocols = new HashMap<Class<? extends Protocol>, Protocol>();
 		protocols.put(SmsProtocol.class, new SmsProtocol());
@@ -67,22 +75,11 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		//TODO: Make this work
 	}
 
-	
 	public List<Protocol> getProtocols(){
 		return new ArrayList<Protocol>(protocols.values());
 	}
 	
-	public List<Protocol> getActiveProtocols(){
-		List<Protocol> results = new ArrayList<Protocol>();
-		for(Protocol p: protocols.values()){
-			if(canSendToProtocol(p)){
-				results.add(p);
-			}
-		}
-		return results;
-	}
-	
-	public <P extends Protocol> P getProtocolByClass(Class<? extends P> clazz) {
+	public <P extends Protocol> P getProtocolByClass(Class<P> clazz) {
 		return (P) protocols.get(clazz);
 	}
 	
@@ -97,8 +94,8 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	}
 	
 	public boolean canSendToProtocol(Protocol p){
-		if(MessagingModuleActivator.manager == null) return false;
-		return MessagingModuleActivator.manager.getActiveSupportingGateways(p).size() > 0;
+		if(gatewayManager == null) return false;
+		return gatewayManager.getActiveSupportingGateways(p).size() > 0;
 	}
 	
 
@@ -115,5 +112,12 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 			listener.messageRecieved(message);
 		}
 	}
+
+	public GatewayManager getGatewayManager() {
+		return gatewayManager;
+	}	
 	
+	public void setGatewayManager(GatewayManager manager){
+		this.gatewayManager = manager;
+	}
 }
