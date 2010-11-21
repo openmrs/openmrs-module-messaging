@@ -9,7 +9,6 @@ import org.openmrs.module.messaging.MessagingConstants;
 import org.openmrs.module.messaging.googlevoice.GoogleVoiceGateway;
 import org.openmrs.module.messaging.schema.GatewayManager;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
-import org.openmrs.module.messaging.twitter.TwitterGateway;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
-
-import winterwell.jtwitter.Twitter;
 
 import com.techventus.server.voice.Voice;
 
@@ -37,47 +34,12 @@ public class ManageGatewaysController {
 	
 	@RequestMapping("/module/messaging/admin/manageGateways")
 	public void populateModel(HttpServletRequest request){
-		if(gatewayManager.getGatewayByClass(TwitterGateway.class) != null){
-			request.setAttribute("twitterUsername", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_UNAME));
-			request.setAttribute("twitterPassword", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_PASSWORD));
-			String twitterStatus = gatewayManager.getGatewayByClass(TwitterGateway.class).isActive()? "Active":"Inactive";
-			request.setAttribute("twitterStatus", twitterStatus);
-		}
 		if(gatewayManager.getGatewayByClass(GoogleVoiceGateway.class) != null){
 			request.setAttribute("googleVoiceUsername", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME));
 			request.setAttribute("googleVoicePassword", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD));
 			String gvStatus = gatewayManager.getGatewayByClass(GoogleVoiceGateway.class).isActive()? "Active":"Inactive";
 			request.setAttribute("googleVoiceStatus", gvStatus);
 		}
-	}
-	
-	@RequestMapping(value="/module/messaging/changeTwitterCreds", method=RequestMethod.POST)
-	public ModelAndView changeTwitterCredentials(
-			@RequestParam("username") String username,
-			@RequestParam("password1") String password1,
-			@RequestParam("password2") String password2,
-			@RequestParam(value="returnUrl", required=false) String returnUrl,
-			HttpServletRequest request){
-		
-		HttpSession httpSession = request.getSession();
-		if(!password1.equals(password2)){
-			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The passwords didn't match");
-		}else{
-			if(new Twitter(username,password1).isValidLogin()){
-				//save the global properties
-				Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_UNAME, username));
-				Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_DEFAULT_TWITTER_PASSWORD, password1));
-				//update the gateway itself
-				gatewayManager.getGatewayByClass(TwitterGateway.class).updateCredentials(username, password1);
-				httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Credentials saved");
-			}else{
-				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The credentials provided were not a valid twitter login");
-			}
-		}
-		if (returnUrl == null)
-			returnUrl = "admin/manageGateways.form";
-		
-		return new ModelAndView(new RedirectView(returnUrl));
 	}
 	
 	@RequestMapping(value="/module/messaging/changeGoogleVoiceCreds", method=RequestMethod.POST)

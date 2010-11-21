@@ -14,7 +14,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.sms.SmsProtocol;
-import org.openmrs.module.messaging.twitter.TwitterProtocol;
 
 /**
  * The implementation of the MessagingService interface 
@@ -50,7 +49,6 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		//initialize the protocols
 		protocols = new HashMap<Class<? extends Protocol>, Protocol>();
 		protocols.put(SmsProtocol.class, new SmsProtocol());
-		protocols.put(TwitterProtocol.class, new TwitterProtocol());
 	}
 	
 	public void sendMessage(String message, String address, Class<? extends Protocol> protocolClass) throws Exception{
