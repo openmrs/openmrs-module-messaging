@@ -55,16 +55,16 @@
 	</bean>
 
 <!--  Gateway Manager -->	
-	<bean id="gatewayManager" class="org.openmrs.module.messaging.schema.GatewayManager"/>
+	<bean id="gatewayManager" class="org.openmrs.module.messaging.domain.gateway.GatewayManager"/>
 
 	<bean parent="serviceContext" >
 		<property name="moduleService">
 			<list>
-				<value>@MODULE_PACKAGE@.schema.MessagingService</value> 
+				<value>@MODULE_PACKAGE@.MessagingService</value> 
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="@MODULE_PACKAGE@.schema.MessagingServiceImpl">
+						<bean class="@MODULE_PACKAGE@.impl.MessagingServiceImpl">
 							<property name="gatewayManager"><ref bean="gatewayManager"/></property>
 						</bean>
 					</property>

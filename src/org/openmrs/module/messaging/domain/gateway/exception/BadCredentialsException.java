@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.schema.exception;
+package org.openmrs.module.messaging.domain.gateway.exception;
 
 @SuppressWarnings("serial")
 public class BadCredentialsException extends Exception{

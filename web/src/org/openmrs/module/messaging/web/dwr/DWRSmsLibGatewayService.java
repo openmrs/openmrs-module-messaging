@@ -3,10 +3,10 @@ package org.openmrs.module.messaging.web.dwr;
 import java.util.List;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
 import org.openmrs.module.messaging.sms.servicemanager.exception.ServiceStateException;
-import org.openmrs.module.messaging.web.model.ModemBean;
+import org.openmrs.module.messaging.web.domain.ModemBean;
 
 public class DWRSmsLibGatewayService {
 

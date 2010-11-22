@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.schema;
+package org.openmrs.module.messaging.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +13,12 @@ import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
+import org.openmrs.module.messaging.MessagingService;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.gateway.GatewayManager;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.domain.listener.IncomingMessageListener;
 import org.openmrs.module.messaging.sms.SmsProtocol;
 
 /**

@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.schema.exception;
+package org.openmrs.module.messaging.domain.gateway.exception;
 
 /**
  * The exception thrown when an attempt is made to create an 

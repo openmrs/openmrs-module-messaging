@@ -1,7 +1,7 @@
 package org.openmrs.module.messaging.extension.html;
 
 import org.openmrs.module.Extension;
-import org.openmrs.module.messaging.MessagingConstants;
+import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.module.web.extension.PatientDashboardTabExt;
 
 public class MessagingPatientDashboardTabExt extends PatientDashboardTabExt {

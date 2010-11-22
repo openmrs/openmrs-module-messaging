@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.openmrs.Person;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.messaging.schema.MessagingAddress;
+import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface MessagingAddressService extends OpenmrsService{

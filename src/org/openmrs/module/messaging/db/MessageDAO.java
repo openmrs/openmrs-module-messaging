@@ -5,9 +5,9 @@ import java.util.List;
 import org.openmrs.Person;
 import org.openmrs.api.APIException;
 import org.openmrs.module.messaging.MessageService;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 
 /**
  * @author Dieterich

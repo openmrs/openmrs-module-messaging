@@ -6,8 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.schema.MessagingService;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.MessagingService;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 

@@ -1,12 +1,12 @@
-package org.openmrs.module.messaging.web.model;
+package org.openmrs.module.messaging.web.domain;
 
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.MessagingService;
+import org.openmrs.module.messaging.domain.Message;
 
 /**
  * MessageBean is a class for sending message objects over ajax. It's very

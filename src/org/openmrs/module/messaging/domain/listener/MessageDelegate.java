@@ -1,4 +1,7 @@
-package org.openmrs.module.messaging.schema;
+package org.openmrs.module.messaging.domain.listener;
+
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 
 /**
  * This is an interface for objects that wish to receive notifications about the

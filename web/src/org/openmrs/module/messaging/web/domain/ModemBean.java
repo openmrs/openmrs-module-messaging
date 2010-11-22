@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.web.model;
+package org.openmrs.module.messaging.web.domain;
 
 import java.io.IOException;
 

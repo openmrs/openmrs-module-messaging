@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.web.controller.PortletController;
 
 public class MessagingDashboardTabController extends PortletController {

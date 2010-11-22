@@ -8,8 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingServiceImpl;
+import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.impl.MessagingServiceImpl;
 
 public class MessagingAddressTypeTag extends TagSupport {
 

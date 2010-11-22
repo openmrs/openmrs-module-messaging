@@ -15,12 +15,12 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingService;
-import org.openmrs.module.messaging.schema.Protocol;
-import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
-import org.openmrs.module.messaging.web.model.MessageBean;
+import org.openmrs.module.messaging.MessagingService;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
+import org.openmrs.module.messaging.web.domain.MessageBean;
 
 public class DWRModuleMessageService {
 	

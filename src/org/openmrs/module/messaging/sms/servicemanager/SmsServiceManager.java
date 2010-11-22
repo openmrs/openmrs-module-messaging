@@ -11,7 +11,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.messaging.sms.servicemanager.exception.ServiceStateException;
-import org.openmrs.module.messaging.web.model.ModemBean;
+import org.openmrs.module.messaging.web.domain.ModemBean;
 import org.smslib.AGateway;
 import org.smslib.GatewayException;
 import org.smslib.Service;

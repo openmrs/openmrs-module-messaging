@@ -5,10 +5,10 @@ import javax.servlet.http.HttpSession;
 
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessagingConstants;
+import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.googlevoice.GoogleVoiceGateway;
-import org.openmrs.module.messaging.schema.GatewayManager;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
+import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

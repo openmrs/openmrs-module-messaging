@@ -7,8 +7,8 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.db.MessageDAO;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 
 public class MessageServiceImpl extends BaseOpenmrsService implements MessageService {
 

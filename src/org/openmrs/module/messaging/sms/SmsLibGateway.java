@@ -8,13 +8,13 @@ import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessageStatus;
-import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.sms.servicemanager.SmsServiceManager;
 import org.openmrs.module.messaging.sms.servicemanager.exception.ServiceStateException;
-import org.openmrs.module.messaging.web.model.ModemBean;
+import org.openmrs.module.messaging.web.domain.ModemBean;
 import org.smslib.AGateway;
 import org.smslib.IOutboundMessageNotification;
 import org.smslib.InboundMessage;

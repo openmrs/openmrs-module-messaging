@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.MessagingAddress;
+import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.propertyeditor.PersonEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;

@@ -5,8 +5,8 @@ import java.util.List;
 import org.openmrs.Person;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface MessageService extends OpenmrsService{

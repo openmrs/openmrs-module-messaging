@@ -9,9 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.MessagingServiceImpl;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
+import org.openmrs.module.messaging.impl.MessagingServiceImpl;
 
 public class MessagingServiceTag extends TagSupport {
 

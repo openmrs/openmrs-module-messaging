@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.schema;
+package org.openmrs.module.messaging.domain.gateway;
 
 /**
  * A class that represents a set of credentials

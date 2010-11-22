@@ -1,9 +1,13 @@
-package org.openmrs.module.messaging.schema;
+package org.openmrs.module.messaging;
 
 import java.util.List;
 import java.util.Set;
 
 import org.openmrs.Person;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.gateway.GatewayManager;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.domain.listener.IncomingMessageListener;
 
 /**
  * The MessagingService provides methods for sending messages and interacting

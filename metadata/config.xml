@@ -16,9 +16,9 @@
 	
 	<dwr>
 		<allow>	
-			<convert converter="bean" match="org.openmrs.module.messaging.schema.MessagingAddress" />
-			<convert converter="bean" match="org.openmrs.module.messaging.web.model.MessageBean"/>
-			<convert converter="bean" match="org.openmrs.module.messaging.web.model.ModemBean"/>
+			<convert converter="bean" match="org.openmrs.module.messaging.domain.MessagingAddress" />
+			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.MessageBean"/>
+			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.ModemBean"/>
 						
 			<create creator="new" javascript="DWRMessagingAddressService">
 				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingAddressService"/>
@@ -60,19 +60,7 @@
 		<defaultValue>1</defaultValue>
 		<description>The default country code for your location</description>
 	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.twitter.default.username</property>
-		<defaultValue></defaultValue>
-		<description>The default sender's username for the Twitter messaging service</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.twitter.default.password</property>
-		<defaultValue></defaultValue>
-		<description>The default sender's password for the Twitter messaging service</description>
-	</globalProperty>
-	
+
 	<globalProperty>
 		<property>@MODULE_ID@.googlevoice.password</property>
 		<defaultValue></defaultValue>

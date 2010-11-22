@@ -1,8 +1,10 @@
-package org.openmrs.module.messaging.schema;
+package org.openmrs.module.messaging.domain.gateway;
 
 import org.openmrs.Person;
-import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
-import org.openmrs.module.messaging.schema.exception.MessageFormattingException;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
+import org.openmrs.module.messaging.domain.gateway.exception.MessageFormattingException;
 
 /**
  * A Protocol represents the set of rules that govern the formatting of messages

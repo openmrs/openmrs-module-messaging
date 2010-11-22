@@ -13,8 +13,8 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
-import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 
 public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 

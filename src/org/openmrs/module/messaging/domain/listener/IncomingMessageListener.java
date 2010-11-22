@@ -1,4 +1,6 @@
-package org.openmrs.module.messaging.schema;
+package org.openmrs.module.messaging.domain.listener;
+
+import org.openmrs.module.messaging.domain.Message;
 
 /**
  * An interface for objects that want to be notified when a message is received

@@ -6,10 +6,10 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.MessagingServiceImpl;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.impl.MessagingServiceImpl;
 
 public interface MessagingAddressDAO {
 	

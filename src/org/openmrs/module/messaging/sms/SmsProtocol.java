@@ -2,12 +2,12 @@ package org.openmrs.module.messaging.sms;
 
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessagingConstants;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingAddress;
-import org.openmrs.module.messaging.schema.Protocol;
-import org.openmrs.module.messaging.schema.exception.AddressFormattingException;
-import org.openmrs.module.messaging.schema.exception.MessageFormattingException;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
+import org.openmrs.module.messaging.domain.gateway.exception.MessageFormattingException;
+import org.openmrs.module.messaging.util.MessagingConstants;
 
 /**
  * A protocol for sending SMS messages
@@ -60,7 +60,7 @@ public class SmsProtocol extends Protocol{
 	 * stripping all non-numeric characters from the string and checking if
 	 * it is at least 10 characters.
 	 * 
-	 * @see org.openmrs.module.messaging.schema.Protocol#addressIsValid(java.lang.String)
+	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#addressIsValid(java.lang.String)
 	 */
 	@Override
 	public boolean addressIsValid(String address) {
@@ -105,7 +105,7 @@ public class SmsProtocol extends Protocol{
 	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). If null safe for 'fromAddress',
 	 * the only parameter that is allowed to be null
 	 * 
-	 * @see org.openmrs.module.messaging.schema.Protocol#createMessage(java.lang.String,
+	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createMessage(java.lang.String,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -154,7 +154,7 @@ public class SmsProtocol extends Protocol{
 	 * parameters, use this method:
 	 * {@link #messageContentIsValid(String, int, SmsAlphabet)}
 	 * 
-	 * @see org.openmrs.module.messaging.schema.Protocol#messageContentIsValid(java.lang.String)
+	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#messageContentIsValid(java.lang.String)
 	 */
 	@Override
 	public boolean messageContentIsValid(String content) {

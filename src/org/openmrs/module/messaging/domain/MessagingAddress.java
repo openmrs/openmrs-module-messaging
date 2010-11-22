@@ -1,7 +1,8 @@
-package org.openmrs.module.messaging.schema;
+package org.openmrs.module.messaging.domain;
 
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Person;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 
 /**
  * MessagingAddress objects represent a 'place' that a message is sent to or from.

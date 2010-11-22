@@ -1,4 +1,4 @@
-package org.openmrs.module.messaging.schema;
+package org.openmrs.module.messaging.domain;
 
 import java.util.Date;
 

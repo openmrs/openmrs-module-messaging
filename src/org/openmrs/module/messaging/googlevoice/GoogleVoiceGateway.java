@@ -5,12 +5,12 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessagingConstants;
-import org.openmrs.module.messaging.schema.CredentialSet;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.gateway.CredentialSet;
+import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
+import org.openmrs.module.messaging.util.MessagingConstants;
 
 import com.techventus.server.voice.Voice;
 

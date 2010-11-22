@@ -10,11 +10,11 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.db.MessageDAO;
-import org.openmrs.module.messaging.schema.Message;
-import org.openmrs.module.messaging.schema.MessageStatus;
-import org.openmrs.module.messaging.schema.MessagingService;
-import org.openmrs.module.messaging.schema.Protocol;
+import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 
 public class HibernateMessageDAO implements MessageDAO {
 

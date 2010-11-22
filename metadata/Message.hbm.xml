@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class table="messaging_messages" name="@MODULE_PACKAGE@.schema.Message">
+    <class table="messaging_messages" name="@MODULE_PACKAGE@.domain.Message">
        
         <id name="messageId" type="int" column="message_id"  unsaved-value="0">
 				<generator class="native" />

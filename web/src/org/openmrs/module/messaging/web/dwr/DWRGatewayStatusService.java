@@ -1,8 +1,8 @@
 package org.openmrs.module.messaging.web.dwr;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.schema.MessagingGateway;
-import org.openmrs.module.messaging.schema.MessagingService;
+import org.openmrs.module.messaging.MessagingService;
+import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 
 public class DWRGatewayStatusService {
 	
