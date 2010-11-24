@@ -6,8 +6,6 @@ import java.io.OutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.messaging.sms.ModemInfo;
-import org.smslib.modem.SerialModemGateway;
 
 public class DetectorUtils {
 	
@@ -50,31 +48,6 @@ public class DetectorUtils {
 	public static final String trimResponse(String command, String response) {
 		String minicommand = command.replace("AT", "");
 		return response.replace("OK", "").replace(command, "").replace(minicommand, "").replace("\"", "").trim();
-	}
-	
-	public static final ModemInfo getInfoForGateway(SerialModemGateway gateway){
-		ModemInfo mi = new ModemInfo("13173635376",gateway.getGatewayId(),"","",gateway.getStatus().toString(),gateway.getGatewayId());
-		try{
-			String number = parseCNUM(gateway.sendCustomATCommand("AT+CNUM"));
-			if(number != null && !number.equals("")){
-				number = number.substring(0,number.lastIndexOf("\""));
-				number = number.substring(number.lastIndexOf("\""));
-				mi.setNumber(number);
-			}
-			String model =  gateway.sendCustomATCommand("AT+GMM");
-			if(model != null && !model.equals("")){
-				model = model.substring(model.indexOf(":")+2);
-				mi.setModel(model);
-			}
-			String manufacturer = gateway.sendCustomATCommand("AT+GMI");
-			if(manufacturer != null && !manufacturer.equals("")){
-				manufacturer = manufacturer.substring(manufacturer.indexOf("\"")+1,manufacturer.lastIndexOf("\""));
-				mi.setManufacturer(manufacturer);
-			}
-		}catch(Exception e){
-			log.error("Unable to fetch additional info for the serial modem gateway",e);
-		}
-		return mi;
 	}
 	
 	public static String parseCNUM(String raw){
