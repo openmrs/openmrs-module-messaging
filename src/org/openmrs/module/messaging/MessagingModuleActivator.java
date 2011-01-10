@@ -51,10 +51,10 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 	 * This method creates the task that polls the database and dispatches outgoing messages
 	 */
 	private void createGatewayManagerTask(){
-		Context.openSession();
-		//temporarily add the privelege to manage the scheduler
+		//temporarily add the privilege to manage the scheduler
 		Context.addProxyPrivilege(OpenmrsConstants.PRIV_MANAGE_SCHEDULER);
-		TaskDefinition dispatchMessagesTaskDef= Context.getSchedulerService().getTaskByName(TASK_NAME);
+		TaskDefinition dispatchMessagesTaskDef = Context.getSchedulerService().getTaskByName(TASK_NAME);
+
 		if(dispatchMessagesTaskDef == null){
 			dispatchMessagesTaskDef = new TaskDefinition();
 			dispatchMessagesTaskDef.setUuid(UUID.randomUUID().toString());
@@ -70,9 +70,7 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 				log.error("Error creating the gateway manager task in the scheduler", e);
 			}
 		}
-		Context.closeSession();
-		startedCalled=true;
+		startedCalled = true;
 	}
-	
 	
 }

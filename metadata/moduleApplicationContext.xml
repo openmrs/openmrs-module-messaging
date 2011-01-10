@@ -78,4 +78,25 @@
 			</list>
 		</property>
 	</bean>
+
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>@MODULE_PACKAGE@.EncryptionService</value> 
+				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager"><ref bean="transactionManager"/></property>
+					<property name="target">
+						<bean class="@MODULE_PACKAGE@.impl.EncryptionServiceImpl" />
+					</property>
+					<property name="preInterceptors">
+                        <ref bean="serviceInterceptors" />
+					</property>
+					<property name="transactionAttributeSource">
+						<bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
 </beans>

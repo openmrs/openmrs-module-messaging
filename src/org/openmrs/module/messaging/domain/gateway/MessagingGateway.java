@@ -11,9 +11,9 @@ import org.openmrs.module.messaging.domain.Message;
  */
 public abstract class MessagingGateway {
 
-	protected MessagingAddressService addressService = Context.getService(MessagingAddressService.class);
+	protected MessagingAddressService addressService;
 	
-	protected MessageService messageService = Context.getService(MessageService.class);
+	protected MessageService messageService;
 	
 	public abstract void sendMessage(Message message) throws Exception;
 	
@@ -76,5 +76,23 @@ public abstract class MessagingGateway {
 	 * @return
 	 */
 	public abstract boolean supportsProtocol(Protocol p);
+
+	/**
+	 * @return the addressService
+	 */
+	public MessagingAddressService getAddressService() {
+		if (addressService == null)
+			 addressService = Context.getService(MessagingAddressService.class);
+		return addressService;
+	}
+
+	/**
+	 * @return the messageService
+	 */
+	public MessageService getMessageService() {
+		if (messageService == null)
+			 messageService = Context.getService(MessageService.class);
+		return messageService;
+	}
 
 }

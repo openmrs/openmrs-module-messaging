@@ -60,18 +60,16 @@
   </table>
   
 <script type="text/javascript">
-	window.onload = init;
-	
 	var addressCache = { };
 	var viewed = -1;
 	
-	function init(){
+	$j(document).ready(function(){
 		//dwr.util.useLoadingMessage();
 		dwr.engine.beginBatch();
 		fillTable();
-		selectChanged();
+		//selectChanged();
 		dwr.engine.endBatch();
-	}
+	});
 	
 	function fillTable() {
 		DWRMessagingAddressService.getAllAddressesForCurrentUser(function(addresses) {

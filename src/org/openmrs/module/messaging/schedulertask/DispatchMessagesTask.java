@@ -27,25 +27,18 @@ public class DispatchMessagesTask extends AbstractTask{
 	
 	private static Log log = LogFactory.getLog(DispatchMessagesTask.class);
 	
+	/**
+	 * private cached instance of the module MessageService
+	 */
 	private MessageService messageService;
 	
 	/** 
 	 * The maximum number of times that this system will try 
 	 * to send a message before marking it as failed 
 	 */
-	private int maxRetryAttempts;
+	private Integer maxRetryAttempts;
 		
 	private final Random rand = new Random();
-
-	public DispatchMessagesTask(){
-		messageService = Context.getService(MessageService.class);
-		//get the max number of retries
-		try{
-			maxRetryAttempts = Integer.parseInt(Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_MAX_RETRIES));
-		}catch(Exception e){
-			maxRetryAttempts = 3;
-		}
-	}
 
 	/**
 	 * This method does the dispatching of outgoing messages.
@@ -53,27 +46,44 @@ public class DispatchMessagesTask extends AbstractTask{
 	 * of 'outbox' and then dispatches them to the proper gateway. 
 	 */
 	public void execute(){
-		GatewayManager manager = Context.getService(MessagingService.class).getGatewayManager(); 
-		if(manager == null) return;
-		//organize outgoing messages by protocol
-		log.debug("Dispatching messages");
-		List<Protocol> protocols = Context.getService(MessagingService.class).getProtocols();
-		for(Protocol p: protocols){
-			//start by recieving the messages
-			for(MessagingGateway gateway: manager.getSupportingGateways(p)){
-				if(gateway.canReceive())
-					gateway.recieveMessages();
-			}
-			//get all outgoing messages and the gateways that can send them
-			List<Message> messages = messageService.getOutboxMessagesByProtocol(p);
-			if(messages.size() <=0) continue;
-			//get the supporting gateways
-			List<MessagingGateway> gateways = manager.getActiveSupportingGateways(p);
-			//if there are no active supporting gateways, then we can't do anything
-			if(gateways.size() < 1) continue;
-			//dispatch the messages
-			dispatchMessages(gateways,messages);
+		Context.openSession();
+
+		try {
+			// authenticate (for pre-1.7)
+			if (!Context.isAuthenticated())
+				authenticate();
 			
+			GatewayManager manager = Context.getService(MessagingService.class).getGatewayManager(); 
+			if(manager == null) return;
+			
+			//organize outgoing messages by protocol
+			log.debug("Dispatching messages");
+			List<Protocol> protocols = Context.getService(MessagingService.class).getProtocols();
+			for(Protocol p: protocols){
+				
+				//start by receiving the messages
+				for(MessagingGateway gateway: manager.getSupportingGateways(p)){
+					if(gateway.canReceive())
+						gateway.recieveMessages();
+				}
+				
+				//get all outgoing messages and the gateways that can send them
+				List<Message> messages = getMessageService().getOutboxMessagesByProtocol(p);
+				if(messages.size() <=0) continue;
+				
+				//get the supporting gateways
+				List<MessagingGateway> gateways = manager.getActiveSupportingGateways(p);
+				
+				//if there are no active supporting gateways, then we can't do anything
+				if(gateways.size() < 1) continue;
+				
+				//dispatch the messages
+				dispatchMessages(gateways,messages);
+			}
+		} catch (Exception e) {
+			log.error("Exception occurred during DispatchMessagesTask", e);
+		} finally {
+			Context.closeSession();
 		}
 	}
 	
@@ -81,10 +91,13 @@ public class DispatchMessagesTask extends AbstractTask{
 		int messageIndex = rand.nextInt(gateways.size());
 		int gatewayCount = gateways.size();
 		for(Message message: messages){
+			
 			//increment the number of send attempts
 			message.setSendAttempts(message.getSendAttempts()+1);
+			
 			//set the sent/last attempt date
 			message.setDate(new Date());
+			
 			try{
 				//round robin
 				gateways.get(messageIndex++ % gatewayCount).sendMessage(message);
@@ -93,7 +106,7 @@ public class DispatchMessagesTask extends AbstractTask{
 			}catch(Exception e){
 				log.error("Error sending message",e);
 				//if the sending didn't work, update the message status
-				if(message.getSendAttempts() < maxRetryAttempts){
+				if(message.getSendAttempts() < getMaxRetryAttempts()){
 					message.setMessageStatus(MessageStatus.RETRYING);
 					log.info("Retrying message #" + message.getId());
 				}else{
@@ -101,8 +114,33 @@ public class DispatchMessagesTask extends AbstractTask{
 					log.info("Message #" + message.getId()+ " failed");
 				}
 			}
+			
 			//save the message
-			messageService.saveMessage(message);
+			getMessageService().saveMessage(message);
 		}
 	}
+
+	/**
+	 * @return the messageService
+	 */
+	private MessageService getMessageService() {
+		if (messageService == null)
+			messageService = Context.getService(MessageService.class);		
+		return messageService;
+	}
+
+	/**
+	 * @return the maxRetryAttempts
+	 */
+	private Integer getMaxRetryAttempts() {
+		if (maxRetryAttempts == null)
+			try{
+				maxRetryAttempts = Integer.parseInt(Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_MAX_RETRIES));
+			}catch(Exception e){
+				maxRetryAttempts = 3;
+			}
+		return maxRetryAttempts;
+	}
+	
+	
 }

@@ -79,6 +79,120 @@
 		<description>The number of times that the system should try to send a message once it fails.</description>
 	</globalProperty>
 	
+	<globalProperty>
+		<property>@MODULE_ID@.email.in.protocol</property>
+		<defaultValue>pop3</defaultValue>
+		<description>Messaging Module incoming email protocol</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.in.host</property>
+		<defaultValue>localhost</defaultValue>
+		<description>Messaging Module incoming email host</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.email.in.port</property>
+		<defaultValue>110</defaultValue>
+		<description>Messaging Module incoming email port</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.in.auth</property>
+		<defaultValue>true</defaultValue>
+		<description>Messaging Module incoming email auth flag</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.in.tls</property>
+		<defaultValue>false</defaultValue>
+		<description>Messaging Module incoming email TLS flag</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.in.username</property>
+		<defaultValue></defaultValue>
+		<description>Messaging Module incoming email username</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.email.in.password</property>
+		<defaultValue></defaultValue>
+		<description>Messaging Module incoming email password (encrypted)</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.usedefault</property>
+		<defaultValue>true</defaultValue>
+		<description>Messaging Module outgoing email use default flag</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.protocol</property>
+		<defaultValue>smtp</defaultValue>
+		<description>Messaging Module outgoing email protocol</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.host</property>
+		<defaultValue>localhost</defaultValue>
+		<description>Messaging Module outgoing email host</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.port</property>
+		<defaultValue>25</defaultValue>
+		<description>Messaging Module outgoing email port</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.auth</property>
+		<defaultValue>false</defaultValue>
+		<description>Messaging Module outgoing email auth flag</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.tls</property>
+		<defaultValue>false</defaultValue>
+		<description>Messaging Module outgoing email TLS flag</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.from</property>
+		<defaultValue></defaultValue>
+		<description>Messaging Module outgoing email from address</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.username</property>
+		<defaultValue></defaultValue>
+		<description>Messaging Module outgoing email username</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.email.out.password</property>
+		<defaultValue></defaultValue>
+		<description>Messaging Module outgoing email password (encrypted)</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.email.subject</property>
+		<defaultValue>Message from OpenMRS</defaultValue>
+		<description>Messaging Module outgoing email subject</description>
+	</globalProperty>
+	
+	<globalProperty>
+		<property>@MODULE_ID@.email.signature</property>
+		<defaultValue></defaultValue>
+		<description>Messaging Module outgoing email signature</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.encryption.key</property>
+		<defaultValue></defaultValue>
+		<description>Encryption key ... DO NOT DELETE UNLESS WILLING TO RESET ALL ENCRYPTED DATA</description>
+	</globalProperty>
+
 	<!-- Extension points -->
 	
 	<extension>
@@ -116,6 +230,11 @@
 	<privilege>
 		<name>Manage Messaging Addresses</name>
 		<description>Able to add/edit/delete messaging addresses</description>
+	</privilege>
+	
+	<privilege>
+		<name>Manage Messaging Gateways</name>
+		<description>Able to start/stop and configure messaging gateways</description>
 	</privilege>
 	
 	<!-- Internationalization -->

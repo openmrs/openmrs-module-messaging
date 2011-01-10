@@ -4,11 +4,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.openmrs.GlobalProperty;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.messaging.EncryptionService;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
+import org.openmrs.module.messaging.email.EmailGateway;
 import org.openmrs.module.messaging.googlevoice.GoogleVoiceGateway;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
 import org.openmrs.module.messaging.util.MessagingConstants;
+import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,11 +38,33 @@ public class ManageGatewaysController {
 	
 	@RequestMapping("/module/messaging/admin/manageGateways")
 	public void populateModel(HttpServletRequest request){
+		AdministrationService adminService = Context.getAdministrationService();
+		
 		if(gatewayManager.getGatewayByClass(GoogleVoiceGateway.class) != null){
-			request.setAttribute("googleVoiceUsername", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME));
-			request.setAttribute("googleVoicePassword", Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD));
+			request.setAttribute("googleVoiceUsername", adminService.getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME));
+			request.setAttribute("googleVoicePassword", adminService.getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD));
 			String gvStatus = gatewayManager.getGatewayByClass(GoogleVoiceGateway.class).isActive()? "Active":"Inactive";
 			request.setAttribute("googleVoiceStatus", gvStatus);
+		}
+		
+		// add email config values
+		if(gatewayManager.getGatewayByClass(EmailGateway.class) != null){
+			request.setAttribute("emailMessageSubject", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_SUBJECT));
+			request.setAttribute("emailMessageSignature", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_SIGNATURE));
+			request.setAttribute("emailInProtocol", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_IN_PROTOCOL));
+			request.setAttribute("emailInHost", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_IN_HOST));
+			request.setAttribute("emailInPort", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_IN_PORT));
+			request.setAttribute("emailInAuth", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_IN_AUTH));
+			request.setAttribute("emailInTLS", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_IN_TLS));
+			request.setAttribute("emailInUsername", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_IN_USERNAME));
+			request.setAttribute("emailOutUseDefault", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_OUT_USEDEFAULT));
+			request.setAttribute("emailOutProtocol", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_OUT_PROTOCOL));
+			request.setAttribute("emailOutHost", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_OUT_HOST));
+			request.setAttribute("emailOutPort", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_OUT_PORT));
+			request.setAttribute("emailOutAuth", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_OUT_AUTH));
+			request.setAttribute("emailOutTLS", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_OUT_TLS));
+			request.setAttribute("emailOutFrom", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_OUT_FROM));
+			request.setAttribute("emailOutUsername", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_OUT_USERNAME));
 		}
 	}
 	
@@ -84,4 +110,116 @@ public class ManageGatewaysController {
 
 		return "redirect:" + returnUrl;
 	}
+
+	@RequestMapping(value="/module/messaging/changeEmailCreds", method=RequestMethod.POST)
+	public ModelAndView changeEmailCredentials(
+			@RequestParam("messageSubject") String messageSubject,
+			@RequestParam("messageSignature") String messageSignature,
+			@RequestParam("inprotocol") String inprotocol,
+			@RequestParam("inhost") String inhost,
+			@RequestParam("inport") Integer inport,
+			@RequestParam("inusername") String inusername,
+			@RequestParam("inpwd1") String inpwd1,
+			@RequestParam("inpwd2") String inpwd2,
+			@RequestParam("inpwdchanged") Boolean inpwdchanged,
+			@RequestParam("outprotocol") String outprotocol,
+			@RequestParam("outhost") String outhost,
+			@RequestParam("outport") Integer outport,
+			@RequestParam("outfrom") String outfrom,
+			@RequestParam("outusername") String outusername,
+			@RequestParam("outpwd1") String outpwd1,
+			@RequestParam("outpwd2") String outpwd2,
+			@RequestParam("outpwdchanged") Boolean outpwdchanged,
+			@RequestParam(value="returnUrl", required=false) String returnUrl,
+			HttpServletRequest request){
+		
+		HttpSession httpSession = request.getSession();
+		AdministrationService adminService = Context.getAdministrationService();
+		EncryptionService encryptionService = (EncryptionService) Context.getService(EncryptionService.class); 
+
+		if(!OpenmrsUtil.nullSafeEquals(inpwd1,inpwd2))
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The incoming email passwords do not match");
+		else if(!OpenmrsUtil.nullSafeEquals(outpwd1,outpwd2))
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The outgoing email passwords do not match");
+		else if(inport == null)
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The incoming email port is required");
+		else if(outport == null)
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "The outgoing email port is required");
+		else {
+			try {
+				// get all booleans (checkboxes) from the request
+				Boolean inauth = request.getParameter("inauth") != null;
+				Boolean intls = request.getParameter("intls") != null;
+				Boolean usedefaultout = request.getParameter("usedefaultout") != null;
+				Boolean outauth = request.getParameter("outauth") != null;
+				Boolean outtls = request.getParameter("outtls") != null;
+
+				// get the gateway
+				EmailGateway gateway = gatewayManager.getGatewayByClass(EmailGateway.class);
+				
+				// update subject and signature
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_SUBJECT, messageSubject));
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_SIGNATURE, messageSignature));
+				
+				// update incoming email server global properties
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_IN_PROTOCOL, inprotocol));
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_IN_HOST, inhost));
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_IN_PORT, inport.toString()));
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_IN_AUTH, inauth.toString()));
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_IN_TLS, intls.toString()));
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_IN_USERNAME, inusername));
+				if (inpwdchanged)
+					adminService.saveGlobalProperty(
+							new GlobalProperty(MessagingConstants.GP_EMAIL_IN_PASSWORD, encryptionService.encrypt(inpwd1)));
+
+				// update outgoing email server global properties
+				adminService.saveGlobalProperty(
+						new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_USEDEFAULT, usedefaultout.toString()));
+				if (!usedefaultout) {
+					adminService.saveGlobalProperty(
+							new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_PROTOCOL, outprotocol));
+					adminService.saveGlobalProperty(
+							new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_HOST, outhost));
+					adminService.saveGlobalProperty(
+							new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_PORT, outport.toString()));
+					adminService.saveGlobalProperty(
+							new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_AUTH, outauth.toString()));
+					adminService.saveGlobalProperty(
+							new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_TLS, outtls.toString()));
+					adminService.saveGlobalProperty(
+							new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_FROM, outfrom));
+					adminService.saveGlobalProperty(
+							new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_USERNAME, outusername));
+					if (outpwdchanged)
+						adminService.saveGlobalProperty(
+								new GlobalProperty(MessagingConstants.GP_EMAIL_OUT_PASSWORD, encryptionService.encrypt(outpwd1)));
+				}
+
+				// restart the gateway if it is running
+				if (gateway.isActive()) {
+					gateway.shutdown();
+					gateway.startup();
+				}
+				
+				// kindly respond
+				httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Credentials saved");
+				
+			} catch (Exception e) {
+				httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "There was an error while processing the email credentials");
+			}
+		}
+		if (returnUrl == null)
+			returnUrl = "admin/manageGateways.form";
+		
+		return new ModelAndView(new RedirectView(returnUrl));
+	}
+
 }

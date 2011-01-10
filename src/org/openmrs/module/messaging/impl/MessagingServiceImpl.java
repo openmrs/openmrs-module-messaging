@@ -19,6 +19,7 @@ import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.domain.listener.IncomingMessageListener;
+import org.openmrs.module.messaging.email.EmailProtocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
 
 /**
@@ -46,15 +47,18 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	public MessagingServiceImpl(){
 		//setup the listeners
 		listeners = new CopyOnWriteArrayList<IncomingMessageListener>();
+		
 		// add a trial listener
 		listeners.add(new IncomingMessageListener() {	
 			public void messageRecieved(Message message) {
 				log.info("INCOMING MESSAGE RECIEVED: "+ message.getContent() + ". SENDER: "+ message.getOrigin());
 			}
 		});
+
 		//initialize the protocols
 		protocols = new HashMap<Class<? extends Protocol>, Protocol>();
 		protocols.put(SmsProtocol.class, new SmsProtocol());
+		protocols.put(EmailProtocol.class, new EmailProtocol());
 	}
 	
 	public void sendMessage(String message, String address, Class<? extends Protocol> protocolClass) throws Exception{

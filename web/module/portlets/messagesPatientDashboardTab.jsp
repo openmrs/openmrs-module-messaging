@@ -1,6 +1,8 @@
 <%@ include file="/WEB-INF/view/module/messaging/include.jsp"%>
+
 <openmrs:htmlInclude file="/dwr/engine.js" />
 <openmrs:htmlInclude file="/dwr/util.js" />
+
 <script src="<openmrs:contextPath/>/dwr/interface/DWRModuleMessageService.js"></script>
 <script src="<openmrs:contextPath/>/dwr/interface/DWRMessagingAddressService.js"></script>
 
@@ -9,12 +11,14 @@
 		float:right
 	}
 	.conversationBox {
-		width:70%;
 	}
 	.conversation-header {
 		margin:7px;
 	}
 	.message-list {
+		height: 20em;
+		overflow-x: none;
+		overflow-y: scroll;
 		background:white;
 		padding:7px;
 	}
@@ -45,108 +49,134 @@
 	.send-box{
 		width:100%;
 	}
+	div#addressesBox{
+		padding: 1em;
+	}
+	table#addresses{
+		border: 1px solid #aaa;
+		border-collapse: collapse;
+	}
+	table#addresses th {
+		background-color: #ddd;
+		border: 1px solid #aaa;
+		padding: 0.5em;
+	}
+	table#addresses td {
+		border: 1px solid #aaa;
+		padding: 0.5em;
+	}
 	
 </style>
-		<div class="conversationBox">
-			<div class="boxHeader">
-				<span style="margin:3px">Messages</span>
-				<img id="refreshButton" class="align-right" src="../openmrs/moduleResources/messaging/images/refresh.png" onclick="fillMessageList()"/>
-			</div>
-			<div class="box">
-				<div class="message-list" id="messageList">
-					<div class="to-message-row" id="messagePattern" style="display:none" onmouseover="handleMouseOver(this.id)" onmouseout="handleMouseOut(this.id)">
-						<span class="message-sender" id="messageSender"></span>
-						<span class="message-text" id="messageText"></span>
-						<span class="message-time" id="messageTime" style="display:none"></span>
-					</div>
-				</div>
-			</div>
-				<div class="boxHeader">
-					<table>
-						<tr>
-							<td class="send-box-cell"><textarea class="send-box" rows="2" id="messageContentBox"></textarea></td>
-							<td>
-								<select id="toAddressSelect"></select><br/>
-								<input class="send-button" type="submit" value="Send" onclick="sendMessage()"></input>
-							</td>
-						</tr>
-						<tr>
-							<td id="sendMessageResults"></td>
-						
-						</tr>
-					</table>
-				</div>
-			</div>
-<br/><br/>
-<div class="boxHeader">
-Manage Addresses
-</div>		
-<div class="box">
-<table border="1" class="rowed grey">
-  <thead>
-    <tr>
-		<th>Type</th>
-		<th>Address</th>
-		<th>Date Created</th>
-		<th>Preferred</th>
-		<th>Actions</th>
-	</tr>
-  </thead>
-  <tbody id="addressbody">
-    <tr id="pattern" style="display:none;">
-      <td><span id="tableType">Type</span><br/></td>
-      <td><span id="tableAddress">Address</span></td>
-      <td><span id="tableDateCreated">Date Created</span></td>
-      <td><span id="tablePreferred">Preferred</span></td>
-      <td>
-        <input id="edit" type="button" value="Edit" onclick="editClicked(this.id)"/>
-        <input id="delete" type="button" value="Delete" onclick="deleteClicked(this.id)"/>
-      </td>
-    </tr>
-  </tbody>
-</table>
 
-<span id="editSpan"><h3>Add an Address</h3></span>
-<table class="plain">
-  <tr>
-  	<td>Type</td>
-  	<td>
-  		<select id="protocolId">
-			<c:forEach var="protocol" items="${protocols}">
-				<option value="${protocol.protocolId}">${protocol.protocolName}</option>
-			</c:forEach>
-		</select>
-	</td>
-    <td>Address</td>
-    <td>
-    	<input id="address" type="text" size="20"/>
-		<span id="messagingAddressId" style="display:none">-1</span>
-    </td>
-    <td>Preferred</td>
-    <td><input id="preferred" type="checkbox"/></td>
-    <td colspan="2" align="right">
-      <input type="button" value="Save" onclick="writeAddress()"/>
-      <input type="button" value="Clear" onclick="clearAddress()"/>
-   </td>
-  </tr>
-  </table>
- </div>
- </div>
+<div class="conversationBox">
+	<div class="boxHeader">
+		<span style="margin:3px">Messages</span>
+		<img id="refreshButton" class="align-right" src="<openmrs:contextPath/>/moduleResources/messaging/images/refresh.png" onclick="fillMessageList()"/>
+	</div>
+	<div class="box">
+		<div class="message-list" id="messageList">
+			<div class="to-message-row" id="messagePattern" style="display:none" onmouseover="handleMouseOver(this.id)" onmouseout="handleMouseOut(this.id)">
+				<span class="message-sender" id="messageSender"></span>
+				<span class="message-text" id="messageText"></span>
+				<span class="message-time" id="messageTime" style="display:none"></span>
+			</div>
+		</div>
+	</div>
+	<div class="boxHeader">
+		<table>
+			<tr>
+				<td class="send-box-cell"><textarea class="send-box" rows="2" id="messageContentBox"></textarea></td>
+				<td>
+					<select id="toAddressSelect"></select><br/>
+					<input class="send-button" type="submit" value="Send" onclick="sendMessage()"></input>
+				</td>
+			</tr>
+			<tr>
+				<td id="sendMessageResults"></td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<br/>
+
+<div class="boxHeader">Manage Addresses</div>		
+<div class="box">
+  <div id="addressesBox">
+	<table id="addresses" class="rowed grey">
+	  <thead>
+	    <tr>
+			<th>Type</th>
+			<th>Address</th>
+			<th>Date Created</th>
+			<th>Preferred</th>
+			<th>Actions</th>
+		</tr>
+	  </thead>
+	  <tbody id="addressbody">
+	    <tr id="pattern" style="display:none;">
+	      <td><span id="tableType">Type</span><br/></td>
+	      <td><span id="tableAddress">Address</span></td>
+	      <td><span id="tableDateCreated">Date Created</span></td>
+	      <td><span id="tablePreferred">Preferred</span></td>
+	      <td>
+	        <input id="edit" type="button" value="Edit" onclick="editClicked(this.id)"/>
+	        <input id="delete" type="button" value="Delete" onclick="deleteClicked(this.id)"/>
+	      </td>
+	    </tr>
+	  </tbody>
+	</table>
+	
+	<br/>
+	
+	<h3 id="editSpan">Add an Address</h3>
+	<table class="plain">
+	  <tr>
+	  	<td>Type</td>
+	  	<td>
+	  		<select id="protocolId">
+				<c:forEach var="protocol" items="${protocols}">
+					<option value="${protocol.protocolId}">${protocol.protocolName}</option>
+				</c:forEach>
+			</select>
+		</td>
+	    <td>Address</td>
+	    <td>
+	    	<input id="address" type="text" size="20"/>
+			<span id="messagingAddressId" style="display:none">-1</span>
+	    </td>
+	    <td>Preferred</td>
+	    <td><input id="preferred" type="checkbox"/></td>
+	    <td colspan="2" align="right">
+	      <input type="button" value="Save" onclick="writeAddress()"/>
+	      <input type="button" value="Clear" onclick="clearAddress()"/>
+	   </td>
+	  </tr>
+    </table>
+  </div>
+</div>
  
 <script type="text/javascript">
-	window.onload = init;
-	
 	var addressCache = { };
 	var viewed = -1;
 	var colors = ["red","#32CD32","blue","#FFD700","orchid","aqua","purple"];
 	
-	function init(){
+	$j(document).ready(function(){
 		dwr.engine.beginBatch();
 		fillMessageList();
 		fillAddressesTable();
 		fillToAddressSelect();
 		dwr.engine.endBatch();
-	}
+		
+		// set "enter" to send the message
+		$j("#messageContentBox").keyup(function(event){
+			if (event.keyCode == '13')
+				sendMessage();
+		})
+
+		// auto scroll the messages to the bottom
+		$j("#messageList").attr({scrollTop: $j("#messageList").attr("scrollHeight")});
+	});
 	
 	function fillAddressesTable() {
 		//call the DWR service to get all the addresses for the patient that is being viewed
@@ -176,7 +206,7 @@ Manage Addresses
 		// put the address's values into the editing area
 		dwr.util.setValues(address);
 		// change the title of the editing area
-		$("editSpan").innerHTML = "<h3>Editing \"" + address.address + "\"</h3>";
+		$j("#editSpan").html("Editing " + address.address);
 	}
 	
 	function deleteClicked(eleid) {
@@ -197,7 +227,7 @@ Manage Addresses
 	function clearAddress() {
 	 	viewed = -1;
 		dwr.util.setValues({ messagingAddressId:-1, address:null, preferred:null, dateCreated:null });
-		$("editSpan").innerHTML = "<h3>Add an Address</h3>";
+		$j("#editSpan").html("Add an Address");
 		
 	}
 
@@ -230,7 +260,7 @@ Manage Addresses
 				$("messagePattern"+id).className="time-message-row";
 		    	$("messageSender"+id).style.fontWeight="normal";
 		    	dwr.util.setValue("messageSender"+id, "");
-			    dwr.util.setValue("messageText" + id,  message.date+" "+message.time);
+			    dwr.util.setValue("messageText" + id, message.date+" "+message.time);
 			    dwr.util.setValue("messageTime" + id, "");
 		    }else{ //otherwise, it's a message row
 		    	dwr.util.setValue("messageText" + id, message.text);
@@ -246,7 +276,7 @@ Manage Addresses
 		    //make it visible
 		    $("messagePattern" + id).style.display = "block";
 		}
-		$("refreshButton").src = "../openmrs/moduleResources/messaging/images/refresh.png";
+		$("refreshButton").src = "<openmrs:contextPath/>/moduleResources/messaging/images/refresh.png";
 		});
 	}
 
@@ -262,9 +292,10 @@ Manage Addresses
 			$("sendMessageResults").innerHTML = output;
 			fillMessageList();
 			dwr.util.setValue("messageContentBox","");
+			$j("#messageList").animate({ scrollTop: $j("#messageList").attr("scrollHeight") }, 3000);
+			$j("#messageContentBox").focus();
 		});
 	}
-		
 
 	function removeChildrenFromNode(node){
 		while(node.firstChild.id != "messagePattern"){
