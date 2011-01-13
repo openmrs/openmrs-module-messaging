@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.xerces.impl.dv.util.Base64;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
@@ -18,8 +19,6 @@ import org.openmrs.module.messaging.EncryptionService;
 import org.openmrs.module.messaging.util.MessagingConstants;
 import org.springframework.util.StringUtils;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 public class EncryptionServiceImpl implements EncryptionService {
 
@@ -79,7 +78,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 			throw new APIException("could not encrypt text", e);
 		}
 		
-		return new BASE64Encoder().encode(encrypted);
+		return Base64.encode(encrypted);
 	}
 
 	/**
@@ -94,7 +93,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 
 		try {
 			Cipher cipher = this.getDecryptionCipher();
-			byte[] original = cipher.doFinal(new BASE64Decoder().decodeBuffer(text));
+			byte[] original = cipher.doFinal(Base64.decode(text));
 			decrypted = new String(original);
 		} catch (GeneralSecurityException e) {
 			throw new APIException("could not decrypt text", e);
@@ -147,7 +146,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 				.getGlobalProperty(MessagingConstants.GP_ENCRYPTION_VECTOR);
 		
 		if (StringUtils.hasText(initVectorText))
-			return new BASE64Decoder().decodeBuffer(initVectorText);
+			return Base64.decode(initVectorText);
 
 		byte[] iv = generateNewInitVector();
 
@@ -161,7 +160,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 			gp.setProperty(MessagingConstants.GP_ENCRYPTION_VECTOR);
 		}
 		
-		gp.setPropertyValue(new BASE64Encoder().encode(iv));
+		gp.setPropertyValue(Base64.encode(iv));
 		Context.getAdministrationService().saveGlobalProperty(gp);
 		
 		return iv;
@@ -192,7 +191,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 				.getGlobalProperty(MessagingConstants.GP_ENCRYPTION_KEY);
 
 		if (StringUtils.hasText(keyText))
-			return new BASE64Decoder().decodeBuffer(keyText);
+			return Base64.decode(keyText);
 
 		// generate and save the key
 		byte[] key = generateNewSecretKey();
@@ -205,7 +204,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 			gp.setProperty(MessagingConstants.GP_ENCRYPTION_KEY);
 		}
 		
-		gp.setPropertyValue(new BASE64Encoder().encode(key));
+		gp.setPropertyValue(Base64.encode(key));
 		Context.getAdministrationService().saveGlobalProperty(gp);
 		
 		return key;
