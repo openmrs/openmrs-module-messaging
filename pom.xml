@@ -1,0 +1,131 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.openmrs.module</groupId>
+	<artifactId>messaging</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+	<name>Messaging Module</name>
+	<description>Parent project for Messaging Module</description>
+
+	<url>http://openmrs.org</url>
+
+	<scm>
+		<connection>scm:svn:http://svn.openmrs.org/openmrs-modules/messaging/trunk/</connection>
+		<developerConnection>scm:svn:http://svn.openmrs.org/openmrs-modules/messaging/trunk/</developerConnection>
+		<url>http://svn.openmrs.org/openmrs-modules/messaging/trunk/</url>
+	</scm>
+
+	<modules>
+		<module>api</module>
+		<module>omod</module>
+	</modules>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.rxtx</groupId>
+			<artifactId>rxtxcomm</artifactId>
+			<version>2.0-7pre1</version>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<!--
+			Libraries from lib to add as dependencies with compile or runtime scope:
+
+			lib/commons-net-2.0.jar
+			lib/pduutils.jar
+			lib/RXTXcomm.jar
+			lib/jtwitter.jar
+			lib/smslib-3.5.0.jar
+			lib/jsmpp-2.1.0.jar
+			lib/google-voice-java-1.6.jar
+			lib/json.jar
+				
+			Find matching dependencies in maven central repository.
+			<dependency>
+				<groupId>org.other.library</groupId>
+				<artifactId>library-name</artifactId>
+				<version>library.version</version>
+				<scope>compile</scope>
+			</dependency>
+			-->
+			<dependency>
+				<groupId>org.smslib</groupId>
+				<artifactId>smslib</artifactId>
+				<version>3.5.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs.api</groupId>
+				<artifactId>openmrs-api</artifactId>
+				<version>${openMRSVersion}</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs.web</groupId>
+				<artifactId>openmrs-web</artifactId>
+				<version>${openMRSVersion}</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs.test</groupId>
+				<artifactId>openmrs-test</artifactId>
+				<version>${openMRSVersion}</version>
+				<type>jar</type>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<properties>
+		<openMRSVersion>1.7.0</openMRSVersion>
+	</properties>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<target>1.5</target>
+						<source>1.5</source>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.openmrs.maven.plugins</groupId>
+					<artifactId>maven-openmrs-plugin</artifactId>
+					<version>1.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>openmrs-repo</id>
+			<name>OpenMRS Nexus Repository</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+		</repository>
+		<repository>
+			<id>smslib-staging-037</id>
+			<url>https://oss.sonatype.org/content/repositories/orgsmslib-037</url>
+			<snapshots><enabled>false</enabled></snapshots>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>openmrs-repo</id>
+			<name>OpenMRS Nexus Repository</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+</project>

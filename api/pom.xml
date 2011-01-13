@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.openmrs.module</groupId>
+		<artifactId>messaging</artifactId>
+		<version>1.0</version>
+	</parent>
+	<groupId>org.openmrs.module</groupId>
+	<artifactId>messaging-api</artifactId>
+	<packaging>jar</packaging>
+	<name>Messaging Module API</name>
+	<description>API project for Messaging Module</description>
+
+	<dependencies>
+		<!-- 
+		Add other dependencies from lib:
+		<dependency>
+			<groupId>org.other.library</groupId>
+			<artifactId>library-name</artifactId>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>com.techventus.server</groupId>
+			<artifactId>google-voice-java</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.smslib</groupId>
+			<artifactId>smslib</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.rxtx</groupId>
+			<artifactId>rxtx</artifactId>
+			<version>2.1.7</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.api</groupId>
+			<artifactId>openmrs-api</artifactId>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.web</groupId>
+			<artifactId>openmrs-web</artifactId>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.test</groupId>
+			<artifactId>openmrs-test</artifactId>
+			<type>jar</type>
+		</dependency>
+	</dependencies>
+
+</project>
