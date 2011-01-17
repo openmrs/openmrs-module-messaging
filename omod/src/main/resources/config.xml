@@ -18,7 +18,7 @@
 		<allow>	
 			<convert converter="bean" match="org.openmrs.module.messaging.domain.MessagingAddress" />
 			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.MessageBean"/>
-			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.ModemBean"/>
+			<convert converter="bean" match="org.openmrs.module.messaging.domain.Modem"/>
 						
 			<create creator="new" javascript="DWRMessagingAddressService">
 				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingAddressService"/>
