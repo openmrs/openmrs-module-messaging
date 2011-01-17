@@ -64,7 +64,7 @@ public class DispatchMessagesTask extends AbstractTask{
 				//start by receiving the messages
 				for(MessagingGateway gateway: manager.getSupportingGateways(p)){
 					if(gateway.canReceive())
-						gateway.recieveMessages();
+						gateway.receiveMessages();
 				}
 				
 				//get all outgoing messages and the gateways that can send them

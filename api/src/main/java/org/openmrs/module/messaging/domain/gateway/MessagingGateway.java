@@ -11,13 +11,13 @@ import org.openmrs.module.messaging.domain.Message;
  */
 public abstract class MessagingGateway {
 
-	protected MessagingAddressService addressService;
+	private MessagingAddressService addressService;
 	
-	protected MessageService messageService;
+	private MessageService messageService;
 	
 	public abstract void sendMessage(Message message) throws Exception;
 	
-	public abstract void recieveMessages();
+	public abstract void receiveMessages();
 
 	/**
 	 * Should return true if the messaging service has the ability to send

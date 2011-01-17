@@ -160,7 +160,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	}
 
 	@Override
-	public void recieveMessages() {
+	public void receiveMessages() {
 		//do nothing
 	}
 

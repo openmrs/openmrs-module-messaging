@@ -72,7 +72,7 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 		Service.getInstance().queueMessage(om);
 	}
 	
-	public void recieveMessages(){
+	public void receiveMessages(){
 		List<InboundMessage> inboundMessages = new ArrayList<InboundMessage>();
 		try {
 			Service.getInstance().readMessages(inboundMessages,MessageClasses.READ);
@@ -81,12 +81,12 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 		}
 		for(InboundMessage iMessage: inboundMessages){
 			Message m = new Message(Service.getInstance().getGateway(iMessage.getGatewayId()).getFrom(), iMessage.getText());
-			m.setSender(addressService.getPersonForAddress("+"+iMessage.getOriginator()));
+			m.setSender(getAddressService().getPersonForAddress("+"+iMessage.getOriginator()));
 			m.setOrigin("+"+iMessage.getOriginator());
 			m.setMessageStatus(MessageStatus.RECEIVED);
 			m.setDate(iMessage.getDate());
 			m.setProtocolId(SmsProtocol.class.getName());
-			messageService.saveMessage(m);
+			getMessageService().saveMessage(m);
 			try {
 				Service.getInstance().deleteMessage(iMessage);
 			} catch (Exception e) {
@@ -155,7 +155,7 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 			log.error("Message unsent, retrying: "+ oMessage.getErrorMessage());
 			m.setMessageStatus(MessageStatus.RETRYING);
 		}
-		messageService.saveMessage(m);
+		getMessageService().saveMessage(m);
 	}
 
 }

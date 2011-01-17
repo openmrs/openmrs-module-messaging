@@ -134,7 +134,7 @@ public class EmailGateway extends MessagingGateway {
 	 * receive messages
 	 */
 	@Override
-	public void recieveMessages() {
+	public void receiveMessages() {
 		if (inSession == null) {
 			log.error("cannot recieve messages; gateway is off");
 			return;
