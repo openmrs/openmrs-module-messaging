@@ -1,6 +1,6 @@
 <%@ include file="/WEB-INF/view/module/messaging/include.jsp"%>
 
-<openmrs:require privilege="Manage Messaging Gateways" otherwise="/login.htm" redirect="/module/messaging/manageGateways.form"/>
+<openmrs:require privilege="Manage Messaging Gateways" otherwise="/login.htm" redirect="/module/messaging/manage_gateways.form"/>
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 

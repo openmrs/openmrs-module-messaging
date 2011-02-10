@@ -17,16 +17,23 @@
 		<property name="order"><value>2</value></property>
 		<property name="mappings">
 			<props>
-				<prop key="module/messaging/admin/sendMessage.form">sendMessageController</prop>
 				<prop key="**/messagesPatientDashboardTab.portlet">messagesPatientDashboardTab</prop>
-				<prop key="module/messaging/admin/manageGateways.form">manageGatewaysController</prop>
-				<prop key="module/messaging/admin/manageAddresses.form">manageAddressesController</prop>
+				<prop key="module/messaging/inbox.form">inboxController</prop>
+				<prop key="module/messaging/compose_message.form">composeMessageController</prop>
+				<prop key="module/messaging/sent_messages.form">sentMessagesController</prop>
+				<prop key="module/messaging/external_conversations.form">externalConversationsController</prop>
+				<prop key="module/messaging/settings.form">settingsController</prop>
+				<prop key="module/messaging/manage_gatways.form">manageGatewaysController</prop>
 			</props>
 		</property>
 	</bean>
 		
-	<bean id="manageAddressesController" class="org.openmrs.module.messaging.web.controller.ManageAddressesController" />
-	<bean id="sendMessageController" class="org.openmrs.module.messaging.web.controller.SendMessageController" />
+	<bean id="inboxController" class="org.openmrs.module.messaging.web.controller.InboxController" />
+	<bean id="composeMessageController" class="org.openmrs.module.messaging.web.controller.ComposeMessageController" />
+	<bean id="sentMessagesController" class="org.openmrs.module.messaging.web.controller.SentMessagesController" />
+	<bean id="externalConversationsController" class="org.openmrs.module.messaging.web.controller.ExternalConversationsController" />
+	<bean id="settingsController" class="org.openmrs.module.messaging.web.controller.SettingsController" />
+	
 	<bean id="manageGatewaysController" class="org.openmrs.module.messaging.web.controller.ManageGatewaysController" >
 		<property name="gatewayManager"><ref bean="gatewayManager"/></property>
 	</bean>

@@ -1,6 +1,7 @@
 package org.openmrs.module.messaging.extension.html;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.openmrs.module.Extension;
@@ -17,10 +18,13 @@ public class AdminList extends AdministrationSectionExt{
 	
 	@Override
 	public Map<String, String> getLinks() {
-		HashMap<String, String> links = new HashMap<String,String>();
-		links.put("module/messaging/admin/sendMessage.form", "Send a Message");
-		links.put("module/messaging/admin/manageAddresses.form", "Manage Your Messaging Addresses");
-		links.put("module/messaging/admin/manageGateways.form", "Manage Messaging Gateways");
+		HashMap<String, String> links = new LinkedHashMap<String,String>();
+		links.put("module/messaging/inbox.form", "Inbox");
+		links.put("module/messaging/compose_message.form", "Compose Message");
+		links.put("module/messaging/sent_messages.form", "Sent Messages");
+		links.put("module/messaging/external_conversations.form", "External Conversations");
+		links.put("module/messaging/settings.form", "Messaging Settings");
+		links.put("module/messaging/manage_gateways.form", "Manage Messaging Gateways");
 		return links;
 	}
 

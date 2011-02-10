@@ -36,7 +36,7 @@ public class ManageGatewaysController {
 		this.gatewayManager = manager;
 	}
 	
-	@RequestMapping("/module/messaging/admin/manageGateways")
+	@RequestMapping("/module/messaging/manage_gateways")
 	public void populateModel(HttpServletRequest request){
 		AdministrationService adminService = Context.getAdministrationService();
 		
