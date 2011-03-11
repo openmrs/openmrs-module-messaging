@@ -69,7 +69,7 @@ public class DWRMessagingAddressService {
 	 * @param personId The if of the person that this address is for (can be null if you aren't creating a new address) 
 	 */
 	public void saveOrUpdateAddress(MessagingAddress address, Integer personId){
-		Protocol protocol = Context.getService(MessagingService.class).getProtocolById(address.getProtocolId());
+		Protocol protocol = Context.getService(MessagingService.class).getProtocolByClass(address.getProtocol());
 		MessagingAddress ma = null;
 		if(address.getId() == -1){
 			try {
@@ -82,7 +82,7 @@ public class DWRMessagingAddressService {
 		}else{ //otherwise, we're modifying a previously existing address
 			ma = Context.getService(MessagingAddressService.class).getMessagingAddress(address.getId());
 			ma.setAddress(address.getAddress());
-			ma.setProtocolId(address.getProtocolId());
+			ma.setProtocol(address.getProtocol());
 			ma.setDateChanged(new Date());
 			ma.setChangedBy(Context.getAuthenticatedUser());
 		}

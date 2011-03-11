@@ -3,28 +3,27 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class table="messaging_messages" name="@MODULE_PACKAGE@.domain.Message">
-       
-        <id name="messageId" type="int" column="message_id"  unsaved-value="0">
+       <id name="messageId" type="int" column="message_id"  unsaved-value="0">
 				<generator class="native" />
 		</id>
 		
 		<property name="uuid" type="string" length="38" not-null="true" />
 		
-        <property name="content" type="java.lang.String"/>
-        <property name="sendAttempts" type="int" length="3" column="send_attempts"/>
-        <property name="origin" type="java.lang.String"/>
-        <property name="destination" type="java.lang.String"/>
+        <property name="content" type="text"/>
+        <property name="subject" type="java.lang.String"/>
+        
+        <many-to-one name="from" class="@MODULE_PACKAGE@.domain.MessagingAddress" lazy="false"/>
+		<set name="to" table="messaging_message_recipients" lazy="false">
+			<key column="message"/>
+			<many-to-many column="recipient" class="@MODULE_PACKAGE@.domain.MessagingAddress"/>
+		</set>
+		
+		<many-to-one name="inReplyTo" class="@MODULE_PACKAGE@.domain.Message" column="in_reply_to" cascade="none"/>
+		
         <property name="date" type="java.util.Date" length="19"/>
         <property name="status" type="int" length="4"/>
-        
-        <many-to-one name="sender" class="org.openmrs.Person">
-			<column name="sender"></column>
-		</many-to-one>
-		
-		<many-to-one name="recipient" class="org.openmrs.Person">
-			<column name="recipient"></column>
-		</many-to-one>
-		
+        <property name="sendAttempts" type="int" length="3" column="send_attempts"/>
 		<property name="protocolId" type="java.lang.String" column="protocol_id"/>	
+        		
     </class>
 </hibernate-mapping>

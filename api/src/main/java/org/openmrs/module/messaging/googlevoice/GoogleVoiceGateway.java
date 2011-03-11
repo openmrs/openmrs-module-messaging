@@ -6,6 +6,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.CredentialSet;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
@@ -69,7 +71,16 @@ public class GoogleVoiceGateway extends MessagingGateway {
 
 	@Override
 	public void sendMessage(Message message) throws Exception{
-		googleVoice.sendSMS(message.getDestination(),message.getContent());
+		try{
+			for(MessagingAddress address: message.getTo()){
+				googleVoice.sendSMS(address.getAddress(),message.getContent());
+			}
+			message.setStatus(MessageStatus.SENT);
+		}catch(Throwable t){
+			log.error("Google Voice Gateway failed to send message",t);
+			message.setStatus(MessageStatus.FAILED);
+		}
+		getMessageService().saveMessage(message);
 	}
 
 	@Override
@@ -156,7 +167,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	
 	@Override
 	public boolean supportsProtocol(Protocol p) {
-		return p.getProtocolId() == SmsProtocol.class.getName();
+		return p.getClass() == SmsProtocol.class;
 	}
 
 	@Override

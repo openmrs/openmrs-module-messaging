@@ -68,15 +68,6 @@ public interface MessagingService {
 	public void sendMessages(Set<Message> messages);
 
 	/**
-	 * Returns the protocol with the provided ID. If there is no protocol with
-	 * that ID, null is returned.
-	 * 
-	 * @param protocolId
-	 * @return the protocol or null
-	 */
-	public Protocol getProtocolById(String protocolId);
-
-	/**
 	 * @return All protocols
 	 */
 	public List<Protocol> getProtocols();

@@ -29,12 +29,12 @@ public interface MessageDAO {
 	/**
 	 * @see MessageService#findMessagesWithAdresses(MessageService, String, String, String, Integer)
 	 */
-	public List<Message> findMessagesWithAddresses(Protocol protocol, String toAddress,String fromAddress, String content,Integer status);
+	public List<Message> findMessagesWithAddresses(Class<? extends Protocol> protocolClass, String toAddress,String fromAddress, String content,Integer status);
 
 	/**
 	 * @see MessageService#findMessages(MessagingGateway, Person, Person, String, Integer)
 	 */
-	public List<Message> findMessagesWithPeople(Protocol protocol, Person sender, Person recipient, String content, Integer status);
+	public List<Message> findMessagesWithPeople(Class<? extends Protocol> protocolClass, Person sender, Person recipient, String content, Integer status);
 
 	/**
 	 * @see MessageService#saveMessage(Message)
@@ -48,5 +48,5 @@ public interface MessageDAO {
 
 	public List<Message> getOutboxMessages();
 
-	public List<Message> getOutboxMessagesByProtocol(Protocol p);
+	public List<Message> getOutboxMessagesByProtocol(Class<? extends Protocol> protocolClass);
 }

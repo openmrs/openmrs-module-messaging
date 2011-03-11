@@ -10,7 +10,6 @@
         <property name="uuid" type="string" length="38" not-null="true" />
         
         <property name="address" type="java.lang.String"/>
-        <property name="password" type="java.lang.String" />
         <many-to-one name="person" class="org.openmrs.Person" lazy="false"/>
         
         <property name="preferred" type="boolean" not-null="true" length="1"/>

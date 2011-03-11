@@ -38,8 +38,7 @@ public class MessageBean implements Serializable {
 		this.setId(message.getId());
 		this.text = message.getContent();
 		this.sender = message.getDisplayOrigin();
-		this.setProtocolName(Context.getService(MessagingService.class)
-				.getProtocolById(message.getProtocolId()).getProtocolName());
+		this.setProtocolName(Context.getService(MessagingService.class).getProtocolByClass(message.getProtocol()).getProtocolName());
 		if (message.getDate() != null) {
 			this.date = DateFormat.getDateInstance(DateFormat.SHORT).format(
 					message.getDate());

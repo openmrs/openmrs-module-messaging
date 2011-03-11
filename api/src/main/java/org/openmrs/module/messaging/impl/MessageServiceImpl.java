@@ -54,12 +54,12 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 		return dao.findMessagesWithAddresses(null, null, null, content, null);
 	}
 	
-	public List<Message> findMessagesWithAdresses(Protocol protocol, String toAddress, String fromAddress, String content, Integer status) {
+	public List<Message> findMessagesWithAdresses(Class<? extends Protocol> protocol, String toAddress, String fromAddress, String content, Integer status) {
 		return dao.findMessagesWithAddresses(protocol,toAddress,fromAddress,content,status);
 	}
 
 
-	public List<Message> findMessagesWithPeople(Protocol protocol, Person sender, Person recipient, String content, Integer status) {
+	public List<Message> findMessagesWithPeople(Class<? extends Protocol> protocol, Person sender, Person recipient, String content, Integer status) {
 		return dao.findMessagesWithPeople(protocol, sender, recipient, content, status);
 	}
 
@@ -71,7 +71,7 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 		dao.saveMessage(message);
 	}
 
-	public List<Message> getMessagesForPersonAndProtocol(Person person, Protocol protocol) {
+	public List<Message> getMessagesForPersonAndProtocol(Person person, Class<? extends Protocol> protocol) {
 		return dao.findMessagesWithPeople(protocol, person, person, null, null);
 	}
 
@@ -79,7 +79,7 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 		return dao.getOutboxMessages();
 	}
 
-	public List<Message> getOutboxMessagesByProtocol(Protocol p) {
-		return dao.getOutboxMessagesByProtocol(p);
+	public List<Message> getOutboxMessagesByProtocol(Class<? extends Protocol> protocol) {
+		return dao.getOutboxMessagesByProtocol(protocol);
 	}
 }

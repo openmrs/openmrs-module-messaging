@@ -48,13 +48,13 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	}
 	
 
-	public List<MessagingAddress> findMessagingAddresses(String address, Protocol protocol, Person person) {
+	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocolClass, Person person) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
 		if(address != null && !address.equals("")){
 			c.add(Restrictions.like("address", address,MatchMode.ANYWHERE));
 		}
-		if(protocol != null){
-			c.add(Restrictions.eq("protocolId", protocol.getProtocolId()));
+		if(protocolClass != null){
+			c.add(Restrictions.eq("protocolId", protocolClass.getName()));
 		}
 		if(person != null){
 			c.add(Restrictions.eq("person", person));

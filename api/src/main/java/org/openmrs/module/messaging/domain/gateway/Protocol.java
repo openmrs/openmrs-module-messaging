@@ -1,6 +1,10 @@
 package org.openmrs.module.messaging.domain.gateway;
 
+import java.util.Set;
+
 import org.openmrs.Person;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
@@ -10,37 +14,51 @@ import org.openmrs.module.messaging.domain.gateway.exception.MessageFormattingEx
  * A Protocol represents the set of rules that govern the formatting of messages
  * and addresses. As such, a Protocol is a factory class for creating valid
  * messages and addresses.
- * 
  */
 public abstract class Protocol {
 
+	private MessagingAddressService addressService;
+	
+	protected MessagingAddressService getAddressService(){
+		if(addressService == null){
+			addressService = Context.getService(MessagingAddressService.class);
+		}
+		return addressService;
+	}
 	/**
 	 * This method should return the display name of the protocol. This will be
 	 * used in the UI and should be internationalized if necessary <br>
 	 * </br> e.g. "SMS" or "Twitter"
 	 */
 	public abstract String getProtocolName();
-
+	
+	
 	/**
-	 * Creates a message using the supplied parameters. Any of them can be null,
-	 * but that is not suggested because the point of this method is to validate
-	 * the parameters. <br>
-	 * </br> The parameters to this method are the only {@link Message} fields
-	 * that require validation - after creating a message with this method, feel
-	 * free to modify other message fields like {@link Message#sender} and
-	 * {@link Message#recipient} as you wish.
+	 * Creates a message. "from" can be null or blank, but will be filled in depending on which gateway sends the message. The message will also
+	 * be marked as 'from' the currently authenticated user at the time of sending.
 	 * 
-	 * @param messageContent
-	 *            the text content
-	 * @param toAddress
-	 *            the destination address
-	 * @param fromAddress
-	 *            the originating address
-	 * @return
+	 * @throws MessageFormattingException
+	 * @throws AddressFormattingException
 	 */
-	public abstract Message createMessage(String messageContent,
-			String toAddress, String fromAddress)
-			throws MessageFormattingException, AddressFormattingException;
+	public abstract Message createMessage(String messageContent, String to, String from) throws MessageFormattingException, AddressFormattingException;
+	
+	/**
+	 * Creates a message.  "from" can be null or blank, but will be filled in depending on which gateway sends the message. The message will also
+	 * be marked as 'from' the currently authenticated user at the time of sending.
+	 * 
+	 * @throws MessageFormattingException
+	 * @throws AddressFormattingException
+	 */
+	public abstract Message createMessage(String messageContent, MessagingAddress to, MessagingAddress from) throws MessageFormattingException;
+	
+	/**
+	 * Creates a message.  "from" can be null or blank, but will be filled in depending on which gateway sends the message. The message will also
+	 * be marked as 'from' the currently authenticated user at the time of sending.
+	 * 
+	 * @throws MessageFormattingException
+	 * @throws AddressFormattingException
+	 */
+	public abstract Message createMessage(String messageContent, Set<MessagingAddress> to, MessagingAddress from) throws MessageFormattingException;
 
 	/**
 	 * Creates a MessagingAddress with the supplied address. 'person' can be
@@ -52,8 +70,7 @@ public abstract class Protocol {
 	 *            the person
 	 * @return
 	 */
-	public abstract MessagingAddress createAddress(String address, Person person)
-			throws AddressFormattingException;
+	public abstract MessagingAddress createAddress(String address, Person person) throws AddressFormattingException;
 
 	/**
 	 * Returns boolean indicating whether or not the message content is valid
@@ -61,7 +78,6 @@ public abstract class Protocol {
 	 * 
 	 * @param content
 	 *            the content to validate
-	 * @return
 	 */
 	public abstract boolean messageContentIsValid(String content);
 
@@ -71,14 +87,6 @@ public abstract class Protocol {
 	 * 
 	 * @param address
 	 *            the address to validate
-	 * @return
 	 */
 	public abstract boolean addressIsValid(String address);
-
-	public abstract boolean requiresPassword();
-	
-	public String getProtocolId(){
-		return getClass().getName();
-	}
-
 }

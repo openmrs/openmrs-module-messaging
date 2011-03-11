@@ -1,5 +1,6 @@
 package org.openmrs.module.messaging.email;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,24 +43,47 @@ public class EmailProtocol extends Protocol {
 	 * validate addresses and create a Message object
 	 */
 	@Override
-	public Message createMessage(String messageContent, String toAddress,
-			String fromAddress) throws MessageFormattingException,
-			AddressFormattingException {
-
-		if (!addressIsValid(toAddress))
-			throw new AddressFormattingException("to address is not valid");
-
-		if (StringUtils.hasText(fromAddress) && !addressIsValid(fromAddress))
-			throw new AddressFormattingException("from address is not valid");
-
+	public Message createMessage(String messageContent, String toAddress, String fromAddress) throws MessageFormattingException, AddressFormattingException {
+		MessagingAddress to=null,from=null;
+		to = createAddress(toAddress,null);
+		from = createAddress(fromAddress,null);
 		if(!messageContentIsValid(messageContent))
 			throw new MessageFormattingException("Message has no content");
 		
-		Message result = new Message(toAddress, fromAddress, messageContent);
-		result.setProtocolId(getProtocolId());
+		Message result = new Message(to, from, messageContent);
+		result.setProtocol(this.getClass());
 		
 		log.debug("Created message from " + fromAddress + " to " + toAddress);
 		
+		return result;
+	}
+	
+
+	@Override
+	public Message createMessage(String messageContent, MessagingAddress to, MessagingAddress from) throws MessageFormattingException {
+		if(!messageContentIsValid(messageContent))
+			throw new MessageFormattingException("Message has no content");
+		
+		Message result = new Message(to, from, messageContent);
+		result.setProtocol(this.getClass());
+		
+		log.debug("Created message from " + from.getAddress() + " to " + to.getAddress());
+		
+		return result;
+	}
+
+	@Override
+	public Message createMessage(String messageContent, Set<MessagingAddress> to, MessagingAddress from) throws MessageFormattingException {
+		if(!messageContentIsValid(messageContent))
+			throw new MessageFormattingException("Message has no content");
+		
+		Message result = new Message(to, from, messageContent);
+		result.setProtocol(this.getClass());
+		StringBuilder recipientList = new StringBuilder();
+		for(MessagingAddress toAdr: to){
+			recipientList.append(toAdr.getAddress() + " ");
+		}
+		log.debug("Created message from " + from.getAddress() + " to " + recipientList.toString());
 		return result;
 	}
 
@@ -71,15 +95,14 @@ public class EmailProtocol extends Protocol {
 	 * @return the newly created MessagingAddress
 	 */
 	@Override
-	public MessagingAddress createAddress(String address, Person person)
-			throws AddressFormattingException {
+	public MessagingAddress createAddress(String address, Person person) throws AddressFormattingException {
 
 		// validate the address
 		if (!addressIsValid(address))
 			throw new AddressFormattingException("The email address you entered was not valid.");
 
 		MessagingAddress result = new MessagingAddress(address, person);
-		result.setProtocolId(getProtocolId());
+		result.setProtocol(this.getClass());
 		
 		log.debug("Created address for " + person + " (" + address + ")");
 		
@@ -104,13 +127,4 @@ public class EmailProtocol extends Protocol {
 		Matcher matcher = emailPattern.matcher(address);
 		return matcher.matches();
 	}
-
-	/**
-	 * determine if a password is required to send messages
-	 */
-	@Override
-	public boolean requiresPassword() {
-		return false;
-	}
-
 }

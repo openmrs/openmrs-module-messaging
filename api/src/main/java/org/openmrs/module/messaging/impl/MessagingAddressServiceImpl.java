@@ -38,7 +38,7 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 		return dao.getPreferredMessagingAddressForPerson(person);
 	}
 	
-	public List<MessagingAddress> findMessagingAddresses(String address, Protocol protocol, Person person){
+	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocol, Person person){
 		return dao.findMessagingAddresses(address,protocol,person);
 	}
 	

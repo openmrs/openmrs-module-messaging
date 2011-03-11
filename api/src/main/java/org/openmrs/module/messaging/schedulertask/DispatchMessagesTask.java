@@ -68,7 +68,7 @@ public class DispatchMessagesTask extends AbstractTask{
 				}
 				
 				//get all outgoing messages and the gateways that can send them
-				List<Message> messages = getMessageService().getOutboxMessagesByProtocol(p);
+				List<Message> messages = getMessageService().getOutboxMessagesByProtocol(p.getClass());
 				if(messages.size() <=0) continue;
 				
 				//get the supporting gateways
@@ -102,15 +102,15 @@ public class DispatchMessagesTask extends AbstractTask{
 				//round robin
 				gateways.get(messageIndex++ % gatewayCount).sendMessage(message);
 				//set the status as sent
-				message.setMessageStatus(MessageStatus.SENT);
+				message.setStatus(MessageStatus.SENT);
 			}catch(Exception e){
 				log.error("Error sending message",e);
 				//if the sending didn't work, update the message status
 				if(message.getSendAttempts() < getMaxRetryAttempts()){
-					message.setMessageStatus(MessageStatus.RETRYING);
+					message.setStatus(MessageStatus.RETRYING);
 					log.info("Retrying message #" + message.getId());
 				}else{
-					message.setMessageStatus(MessageStatus.FAILED);
+					message.setStatus(MessageStatus.FAILED);
 					log.info("Message #" + message.getId()+ " failed");
 				}
 			}

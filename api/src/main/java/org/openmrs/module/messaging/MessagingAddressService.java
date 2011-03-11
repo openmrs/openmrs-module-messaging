@@ -5,6 +5,7 @@ import java.util.List;
 import org.openmrs.Person;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface MessagingAddressService extends OpenmrsService{
@@ -92,5 +93,8 @@ public interface MessagingAddressService extends OpenmrsService{
 	
 	@Transactional(readOnly=true)
 	public List<MessagingAddress> getPublicAddressesForPerson(Person p);
+	
+	@Transactional(readOnly=true)
+	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocol, Person person);
 	
 }

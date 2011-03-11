@@ -66,11 +66,11 @@ public class DWRModuleMessageService {
 			messageBean = new MessageBean(message);
 			messageBean.setFromOpenMRS(message.getRecipient() != null && message.getRecipient().equals(p));
 			//set the proper 'color number'
-			if(messageBean.isFromOpenMRS() && !colorNumbers.containsKey(message.getSender())){
-				colorNumbers.put(message.getSender(), colorNumber);
+			if(messageBean.isFromOpenMRS() && !colorNumbers.containsKey(message.getFrom())){
+				colorNumbers.put(message.getFrom(), colorNumber);
 				messageBean.setColorNumber(colorNumber++);
 			}else if(messageBean.isFromOpenMRS()){
-				messageBean.setColorNumber(colorNumbers.get(message.getSender()));
+				messageBean.setColorNumber(colorNumbers.get(message.getFrom()));
 			}
 			//if this message was sent too far apart from the last one,
 			//insert a date marker (empty MessageBean w/Date)
@@ -102,11 +102,11 @@ public class DWRModuleMessageService {
 		MessagingAddress fromAddress = addressService.getMessagingAddress(fromAddressString);
 		Protocol protocol = null;
 		//attempt to pull the protocol from the messaging addresses
-		if(toAddress != null) protocol = messagingService.getProtocolById(toAddress.getProtocolId());
-		if(fromAddress != null) protocol = messagingService.getProtocolById(fromAddress.getProtocolId());
+		if(toAddress != null) protocol = messagingService.getProtocolByClass(toAddress.getProtocol());
+		if(fromAddress != null) protocol = messagingService.getProtocolByClass(fromAddress.getProtocol());
 		//if pulling the protocol from the addresses didn't work, 
 		// then the protocol should have been passed in as a string
-		if(protocol == null) protocol = messagingService.getProtocolById(protocolId);
+		if(protocol == null) protocol = messagingService.getProtocolByClass((Class<? extends Protocol>) Class.forName(protocolId));
 		//check to make sure that the supplied protocol exists...
 		if(protocol == null){
 			return "Non-existent protocol specified";
@@ -145,7 +145,7 @@ public class DWRModuleMessageService {
 			message.setRecipient(addressService.getPersonForAddress(toAddressString));
 		}
 		if(isFromCurrentUser){
-			message.setSender(Context.getAuthenticatedUser().getPerson());
+			message.setFrom(Context.getAuthenticatedUser().getPerson());
 		}
 		//if it is possible to send the message, do so
 		if (!messagingService.canSendToProtocol(protocol)) {
@@ -154,5 +154,9 @@ public class DWRModuleMessageService {
 			messagingService.sendMessage(message);
 			return null;
 		}
+	}
+	
+	public List<MessagingAddress> parseMessagingAddresses(String addresses){
+		
 	}
 }

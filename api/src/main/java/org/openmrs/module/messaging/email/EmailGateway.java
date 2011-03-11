@@ -66,7 +66,7 @@ public class EmailGateway extends MessagingGateway {
 			throw new MessageException("outgoing server session is not turned on");
 
 		// fail if there is no destination
-		if (message.getDestination() == null)
+		if (message.getTo() == null || message.getTo().size() < 1)
 			throw new MessageException("Message must contain at least one recipient");
 
 		// start a new mime message
@@ -255,16 +255,16 @@ public class EmailGateway extends MessagingGateway {
 			
 			// post the message
 			org.openmrs.module.messaging.domain.Message m = new org.openmrs.module.messaging.domain.Message("", content);
-			m.setSender(sender);
-			m.setMessageStatus(MessageStatus.RECEIVED);
+			m.setFrom(sender);
+			m.setStatus(MessageStatus.RECEIVED);
 			m.setDate(message.getSentDate());
-			m.setProtocolId(EmailProtocol.class.getName());
+			m.setProtocol(EmailProtocol.class.getName());
 			this.getMessageService().saveMessage(m);
 			
 			// mark the message as seen
 			message.setFlag(Flag.SEEN, true);
 			
-			log.debug("Received message from " + m.getSender());
+			log.debug("Received message from " + m.getFrom());
 			
 		} catch (IOException e) {
 			log.error("could not read message content due to an I/O error", e);

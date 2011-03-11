@@ -49,11 +49,11 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		listeners = new CopyOnWriteArrayList<IncomingMessageListener>();
 		
 		// add a trial listener
-		listeners.add(new IncomingMessageListener() {	
-			public void messageRecieved(Message message) {
-				log.info("INCOMING MESSAGE RECIEVED: "+ message.getContent() + ". SENDER: "+ message.getOrigin());
-			}
-		});
+//		listeners.add(new IncomingMessageListener() {	
+//			public void messageRecieved(Message message) {
+//				log.info("INCOMING MESSAGE RECIEVED: "+ message.getContent() + ". SENDER: "+ message.getOrigin());
+//			}
+//		});
 
 		//initialize the protocols
 		protocols = new HashMap<Class<? extends Protocol>, Protocol>();
@@ -69,7 +69,7 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	}
 	
 	public void sendMessage(Message message){
-		message.setMessageStatus(MessageStatus.OUTBOX);
+		message.setStatus(MessageStatus.OUTBOX);
 		Context.getService(MessageService.class).saveMessage(message);
 	}
 	
@@ -89,16 +89,6 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	
 	public <P extends Protocol> P getProtocolByClass(Class<P> clazz) {
 		return (P) protocols.get(clazz);
-	}
-	
-	public Protocol getProtocolById(String protocolId){
-		Protocol result = null;
-		for(Protocol p: protocols.values()){
-			if(p.getProtocolId().equals(protocolId)){
-				result = p;
-			}
-		}
-		return result;
 	}
 	
 	public boolean canSendToProtocol(Protocol p){

@@ -57,5 +57,33 @@
 				
 		</sql>
 	</diff>
+	<diff>
+		<version>1.1</version>
+		<author>Dieterich Lawson</author>
+		<date>February 12th, 2011</date>
+		<description>
+			Makes these changes to the database structure:
+			- make Message.content a MySQL TEXT type (holds ~64 kb of text)
+			- add Message.in_reply_to field - reference to the message that this message is in reply to.
+			- add Message.subject (plain text, 256 characters)
+			- remove "sender", "recipient", "origin", and "destination" of MessagingAddress, replacing them with MessagingAddresses.
+			- make Message.recipients a list of MessagingAddresses (one to many relationship with associative table/join table)
+			- rename protocol_id to protocol_class
+			- remove password field from MessagingAddress
+		</description>
+		<sql>
+			ALTER TABLE messaging_messages MODIFY COLUMN content TEXT NOT NULL DEFAULT ''; 
+			ALTER TABLE messaging_messages ADD COLUMN in_reply_to int(11) DEFAULT NULL, ADD COLUMN subject varchar(256) NOT NULL DEFAULT '';
+			ALTER TABLE messaging_messages DROP COLUMN origin, DROP COLUMN sender, DROP COLUMN destination, DROP COLUMN recipient;
+			ALTER TABLE messaging_messages ADD COLUMN from int(11) DEFAULT NULL;
+			ALTER TABLE messaging_message RENAME COLUMN protocol_id TO protocol_class;
+			CREATE TABLE IF NOT EXISTS messaging_message_recipients(
+				`message` int(11) NOT NULL default 0,
+				`recipient` int(11) NOT NULL default 0,
+				PRIMARY KEY (message,recipient)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+			ALTER TABLE messaging_addresses DROP COLUMN password;
+		</sql>
+	</diff>
 
 </sqldiff>

@@ -1,5 +1,7 @@
 package org.openmrs.module.messaging.sms;
 
+import java.util.Set;
+
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
@@ -15,59 +17,15 @@ import org.openmrs.module.messaging.util.MessagingConstants;
  *
  */
 public class SmsProtocol extends Protocol{
-
-	/**
-	 * SmsAlphabet contains data about the 
-	 * 3 different possible alphabets that can
-	 * be used with SMS.
-	 */
-	public enum SmsAlphabet{
-		GSM_7_BIT(160,153),
-		GSM_8_BIT(140,134),
-		UTF_16(70,67);
-		
-		private int maxSingleLength;
-		private int maxConcatenatedLength;
-		
-		private SmsAlphabet(int singleLength, int concatLength){
-			this.maxSingleLength = singleLength;
-			this.maxConcatenatedLength = concatLength;
-		}
-
-		/**
-		 * @return the maxSingleLength
-		 */
-		public int getMaxSingleLength() {
-			return maxSingleLength;
-		}
-		
-		/**
-		 * @return the maxConcatenatedLength
-		 */
-		public int getMaxConcatenatedLength() {
-			return maxConcatenatedLength;
-		}
-	}
 	
 	@Override
 	public String getProtocolName() {
 		return "SMS";
 	}
 
-	/** 
-	 * Validating phone numbers is hard to do since different nations use
-	 * different numbering systems. This method does the bare minimum of
-	 * stripping all non-numeric characters from the string and checking if
-	 * it is at least 10 characters.
-	 * 
-	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#addressIsValid(java.lang.String)
+	/* (non-Javadoc)
+	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createAddress(java.lang.String, org.openmrs.Person)
 	 */
-	@Override
-	public boolean addressIsValid(String address) {
-		address = address.replaceAll("[^0-9]", "");
-		return address.length() >= 10;
-	}
-
 	@Override
 	public MessagingAddress createAddress(String address, Person person) throws AddressFormattingException {
 		if (!addressIsValid(address)) {
@@ -75,7 +33,7 @@ public class SmsProtocol extends Protocol{
 											   + "and your country code or enter a locally formatted number.");
 		}
 		MessagingAddress result = new MessagingAddress(getProperlyFormattedPhoneNumber(address), person);
-		result.setProtocolId(getProtocolId());
+		result.setProtocol(this.getClass());
 		return result;
 	}
 	
@@ -99,26 +57,40 @@ public class SmsProtocol extends Protocol{
 		}
 		return rawNumber;
 	}
-
+	
+	/** 
+	 * Validating phone numbers is hard to do since different nations use
+	 * different numbering systems. This method does the bare minimum of
+	 * stripping all non-numeric characters from the string and checking if
+	 * it is at least 10 characters.
+	 * 
+	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#addressIsValid(java.lang.String)
+	 */
+	@Override
+	public boolean addressIsValid(String address) {
+		address = address.replaceAll("[^0-9]", "");
+		return address.length() >= 10;
+	}
+	
 	/**
 	 * Creates an SMS message. Validates message content using the default
-	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). If null safe for 'fromAddress',
-	 * the only parameter that is allowed to be null
+	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). 'fromAddress' can be null
 	 * 
 	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createMessage(java.lang.String,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
 	public Message createMessage(String messageContent, String toAddress, String fromAddress) throws MessageFormattingException, AddressFormattingException {
+		MessagingAddress to = null,from = null;
 		try{
-			MessagingAddress to = createAddress(toAddress,null);
+			to = createAddress(toAddress,null);
 		}catch(AddressFormattingException e){
 			AddressFormattingException f = new AddressFormattingException(e.getMessage().replace("phone number", "\"to\" number"));
 			throw f;
 		}
 		if (fromAddress != null && !fromAddress.equals("")) {
 			try {
-				MessagingAddress from = createAddress(fromAddress, null);
+				from = createAddress(fromAddress, null);
 			} catch (AddressFormattingException e) {
 				AddressFormattingException f = new AddressFormattingException(e.getMessage().replace("phone number", "\"from\" number"));
 				throw f;
@@ -127,13 +99,47 @@ public class SmsProtocol extends Protocol{
 		if(!messageContentIsValid(messageContent)){
 			throw new MessageFormattingException("SMS message is too long.");
 		}
-		Message result = new Message(toAddress,fromAddress,messageContent);
-		result.setProtocolId(getProtocolId());
+		Message result = new Message(to,from,messageContent);
+		result.setProtocol(this.getClass());
 		return result; 
 	}
 	
 	/**
-	 * Validates the message content using the supplied paramaters instead of the defaults
+	 * Creates an SMS message. Validates message content using the default
+	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). 'from' can be null
+	 * 
+	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createMessage(java.lang.String,
+	 *      java.lang.String, java.lang.String)
+	 */
+	@Override
+	public Message createMessage(String messageContent, MessagingAddress to, MessagingAddress from) throws MessageFormattingException {
+		if(!messageContentIsValid(messageContent)){
+			throw new MessageFormattingException("SMS message is too long.");
+		}
+		Message result = new Message(to,from,messageContent);
+		result.setProtocol(this.getClass());
+		return result;
+	}
+
+	/**
+	 * Creates an SMS message. Validates message content using the default
+	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). 'from' can be null
+	 * 
+	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createMessage(java.lang.String,
+	 *      java.lang.String, java.lang.String)
+	 */
+	@Override
+	public Message createMessage(String messageContent, Set<MessagingAddress> to, MessagingAddress from) throws MessageFormattingException {
+		if(!messageContentIsValid(messageContent)){
+			throw new MessageFormattingException("SMS message is too long.");
+		}
+		Message result = new Message(to, from, messageContent);
+		result.setProtocol(this.getClass());
+		return result;
+	}
+	
+	/**
+	 * Validates the message content using the supplied parameters instead of the defaults
 	 * @throws MessageFormattingException
 	 */
 	public Message createMessage(String messageContent, MessagingAddress toAddress, MessagingAddress fromAddress, int maxSmsNumber, SmsAlphabet alphabet) throws MessageFormattingException {
@@ -141,14 +147,14 @@ public class SmsProtocol extends Protocol{
 			throw new MessageFormattingException("SMS message is too long.");
 		}
 		//validation complete, create the message
-		Message result =new Message(toAddress.getAddress(),fromAddress.getAddress(),messageContent);
-		result.setProtocolId(getProtocolId());
+		Message result = new Message(toAddress,fromAddress,messageContent);
+		result.setProtocol(this.getClass());
 		return result;
 	}
 	
 
 	/**
-	 * Checking for SMS content validity is rather complicated, so this method
+	 * Checking for SMS content validity is rather complex, so this method
 	 * assumes that you are using the GSM 7-bit alphabet and that the max number
 	 * of concatenated SMS messages is 3. If you need more control over the
 	 * parameters, use this method:
@@ -170,15 +176,28 @@ public class SmsProtocol extends Protocol{
 		if(maxNumberOfSms < 1){//this is invalid
 			return false;
 		}else if(maxNumberOfSms ==1){// single SMS, so use single length
-			return content.length() <= alphabet.getMaxSingleLength();
+			return content.length() <= alphabet.maxSingleLength;
 		}else{// concatenated SMS
-			return content.length() <= alphabet.getMaxConcatenatedLength() * maxNumberOfSms;
+			return content.length() <= alphabet.maxConcatenatedLength * maxNumberOfSms;
 		}
 	}
-
-	@Override
-	public boolean requiresPassword() {
-		return false;
+	
+	/**
+	 * SmsAlphabet contains data about the 
+	 * 3 different possible alphabets that can
+	 * be used with SMS.
+	 */
+	public enum SmsAlphabet{
+		GSM_7_BIT(160,153),
+		GSM_8_BIT(140,134),
+		UTF_16(70,67);
+		
+		public final int maxSingleLength;
+		public final int maxConcatenatedLength;
+		
+		private SmsAlphabet(int singleLength, int concatLength){
+			this.maxSingleLength = singleLength;
+			this.maxConcatenatedLength = concatLength;
+		}
 	}
-
 }

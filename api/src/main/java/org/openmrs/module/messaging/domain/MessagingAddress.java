@@ -17,22 +17,13 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
  */
 public class MessagingAddress extends BaseOpenmrsData {
 
-	public MessagingAddress() {
-	}
+	public MessagingAddress() {}
 	
 	public MessagingAddress(String address, Person person) {
 		super();
 		this.address = address;
 		this.person = person;
 	}
-
-	public MessagingAddress(String address, String password, Person person) {
-		super();
-		this.address = address;
-		this.password = password;
-		this.person = person;
-	}
-
  
 	private Integer messagingAddressId;
 
@@ -40,11 +31,6 @@ public class MessagingAddress extends BaseOpenmrsData {
 	 * The plain text address
 	 */
 	protected String address;
-
-	/**
-	 * The password, if needed
-	 */
-	protected String password;
 
 	/**
 	 * The person this address is for
@@ -58,16 +44,17 @@ public class MessagingAddress extends BaseOpenmrsData {
 	protected Boolean preferred = false;
 
 	/**
-	 * The protocol that is used to send messages to this address
-	 */
-	protected String protocolId;
-
-	/**
 	 * Represents whether or not this message can be found in the OpenMRS
 	 * address directory (i.e. other users can find this address and send
 	 * messages to it)
 	 */
 	private boolean findable;
+	
+	/**
+	 * The protocol that is used to send messages to this address
+	 */
+	protected String protocolClass;
+
 
 	/**
 	 * @return the address
@@ -82,21 +69,6 @@ public class MessagingAddress extends BaseOpenmrsData {
 	 */
 	public void setAddress(String address) {
 		this.address = address;
-	}
-
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
-	}
-
-	/**
-	 * @param password
-	 *            the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 	/**
@@ -145,15 +117,17 @@ public class MessagingAddress extends BaseOpenmrsData {
 	 * @param protocolId
 	 *            the protocolId to set
 	 */
-	public void setProtocolId(String protocolId) {
-		this.protocolId = protocolId;
+	public void setProtocol(Class<? extends Protocol> protocolClass) {
+		this.protocolClass = protocolClass.getName();
 	}
 
-	/**
-	 * @return the protocolId
-	 */
-	public String getProtocolId() {
-		return protocolId;
+	@SuppressWarnings("unchecked")
+	public Class<? extends Protocol> getProtocol() {
+		try {
+			return (Class<? extends Protocol>) Class.forName(protocolClass);
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
 	}
 
 	/**

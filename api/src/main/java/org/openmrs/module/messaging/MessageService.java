@@ -46,7 +46,7 @@ public interface MessageService extends OpenmrsService{
 	public List<Message> getMessagesToOrFromPerson(Person person);
 	
 	
-	public List<Message> getMessagesForPersonAndProtocol(Person person, Protocol protocol);
+	public List<Message> getMessagesForPersonAndProtocol(Person person, Class<? extends Protocol> protocol);
 	
 	/**
 	 * @param address
@@ -88,7 +88,7 @@ public interface MessageService extends OpenmrsService{
 	 * @return
 	 */
 	@Transactional(readOnly=true)
-	public List<Message> findMessagesWithAdresses(Protocol protocol, String toAddress,String fromAddress, String content,Integer status);
+	public List<Message> findMessagesWithAdresses(Class<? extends Protocol> protocol, String toAddress,String fromAddress, String content,Integer status);
 	
 	/**
 	 * Any of the parameters can be null
@@ -100,7 +100,7 @@ public interface MessageService extends OpenmrsService{
 	 * @return
 	 */
 	@Transactional(readOnly=true)
-	public List<Message> findMessagesWithPeople(Protocol protocol, Person sender, Person recipient, String content, Integer status);
+	public List<Message> findMessagesWithPeople(Class<? extends Protocol> protocol, Person sender, Person recipient, String content, Integer status);
 	
 	/**
 	 * Create or update message
@@ -118,6 +118,6 @@ public interface MessageService extends OpenmrsService{
 	public List<Message> getOutboxMessages();
 	
 	@Transactional(readOnly=true)
-	public List<Message> getOutboxMessagesByProtocol(Protocol p);
+	public List<Message> getOutboxMessagesByProtocol(Class<? extends Protocol> protocol);
 
 }
