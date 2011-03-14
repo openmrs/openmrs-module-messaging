@@ -32,6 +32,8 @@ public abstract class Protocol {
 	 */
 	public abstract String getProtocolName();
 	
+	public abstract String getProtocolAbbreviation();
+	
 	
 	/**
 	 * Creates a message. "from" can be null or blank, but will be filled in depending on which gateway sends the message. The message will also

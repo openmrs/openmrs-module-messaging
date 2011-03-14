@@ -200,4 +200,9 @@ public class SmsProtocol extends Protocol{
 			this.maxConcatenatedLength = concatLength;
 		}
 	}
+
+	@Override
+	public String getProtocolAbbreviation() {
+		return "sms";
+	}
 }

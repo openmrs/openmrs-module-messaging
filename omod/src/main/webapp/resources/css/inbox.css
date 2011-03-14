@@ -1,0 +1,132 @@
+#index{
+	width:90%;
+	margin-left:0px;
+	margin-right:auto;
+}
+#link-cell{
+	vertical-align:top;
+	width:12%;
+}
+#link-panel{
+	text-align:right;
+	margin-top:4em;
+	border-top-style:solid;
+	border-bottom-style:solid;
+	border-top-width:1px;
+	border-bottom-width:1px;
+}
+#link-panel a:link, #link-panel a:visited, #link-panel a:active, #link-panel a:hover{
+	text-decoration:none;
+	text-align:right;
+	z-index:auto;
+}
+.panel-link{
+	display:block;
+	margin:1px 0px 1px 0px;
+	padding:1px 10px 1px 0px;
+}
+#inbox-link{
+	background:#dcdcdc;
+}
+#inbox-link:link, #inbox-link:visited, #inbox-link:active, #inbox-link:hover {
+	text-decoration:none;
+	color:black;
+}
+#inbox{
+	width:88%;
+}
+#message-table-container{
+
+}
+#inner-loading-container{
+	position:absolute;
+	top:50%;
+	left:50%;
+	width:30em;
+	height:4em;
+	margin-top:-2em;
+	margin-left:-15em;
+	text-align:center;
+	display:none;
+}
+#inner-loading-container img,#inner-loading-container span{
+	display:block;
+	margin:0 auto;
+	display:none;
+}
+#messages-table{
+	width:100%;
+	border:1px solid #aaa;
+	border-collapse:collapse;
+}
+#messages-table th{
+	background-color: #ddd;
+	border: 1px solid #aaa;
+	padding: 0.2em;
+}
+#messages-table td{
+	border: 1px solid #aaa;
+	padding: 0.2em;
+	cursor:pointer;
+}
+#paging-controls-container{
+	text-align:right;
+	border-right:1px solid black;
+	border-left:1px solid black;
+	padding:5px;
+}
+#paging-info{
+	margin-right:10px;
+}
+#paging-controls-container a{
+	margin-left:2px;
+}
+#search-bar-container{
+	float:right;
+	margin-bottom:3px;
+	width:25%;
+	padding: 0px 7px 0px 0px;
+}
+#inbox-search{
+	width: 100%;
+}
+.highlight-row{
+	background:#E3E4FA;
+}
+#message-info-panel{
+	width:auto;
+	border-color:black;
+	position:relative;
+}
+#message-header-table{
+	padding: 7px 0px 7px 7px;
+	float:left;
+}
+#message-header-table td{
+	padding:0px 7px 0px 0px;
+}
+#reply-buttons{
+	position:absolute;
+	bottom:0;
+	right:0;
+	padding:0px 7px 7px 0px;
+	visibility:hidden;
+}
+#message-header-panel .header-label{
+	font-weight:bold;
+	color: gray;
+	visibility:hidden;
+}
+#header-subject{
+	font-weight:bold;
+}
+#subject-row{
+	font-weight:bold;
+}
+#message-text-panel{
+	border:1px solid black;
+	height:15em;
+	padding: 7px;
+	overflow:scroll;
+	overflow-x:hidden;
+}

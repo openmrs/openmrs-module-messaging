@@ -79,7 +79,7 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		if(address.getPreferred()){
 			List<MessagingAddress> addresses = findMessagingAddresses(null,null,address.getPerson());
 			for(MessagingAddress ad:addresses){
-				if(!ad.equals(address)){
+				if(ad.getId() != address.getId()){
 					ad.setPreferred(false);
 					saveMessagingAddress(ad);
 				}

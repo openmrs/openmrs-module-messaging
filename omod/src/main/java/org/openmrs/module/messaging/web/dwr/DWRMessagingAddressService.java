@@ -1,16 +1,19 @@
 package org.openmrs.module.messaging.web.dwr;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
+import org.openmrs.module.messaging.web.domain.AddressAutocompleteBean;
 
 public class DWRMessagingAddressService {
 
@@ -83,7 +86,6 @@ public class DWRMessagingAddressService {
 			ma = Context.getService(MessagingAddressService.class).getMessagingAddress(address.getId());
 			ma.setAddress(address.getAddress());
 			ma.setProtocol(address.getProtocol());
-			ma.setDateChanged(new Date());
 			ma.setChangedBy(Context.getAuthenticatedUser());
 		}
 		ma.setPreferred(address.getPreferred());
@@ -97,5 +99,28 @@ public class DWRMessagingAddressService {
 	 */
 	public void saveOrUpdateAddressForCurrentUser(MessagingAddress address){
 		saveOrUpdateAddress(address,Context.getAuthenticatedUser().getPerson().getId());
+	}
+	
+	public List<AddressAutocompleteBean> autocompleteSearch(String query){
+		List<AddressAutocompleteBean> addressBeans = new ArrayList<AddressAutocompleteBean>();
+		List<Person> people = Context.getPersonService().getPeople(query, false);
+		MessagingAddressService addressService = Context.getService(MessagingAddressService.class);
+		for(Person p: people){
+			List<MessagingAddress> mAddresses = addressService.getMessagingAddressesForPerson(p);
+			for(MessagingAddress ma: mAddresses){
+				AddressAutocompleteBean addressBean = new AddressAutocompleteBean(ma);
+				if(!addressBeans.contains(addressBean)){
+					addressBeans.add(addressBean);
+				}
+			}
+		}
+		List<MessagingAddress> mAddresses2 = addressService.findMessagingAddresses(query);
+		for(MessagingAddress ma2: mAddresses2){
+			AddressAutocompleteBean addressBean2 = new AddressAutocompleteBean(ma2);
+			if(!addressBeans.contains(addressBean2)){
+				addressBeans.add(addressBean2);
+			}
+		}
+		return addressBeans;
 	}
 }

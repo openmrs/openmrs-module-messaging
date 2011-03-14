@@ -127,4 +127,9 @@ public class EmailProtocol extends Protocol {
 		Matcher matcher = emailPattern.matcher(address);
 		return matcher.matches();
 	}
+
+	@Override
+	public String getProtocolAbbreviation() {
+		return "email";
+	}
 }

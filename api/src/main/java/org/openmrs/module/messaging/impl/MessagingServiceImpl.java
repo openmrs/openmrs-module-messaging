@@ -58,7 +58,7 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		//initialize the protocols
 		protocols = new HashMap<Class<? extends Protocol>, Protocol>();
 		protocols.put(SmsProtocol.class, new SmsProtocol());
-		protocols.put(EmailProtocol.class, new EmailProtocol());
+		//protocols.put(EmailProtocol.class, new EmailProtocol());
 	}
 	
 	public void sendMessage(String message, String address, Class<? extends Protocol> protocolClass) throws Exception{

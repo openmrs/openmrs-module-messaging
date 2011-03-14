@@ -119,5 +119,7 @@ public interface MessageService extends OpenmrsService{
 	
 	@Transactional(readOnly=true)
 	public List<Message> getOutboxMessagesByProtocol(Class<? extends Protocol> protocol);
+	
+	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to);
 
 }

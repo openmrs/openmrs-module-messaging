@@ -14,10 +14,10 @@
         
         <property name="preferred" type="boolean" not-null="true" length="1"/>
         <property name="findable" type="boolean" not-null="true" length="1"/>
-        <property name="protocolId" type="java.lang.String" column="protocol_id"/>	
+        <property name="protocolClass" type="java.lang.String" column="protocol_class"/>	
                         
         <many-to-one name="creator" class="org.openmrs.User" not-null="true" column="creator"/>
-		<property name="dateCreated" type="java.util.Date"  column="date_created" not-null="true" length="19" />
+		<property name="dateCreated" type="java.util.Date"  column="date_created" length="19" />
 
 		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
 		<property name="dateChanged" type="java.util.Date"  column="date_changed" length="19" />

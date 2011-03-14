@@ -1,0 +1,91 @@
+#index{
+	width:90%;
+	margin-left:0px;
+	margin-right:auto;
+}
+#link-cell{
+	vertical-align:top;
+	width:12%;
+}
+#link-panel{
+	text-align:right;
+	margin-top:4em;
+	border-top-style:solid;
+	border-bottom-style:solid;
+	border-top-width:1px;
+	border-bottom-width:1px;
+}
+#link-panel a:link, #link-panel a:visited, #link-panel a:active, #link-panel a:hover{
+	text-decoration:none;
+	text-align:right;
+	z-index:auto;
+}
+.panel-link{
+	display:block;
+	margin:1px 0px 1px 0px;
+	padding:1px 10px 1px 0px;
+}
+#settings-link{
+	background:#dcdcdc;
+}
+#settings-link:link, #settings-link:visited, #settings-link:active, #settings-link:hover {
+	text-decoration:none;
+	color:black;
+}
+#settings-panel{
+	width:88%;
+	border-style:solid;
+	border-width:1px;
+}
+#address-settings{
+	padding:10px 10px 0px 10px;
+}
+#address-table{
+	margin-top:10px;
+	border:1px solid #aaa;
+	border-collapse:collapse;
+}
+#address-table th{
+	background-color: #ddd;
+	border: 1px solid #aaa;
+	padding: 0.4em;
+}
+#address-table td{
+	border: 1px solid #aaa;
+	padding: 0.4em;
+}
+.address-action-buttons{
+	width:40px;
+	margin-left:auto;
+	margin-right:auto;
+	display:inline;
+}
+.address-action-buttons img{
+	padding:1px;
+}
+#edit-address-panel{
+	display:none;
+	margin-top:10px;
+}
+#edit-address-panel input, #edit-address-panel select{
+	margin-right:5px;
+}
+#address-textbox{
+	width:200px;
+}
+#address-button-panel button{
+	margin-top:10px;
+}
+#save-address-button{
+	display:none;
+}
+#cancel-address-button{
+	display:none;
+}
+#alert-settings{
+	padding:10px;
+}
+#alert-settings input, #alert-settings select{
+	margin-bottom:10px;
+	margin-top:10px;
+}

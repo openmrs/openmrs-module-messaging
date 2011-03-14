@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.messaging.email.EmailGateway;
-import org.openmrs.module.messaging.googlevoice.GoogleVoiceGateway;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
 
 public class GatewayManager {
@@ -24,8 +22,8 @@ public class GatewayManager {
 		//add the gateways
 		gateways.put(SmsLibGateway.class, new SmsLibGateway());
 		//gateways.put(TwitterGateway.class, new TwitterGateway());		
-		gateways.put(GoogleVoiceGateway.class, new GoogleVoiceGateway());
-		gateways.put(EmailGateway.class, new EmailGateway());
+		//gateways.put(GoogleVoiceGateway.class, new GoogleVoiceGateway());
+		//gateways.put(EmailGateway.class, new EmailGateway());
 	}
 	
 	/**

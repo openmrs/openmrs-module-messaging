@@ -12,9 +12,8 @@ import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 
 /**
- * A class that represents a text based message sent within the messaging
- * framework. This class should be extended to create different message types,
- * but could be used as-is in rare situations. In general, you should not call
+ * A text based message sent within the OpenMRS messaging
+ * framework. In general, you should not call
  * the message constructor directly but should instead create them via a class
  * that implements the {@link Protocol} interface. Messages created
  * outside of message factories are not guaranteed to have properly formatted.
@@ -62,10 +61,10 @@ public class Message extends BaseOpenmrsObject {
 	/**
 	 * The message that this message is replying to.
 	 */
-	protected Message inReplyTo;
+	private Message inReplyTo;
 	
 	/**
-	 * The date that the message was sent
+	 * The date that the message was sent or received. Intentionally left a little ambiguous.
 	 */
 	protected Date date;
 
@@ -94,7 +93,7 @@ public class Message extends BaseOpenmrsObject {
 	}
 	/**
 	 * Creates a message with only a destination and content. The date and
-	 * origin are all filled in automatically at the time of sending.
+	 * origin are filled in automatically at the time of sending.
 	 * 
 	 * @param content
 	 *            the content of the message
@@ -105,6 +104,14 @@ public class Message extends BaseOpenmrsObject {
 		this.content = content;
 	}
 
+	/**
+	 * Creates a messaging address with 1 destination and an origin. If the message is sent 
+	 * from a gateway with only 1 exit point from OpenMRS (like email or SMS), the 'from' address
+	 * may be overwritten.
+	 * @param to
+	 * @param from
+	 * @param content
+	 */
 	public Message(MessagingAddress to, MessagingAddress from, String content) {
 		this.setTo(new HashSet<MessagingAddress>());
 		getTo().add(to);
@@ -113,6 +120,14 @@ public class Message extends BaseOpenmrsObject {
 		this.content = content;
 	}
 	
+	/**
+	 * Creates a messaging address with several destinations and an origin. If the message is sent 
+	 * from a gateway with only 1 exit point from OpenMRS (like email or SMS), the 'from' address
+	 * may be overwritten.
+	 * @param to
+	 * @param from
+	 * @param content
+	 */
 	public Message(Set<MessagingAddress> to, MessagingAddress from, String content) {
 		this.setTo(to);
 		this.setOrigin(from.getAddress());
@@ -155,7 +170,7 @@ public class Message extends BaseOpenmrsObject {
 	@SuppressWarnings("unchecked")
 	public Class<? extends Protocol> getProtocol() {
 		try {
-			return (Class<? extends Protocol>) Class.forName(protocolClass);
+			return (Class<? extends Protocol>) Class.forName(getProtocolClass());
 		} catch (ClassNotFoundException e) {
 			log.error("Message Protocol class is not correct",e);
 			return null;
@@ -163,10 +178,10 @@ public class Message extends BaseOpenmrsObject {
 	}
 
 	public void setProtocol(Class<? extends Protocol> protocolClass) {
-		this.protocolClass = protocolClass.getName();
+		this.setProtocolClass(protocolClass.getName());
 	}
 
-	public Integer getStatus() {
+	private Integer getStatus() {
 		return status;
 	}
 	
@@ -291,6 +306,32 @@ public class Message extends BaseOpenmrsObject {
 		return sender;
 	}
 	
+	/**
+	 * @param protocolClass the protocolClass to set
+	 */
+	private void setProtocolClass(String protocolClass) {
+		this.protocolClass = protocolClass;
+	}
+	/**
+	 * @return the protocolClass
+	 */
+	private String getProtocolClass() {
+		return protocolClass;
+	}
+
+	/**
+	 * @param inReplyTo the inReplyTo to set
+	 */
+	public void setInReplyTo(Message inReplyTo) {
+		this.inReplyTo = inReplyTo;
+	}
+	/**
+	 * @return the inReplyTo
+	 */
+	public Message getInReplyTo() {
+		return inReplyTo;
+	}
+
 	public enum MessageFields{
 		STATUS("status"),
 		DATE("date"),

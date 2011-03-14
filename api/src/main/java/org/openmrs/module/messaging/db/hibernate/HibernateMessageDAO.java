@@ -50,7 +50,7 @@ public class HibernateMessageDAO implements MessageDAO {
 			c.add(Restrictions.eq(MessageFields.PROTOCOL_CLASS.fieldName,protocolClass.getName()));
 		}
 		if(toAddress!= null && !toAddress.equals("") && toAddress.equals(fromAddress)){
-			c.createAlias("to", "tos");
+			c.createAlias(MessageFields.TO.fieldName, "tos");
 			c.add(Restrictions.or(Restrictions.eq(MessageFields.ORIGIN.fieldName,fromAddress), Restrictions.eq("tos.address",toAddress)));
 		}else{
 			if(toAddress!= null && !toAddress.equals("")){
@@ -120,6 +120,31 @@ public class HibernateMessageDAO implements MessageDAO {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
 		c.add(Restrictions.or(Restrictions.eq(MessageFields.STATUS.fieldName, MessageStatus.OUTBOX.getNumber()),Restrictions.eq(MessageFields.STATUS.fieldName, MessageStatus.RETRYING.getNumber())));
 		c.add(Restrictions.eq(MessageFields.PROTOCOL_CLASS.fieldName, protocolClass.getName()));
+		return c.list();
+	}
+	
+	/**
+	 * Returns the messages to or from a person with several optional parameters. Results can be paged.
+	 * @param pageNumber The page number of the results. -1 returns all results.
+	 * @param pageSize The page size of the results.
+	 * @param personId The person that the messages are to or from.
+	 * @param to If true, this method fetches the messages to the person, otherwise it fetches the messages from the person 
+	 * @return
+	 */
+	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to){
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
+		if(pageNumber >-1){
+			c.setFirstResult(pageNumber * pageSize);
+			c.setMaxResults(pageSize);
+		}
+		Person p = Context.getPersonService().getPerson(personId);
+		if(p != null){
+			if(to == true){
+				c.createCriteria(MessageFields.TO.fieldName).add(Restrictions.eq("person", p));
+			}else{
+				c.add(Restrictions.eq(MessageFields.SENDER.fieldName, p));
+			}
+		}
 		return c.list();
 	}
 }

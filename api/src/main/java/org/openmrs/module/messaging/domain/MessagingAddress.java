@@ -53,7 +53,7 @@ public class MessagingAddress extends BaseOpenmrsData {
 	/**
 	 * The protocol that is used to send messages to this address
 	 */
-	protected String protocolClass;
+	private String protocolClass;
 
 
 	/**
@@ -109,22 +109,18 @@ public class MessagingAddress extends BaseOpenmrsData {
 		return preferred;
 	}
 
-	public boolean equals(MessagingAddress other) {
-		return this.getMessagingAddressId() == other.getId();
-	}
-
 	/**
 	 * @param protocolId
 	 *            the protocolId to set
 	 */
 	public void setProtocol(Class<? extends Protocol> protocolClass) {
-		this.protocolClass = protocolClass.getName();
+		this.setProtocolClass(protocolClass.getName());
 	}
 
 	@SuppressWarnings("unchecked")
 	public Class<? extends Protocol> getProtocol() {
 		try {
-			return (Class<? extends Protocol>) Class.forName(protocolClass);
+			return (Class<? extends Protocol>) Class.forName(getProtocolClass());
 		} catch (ClassNotFoundException e) {
 			return null;
 		}
@@ -158,5 +154,27 @@ public class MessagingAddress extends BaseOpenmrsData {
 	 */
 	public boolean isFindable() {
 		return findable;
+	}
+
+	/**
+	 * @param protocolClass the protocolClass to set
+	 */
+	public void setProtocolClass(String protocolClass) {
+		this.protocolClass = protocolClass;
+	}
+
+	/**
+	 * @return the protocolClass
+	 */
+	public String getProtocolClass() {
+		return protocolClass;
+	}
+	
+	public String toString(){
+		if(person != null){
+			return "\""+person.getPersonName().toString()+"\""+" <"+address+">";
+		}else{
+			return address;
+		}
 	}
 }

@@ -1,0 +1,97 @@
+#index{
+	width:90%;
+	margin-left:0px;
+	margin-right:auto;
+}
+#link-cell{
+	vertical-align:top;
+	width:12%;
+}
+#link-panel{
+	text-align:right;
+	margin-top:4em;
+	border-top-style:solid;
+	border-bottom-style:solid;
+	border-top-width:1px;
+	border-bottom-width:1px;
+}
+#link-panel a:link, #link-panel a:visited, #link-panel a:active, #link-panel a:hover{
+	text-decoration:none;
+	text-align:right;
+	z-index:auto;
+}
+.panel-link{
+	display:block;
+	margin:1px 0px 1px 0px;
+	padding:1px 10px 1px 0px;
+}
+#sent-messages-link{
+	background:#dcdcdc;
+}
+#sent-messages-link:link, #sent-messages-link:visited, #sent-messages-link:active, #sent-messages-link:hover {
+	text-decoration:none;
+	color:black;
+}
+#sent-messages{
+	width:88%;
+}
+#message-table-container{
+
+}
+#messages-table{
+	width:100%;
+	border:1px solid #aaa;
+	border-collapse:collapse;
+}
+#messages-table th{
+	background-color: #ddd;
+	border: 1px solid #aaa;
+	padding: 0.2em;
+}
+#messages-table td{
+	border: 1px solid #aaa;
+	padding: 0.2em;
+	cursor:pointer;
+}
+#search-bar-container{
+	float:right;
+	margin-bottom:3px;
+	width:25%;
+	padding: 0px 7px 0px 0px;
+}
+#sent-messages-search{
+	width: 100%;
+}
+.highlight-row{
+	background:#E3E4FA;
+}
+#message-info-panel{
+	width:auto;
+	border-color:black;
+	position:relative;
+}
+#message-header-table{
+	padding: 7px 0px 7px 7px;
+	float:left;
+}
+#message-header-table td{
+	padding:0px 7px 0px 0px;
+}
+#message-header-panel .header-label{
+	font-weight:bold;
+	color: gray;
+	visibility:hidden;
+}
+#header-subject{
+	font-weight:bold;
+}
+#subject-row{
+	font-weight:bold;
+}
+#message-text-panel{
+	border:1px solid black;
+	height:15em;
+	padding: 7px;
+	overflow:scroll;
+	overflow-x:hidden;
+}

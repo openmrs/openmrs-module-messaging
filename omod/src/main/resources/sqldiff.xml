@@ -30,7 +30,7 @@
 				`findable` tinyint(1) NOT NULL default '0',
 				`protocol_id` varchar(255) NOT NULL default '',
 				`creator` int(11) NOT NULL default '0',
-				`date_created` datetime NOT NULL default '0000-00-00 00:00:00',
+				`date_created` datetime default null,
 				`changed_by` int(11) default NULL,
 				`date_changed` datetime default NULL,
 				`voided` tinyint(1) NOT NULL default '0',
@@ -66,17 +66,17 @@
 			- make Message.content a MySQL TEXT type (holds ~64 kb of text)
 			- add Message.in_reply_to field - reference to the message that this message is in reply to.
 			- add Message.subject (plain text, 256 characters)
-			- remove "sender", "recipient", "origin", and "destination" of MessagingAddress, replacing them with MessagingAddresses.
+			- remove "recipient" and "destination" of MessagingAddress, replacing them with MessagingAddresses.
 			- make Message.recipients a list of MessagingAddresses (one to many relationship with associative table/join table)
 			- rename protocol_id to protocol_class
 			- remove password field from MessagingAddress
 		</description>
 		<sql>
-			ALTER TABLE messaging_messages MODIFY COLUMN content TEXT NOT NULL DEFAULT ''; 
+			ALTER TABLE messaging_messages MODIFY COLUMN content TEXT; 
 			ALTER TABLE messaging_messages ADD COLUMN in_reply_to int(11) DEFAULT NULL, ADD COLUMN subject varchar(256) NOT NULL DEFAULT '';
-			ALTER TABLE messaging_messages DROP COLUMN origin, DROP COLUMN sender, DROP COLUMN destination, DROP COLUMN recipient;
-			ALTER TABLE messaging_messages ADD COLUMN from int(11) DEFAULT NULL;
-			ALTER TABLE messaging_message RENAME COLUMN protocol_id TO protocol_class;
+			ALTER TABLE messaging_messages DROP COLUMN destination, DROP COLUMN recipient;
+			ALTER TABLE messaging_messages CHANGE protocol_id protocol_class varchar(300);
+			ALTER TABLE messaging_addresses CHANGE protocol_id protocol_class varchar(300);
 			CREATE TABLE IF NOT EXISTS messaging_message_recipients(
 				`message` int(11) NOT NULL default 0,
 				`recipient` int(11) NOT NULL default 0,

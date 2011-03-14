@@ -12,7 +12,9 @@
         <property name="content" type="text"/>
         <property name="subject" type="java.lang.String"/>
         
-        <many-to-one name="from" class="@MODULE_PACKAGE@.domain.MessagingAddress" lazy="false"/>
+        <property name="origin" type="java.lang.String"/>
+        <one-to-one name="sender" class="org.openmrs.Person"/>
+        
 		<set name="to" table="messaging_message_recipients" lazy="false">
 			<key column="message"/>
 			<many-to-many column="recipient" class="@MODULE_PACKAGE@.domain.MessagingAddress"/>
@@ -23,7 +25,7 @@
         <property name="date" type="java.util.Date" length="19"/>
         <property name="status" type="int" length="4"/>
         <property name="sendAttempts" type="int" length="3" column="send_attempts"/>
-		<property name="protocolId" type="java.lang.String" column="protocol_id"/>	
+		<property name="protocolClass" type="java.lang.String" column="protocol_class"/>	
         		
     </class>
 </hibernate-mapping>
