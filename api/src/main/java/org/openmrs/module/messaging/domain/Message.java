@@ -66,7 +66,7 @@ public class Message extends BaseOpenmrsObject {
 	/**
 	 * The date that the message was sent or received. Intentionally left a little ambiguous.
 	 */
-	protected Date date;
+	protected Date date = new Date();
 
 	/**
 	 * The status of this message
@@ -185,6 +185,9 @@ public class Message extends BaseOpenmrsObject {
 		return status;
 	}
 	
+	private void setStatus(Integer status){
+		this.status = status;
+	}
 	/**
 	 * @return The message status, in the {@link MessageStatus} enum.
 	 */
@@ -192,7 +195,7 @@ public class Message extends BaseOpenmrsObject {
 		return MessageStatus.getStatusByNumber(this.getStatus());
 	}
 
-	public void setStatus(MessageStatus status) {
+	public void setMessageStatus(MessageStatus status) {
 		this.status = status.getNumber();
 	}
 

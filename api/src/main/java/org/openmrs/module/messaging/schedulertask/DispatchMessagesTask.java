@@ -102,15 +102,15 @@ public class DispatchMessagesTask extends AbstractTask{
 				//round robin
 				gateways.get(messageIndex++ % gatewayCount).sendMessage(message);
 				//set the status as sent
-				message.setStatus(MessageStatus.SENT);
+				message.setMessageStatus(MessageStatus.SENT);
 			}catch(Exception e){
 				log.error("Error sending message",e);
 				//if the sending didn't work, update the message status
 				if(message.getSendAttempts() < getMaxRetryAttempts()){
-					message.setStatus(MessageStatus.RETRYING);
+					message.setMessageStatus(MessageStatus.RETRYING);
 					log.info("Retrying message #" + message.getId());
 				}else{
-					message.setStatus(MessageStatus.FAILED);
+					message.setMessageStatus(MessageStatus.FAILED);
 					log.info("Message #" + message.getId()+ " failed");
 				}
 			}

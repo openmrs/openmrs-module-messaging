@@ -256,7 +256,7 @@ public class EmailGateway extends MessagingGateway {
 			// post the message
 			org.openmrs.module.messaging.domain.Message m = new org.openmrs.module.messaging.domain.Message("", content);
 			m.setFrom(sender);
-			m.setStatus(MessageStatus.RECEIVED);
+			m.setMessageStatus(MessageStatus.RECEIVED);
 			m.setDate(message.getSentDate());
 			m.setProtocol(EmailProtocol.class.getName());
 			this.getMessageService().saveMessage(m);

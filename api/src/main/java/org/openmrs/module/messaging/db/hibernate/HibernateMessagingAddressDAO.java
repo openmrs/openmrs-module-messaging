@@ -54,7 +54,7 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 			c.add(Restrictions.like("address", address,MatchMode.ANYWHERE));
 		}
 		if(protocolClass != null){
-			c.add(Restrictions.eq("protocolId", protocolClass.getName()));
+			c.add(Restrictions.eq("protocolClass", protocolClass.getName()));
 		}
 		if(person != null){
 			c.add(Restrictions.eq("person", person));

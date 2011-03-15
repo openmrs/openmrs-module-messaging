@@ -80,6 +80,8 @@ public interface MessagingService {
 	 * @return the protocol or null
 	 */
 	public <P extends Protocol> P getProtocolByClass(Class<P> clazz);
+	
+	public Protocol getProtocolByAbbreviation(String abbrev);
 
 	/**
 	 * Checks to see if there is at least one active gateway that can carry this

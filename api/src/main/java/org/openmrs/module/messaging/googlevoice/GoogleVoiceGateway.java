@@ -75,10 +75,10 @@ public class GoogleVoiceGateway extends MessagingGateway {
 			for(MessagingAddress address: message.getTo()){
 				googleVoice.sendSMS(address.getAddress(),message.getContent());
 			}
-			message.setStatus(MessageStatus.SENT);
+			message.setMessageStatus(MessageStatus.SENT);
 		}catch(Throwable t){
 			log.error("Google Voice Gateway failed to send message",t);
-			message.setStatus(MessageStatus.FAILED);
+			message.setMessageStatus(MessageStatus.FAILED);
 		}
 		getMessageService().saveMessage(message);
 	}

@@ -89,7 +89,7 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 			Message m = new Message(Service.getInstance().getGateway(iMessage.getGatewayId()).getFrom(), iMessage.getText());
 			m.setSender(getAddressService().getPersonForAddress("+" + iMessage.getOriginator()));
 			m.setOrigin("+" + iMessage.getOriginator());
-			m.setStatus(MessageStatus.RECEIVED);
+			m.setMessageStatus(MessageStatus.RECEIVED);
 			m.setDate(iMessage.getDate());
 			m.setProtocol(SmsProtocol.class);
 			getMessageService().saveMessage(m);
@@ -182,14 +182,14 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 			//we don't have to re-add the message & statuses to the map,
 			//and we can just modify the OpenMRS message status and be done
 			if(allSent){
-				mesg.setStatus(MessageStatus.SENT);				
+				mesg.setMessageStatus(MessageStatus.SENT);				
 			}else{ //otherwise, we have to re-add the message & statuses
 				sentMessages.put(outboundStatuses, mesg);
 			}
 		} else if (oMessage.getMessageStatus() == MessageStatuses.FAILED) { // if the message failed
 			log.error("Message failed: " + oMessage.getErrorMessage());
 			//set the OpenMRS message status
-			mesg.setStatus(MessageStatus.FAILED);
+			mesg.setMessageStatus(MessageStatus.FAILED);
 			//remove the status list and its associated message from the map
 			sentMessages.remove(outboundStatuses);
 		}

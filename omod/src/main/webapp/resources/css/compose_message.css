@@ -44,7 +44,7 @@
 	border-style:solid;
 	border-width:1px;
 	padding: 5px;
-	width:100%;
+	width:99%;
 }
 #to-label{
 	vertical-align:middle;
@@ -56,6 +56,12 @@
 	display:inline;
 	vertical-align:middle;
 	font-size:13px;
+}
+.header-left-column{
+	width:100%;
+}
+#subject{
+	width:95%;
 }
 #compose-message-table .yui-toolbar-titlebar {
  	display: none;

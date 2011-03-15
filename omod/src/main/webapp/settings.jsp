@@ -79,7 +79,7 @@
 	window.onload = init;
 	var viewed = -1;
 
-	var protocolNames= {"org.openmrs.module.messaging.sms.SmsProtocol":"SMS","org.openmrs.module.messaging.email.EmailProtocol":"Email"};
+	var protocolNames= {"org.openmrs.module.messaging.sms.SmsProtocol":"SMS","org.openmrs.module.messaging.omail.OMailProtocol":"OMail"};
 	
 	function init(){
 		//add the "Add Address" event listener

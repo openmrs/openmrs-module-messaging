@@ -3,7 +3,7 @@ package org.openmrs.module.messaging.web.domain;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Set;
+import java.util.Iterator;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingService;
@@ -42,8 +42,12 @@ public class MessageBean implements Serializable {
 		this.setOrigin(message.getOrigin());
 		this.sender = message.getSender().getPersonName().toString();
 		setRecipients("");
-		for(MessagingAddress address: message.getTo()){
-			setRecipients(getRecipients() + (address.toString()+ ", "));
+		Iterator<MessagingAddress> itr = message.getTo().iterator();
+		while(itr.hasNext()){
+			recipients += itr.next().getPerson().getPersonName().toString();
+			if(itr.hasNext()){
+				recipients +=", ";
+			}
 		}
 		setDateAndTime(message.getDate());
 		this.setProtocolName(Context.getService(MessagingService.class).getProtocolByClass(message.getProtocol()).getProtocolName());
@@ -89,10 +93,8 @@ public class MessageBean implements Serializable {
 
 	public void setDateAndTime(Date date) {
 		if (date != null) {
-			this.date = DateFormat.getDateInstance(DateFormat.SHORT).format(
-					date);
-			this.time = DateFormat.getTimeInstance(DateFormat.SHORT).format(
-					date);
+			this.date = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
+			this.time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
 		}
 	}
 

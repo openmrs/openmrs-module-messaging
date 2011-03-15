@@ -1,5 +1,6 @@
 package org.openmrs.module.messaging.db.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -14,6 +15,7 @@ import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.Message.MessageFields;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 
@@ -140,7 +142,17 @@ public class HibernateMessageDAO implements MessageDAO {
 		Person p = Context.getPersonService().getPerson(personId);
 		if(p != null){
 			if(to == true){
-				c.createCriteria(MessageFields.TO.fieldName).add(Restrictions.eq("person", p));
+				List<Message> messages = c.list();
+				List<Message> result = new ArrayList<Message>();
+				for(Message m: messages){
+					for(MessagingAddress ma: m.getTo()){
+						if(ma.getPerson().equals(p)){
+							result.add(m);
+							continue;
+						}
+					}
+				}
+				return result;
 			}else{
 				c.add(Restrictions.eq(MessageFields.SENDER.fieldName, p));
 			}

@@ -3,6 +3,7 @@ package org.openmrs.module.messaging.web.domain;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.omail.OMailProtocol;
 
 public class AddressAutocompleteBean {
 	private String label;

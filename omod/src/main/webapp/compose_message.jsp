@@ -33,12 +33,20 @@
 	</td>
 	<td id="compose-message-cell">
 		<div id="header-panel" class="boxHeader">
-			<span id="to-label">To:</span>
-			<textarea id="to-addresses" rows="2"> </textarea>
+			<table id="header-table">
+				<tr>
+					<td><span id="to-label">To:</span></td>
+					<td class="header-left-column"><textarea id="to-addresses" rows="2"> </textarea></td>
+				</tr>
+				<tr>
+					<td><span id="subject-label">Subject:</span></td>
+					<td class="header-left-column"><input id="subject" type="text"/></td>
+				</tr>
+			</table>
 		</div>
 		<textarea id="writing-area" name="writing-area"/></textarea>
 		<div id="buttons-container" class="boxHeader">
-			<input type="button" value="Send" id="send-button"></input>
+			<input type="button" value="Send" id="send-button" onclick="sendMessage()"></input>
 			<input type="button" value="Discard" id="discard-button"></input>
 		</div>
 	</td>
@@ -58,6 +66,7 @@
 <openmrs:htmlInclude file="/dwr/engine.js"/>
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <script src="<openmrs:contextPath/>/dwr/interface/DWRMessagingAddressService.js"></script>
+<script src="<openmrs:contextPath/>/dwr/interface/DWRModuleMessageService.js"></script>
 <script type="text/javascript">
 $(function() {
 	function split( val ) {
@@ -103,4 +112,18 @@ $(function() {
 			}
 		});
 });
+
+	function sendMessage(){
+		myEditor.saveHTML();
+	    //The var html will now have the contents of the textarea
+	    var html = myEditor.get('element').value, match;
+		match = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+	    html = match ? match[1] : html;
+	    DWRModuleMessageService.sendMessage(html, document.getElementById('to-addresses').value,document.getElementById('subject').value,true,function(response){
+			alert("Message sent!");
+	    });
+	    myEditor.clearEditorDoc();
+	    document.getElementById('to-addresses').innerHTML="";
+	    document.getElementById('subject').value="";
+	}
 </script>

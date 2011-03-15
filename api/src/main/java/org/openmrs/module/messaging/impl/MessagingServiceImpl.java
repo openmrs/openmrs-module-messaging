@@ -19,7 +19,7 @@ import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.domain.listener.IncomingMessageListener;
-import org.openmrs.module.messaging.email.EmailProtocol;
+import org.openmrs.module.messaging.omail.OMailProtocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
 
 /**
@@ -58,6 +58,7 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		//initialize the protocols
 		protocols = new HashMap<Class<? extends Protocol>, Protocol>();
 		protocols.put(SmsProtocol.class, new SmsProtocol());
+		protocols.put(OMailProtocol.class, new OMailProtocol());
 		//protocols.put(EmailProtocol.class, new EmailProtocol());
 	}
 	
@@ -69,7 +70,7 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	}
 	
 	public void sendMessage(Message message){
-		message.setStatus(MessageStatus.OUTBOX);
+		message.setMessageStatus(MessageStatus.OUTBOX);
 		Context.getService(MessageService.class).saveMessage(message);
 	}
 	
@@ -89,6 +90,13 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	
 	public <P extends Protocol> P getProtocolByClass(Class<P> clazz) {
 		return (P) protocols.get(clazz);
+	}
+	
+	public Protocol getProtocolByAbbreviation(String abbrev) {
+		for(Protocol p: protocols.values()){
+			if(p.getProtocolAbbreviation().equals(abbrev)) return p;
+		}
+		return null;
 	}
 	
 	public boolean canSendToProtocol(Protocol p){

@@ -2,15 +2,12 @@ package org.openmrs.module.messaging.web.dwr;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Patient;
-import org.openmrs.Person;
-import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
@@ -19,7 +16,6 @@ import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
-import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
 import org.openmrs.module.messaging.web.domain.MessageBean;
 
 public class DWRModuleMessageService {
@@ -90,71 +86,59 @@ public class DWRModuleMessageService {
 		return Math.abs(thisTime.getTime() - lastTime) > MAX_TIME_DISTANCE;
 	}
 	
-	
-	public String sendMessage(String content, String toAddress, String protocolId){
-		return sendMessage(content,toAddress,null,null,null,protocolId,false);
-	}
-	
-	public String sendMessage(String content, String toAddressString, String fromAddressString, Integer recipientId, Integer senderId, String protocolId, boolean isFromCurrentUser){
-//		Message message = null;
-//		//first we see if the addresses are already in the system
-//		MessagingAddress toAddress = addressService.getMessagingAddress(toAddressString);
-//		MessagingAddress fromAddress = addressService.getMessagingAddress(fromAddressString);
-//		Protocol protocol = null;
-//		//attempt to pull the protocol from the messaging addresses
-//		if(toAddress != null) protocol = messagingService.getProtocolByClass(toAddress.getProtocol());
-//		if(fromAddress != null) protocol = messagingService.getProtocolByClass(fromAddress.getProtocol());
-//		//if pulling the protocol from the addresses didn't work, 
-//		// then the protocol should have been passed in as a string
-//		if(protocol == null) protocol = messagingService.getProtocolByClass((Class<? extends Protocol>) Class.forName(protocolId));
-//		//check to make sure that the supplied protocol exists...
-//		if(protocol == null){
-//			return "Non-existent protocol specified";
-//		}
-//		//if the toAddress didn't exist in the system, create it
-//		if(toAddress == null){
-//			try{
-//				toAddress = protocol.createAddress(toAddressString, null);
-//			}catch (AddressFormattingException e) {
-//				return "To-address \""+toAddressString+"\" was badly formatted.";
-//			}
-//		}
-//		// if the fromAddress didn't exist in the system, create it
-//		// here we have slightly more complicated conditions (as opposed to the toAddress)
-//		// because it's ok to not have a from address
-//		if(fromAddress == null && fromAddressString!=null && !fromAddressString.equals("")){
-//			try{
-//				fromAddress = protocol.createAddress(fromAddressString, null);
-//			}catch (AddressFormattingException e) {
-//				return "From-address \""+toAddressString+"\" was badly formatted.";
-//			}
-//		}
-//		//create the message itself
-//		try{
-//			message = protocol.createMessage(content, toAddressString,fromAddressString);
-//		}catch(Exception e){
-//			return e.getMessage();
-//		}
-//		//set the people involved
-//		PersonService ps = Context.getPersonService();
-//		message.setSender(ps.getPerson(senderId));
-//		//message.setRecipient(ps.getPerson(recipientId));
-//		message.setDate(new Date());
-//		//if people were not passed in, try to pull the people from the addresses
-//		if(message.getRecipient() == null){
-//			message.setRecipient(addressService.getPersonForAddress(toAddressString));
-//		}
-//		if(isFromCurrentUser){
-//			message.setFrom(Context.getAuthenticatedUser().getPerson());
-//		}
-//		//if it is possible to send the message, do so
-//		if (!messagingService.canSendToProtocol(protocol)) {
-//			return "There is not currently a gateway running that can send that type of message.";
-//		} else {
-//			messagingService.sendMessage(message);
-//			return null;
-//		}
-		return "Cannot currently send messages";
+	public String sendMessage(String content, String toAddressString, String subject, boolean isFromCurrentUser){
+		Message message = null;
+		Set<MessagingAddress> toAddresses = new HashSet<MessagingAddress>();
+		MessagingAddress from = null;
+		Class<? extends Protocol> protocolClass;
+		//first we see if the addresses are already in the system
+		String[] addresses = toAddressString.split(",");
+		for(String s: addresses){
+			String adrString = null;
+			try{
+				adrString = s.substring(s.indexOf("<")+1, s.indexOf(">"));
+			}catch(Throwable t){
+				continue;
+			}
+			Class<? extends Protocol> clazz = messagingService.getProtocolByAbbreviation(adrString.split(":")[0]).getClass();
+			List<MessagingAddress> existingAddresses = addressService.findMessagingAddresses(adrString.split(":")[1], clazz, null);
+			if(existingAddresses.size() != 1){
+				return "Could not find address "+ s;
+			}else{
+				toAddresses.add(existingAddresses.get(0));
+			}
+		}
+		if(toAddresses.size() < 1){
+			return "No addresses entered";
+		}
+		protocolClass = ((MessagingAddress) toAddresses.toArray()[0]).getProtocol();
+		for(MessagingAddress adr: toAddresses){
+			if(protocolClass != adr.getProtocol()){
+				return "Cannot currently send to different types of addresses.";
+			}
+		}
+		//here we have a list of previously existing messaging addresses that all use the same protocol
+		if(isFromCurrentUser){
+			List<MessagingAddress> fromAdrResults = addressService.findMessagingAddresses("", protocolClass, Context.getAuthenticatedUser().getPerson());
+			if(fromAdrResults.size() < 1 ){
+				return "Cannot send from authenticated user - no from address";
+			}else{
+				from = fromAdrResults.get(0);
+			}
+		}
+		try{
+			message = messagingService.getProtocolByClass(protocolClass).createMessage(content, toAddresses, from);
+		}catch(Exception e){
+			return "Could not create message";
+		}
+		message.setSubject(subject!=null?subject:"");
+		//if it is possible to send the message, do so
+		if (!messagingService.canSendToProtocol(messagingService.getProtocolByClass(protocolClass))) {
+			return "There is not currently a gateway running that can send that type of message.";
+		} else {
+			messagingService.sendMessage(message);
+			return null;
+		}
 	}
 	
 	public List<MessageBean> getMessagesForAuthenticatedUser(Integer pageNumber, boolean to){
@@ -162,7 +146,7 @@ public class DWRModuleMessageService {
 	}
 	
 	public List<MessageBean> getMessagesForAuthenticatedUserWithPageSize(Integer pageNumber, Integer pageSize, boolean to){
-		return getMessagesForPerson(pageNumber,pageSize, Context.getAuthenticatedUser().getId(),to);
+		return getMessagesForPerson(pageNumber,pageSize, Context.getAuthenticatedUser().getPerson().getId(),to);
 	} 
 	
 	public List<MessageBean> getMessagesForPerson(Integer pageNumber, Integer pageSize, Integer personId, boolean to){
