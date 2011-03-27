@@ -57,17 +57,20 @@
 <script src="<openmrs:contextPath/>/moduleResources/messaging/jquery/jquery.watermark.min.js"></script>
 <openmrs:htmlInclude file="/dwr/engine.js"/>
 <openmrs:htmlInclude file="/dwr/util.js"/>
-<script src="<openmrs:contextPath/>/moduleResources/messaging/data/messages.js"></script>
+<script src="<openmrs:contextPath/>/dwr/interface/DWRModuleMessageService.js"></script>
 
 <script type="text/javascript">
 	window.onload = init;
 	
 	var messageCache = { };
 
+	var pageNum=0;
+	var pageSize=10;
+	
 	function init() {
 		$("#sent-messages-search").watermark("search sent messages");
 		$("#messages-table-body tr").live("click",rowClicked);
-		fillMessageTable(msgs);
+		fillMessageTable();
 	}
 	
 	function rowClicked(event){
@@ -76,55 +79,29 @@
 		document.getElementById("message-panel").style.display="";
 		document.getElementById("header-subject").innerHTML = message.subject;
 		document.getElementById("header-date").innerHTML = message.date;
-		var to="";
-		for(var i = 0; i < message.to.length; i++){
-			to+= message.to[i];
-			if(i != message.to.length-1){
-				to+=", ";
-			}
-		}
-		document.getElementById("header-to").innerHTML = to;
-		document.getElementById("message-text-panel").innerHTML=message.message;
+		document.getElementById("header-to").innerHTML = message.recipients;
+		document.getElementById("message-text-panel").innerHTML = message.content;
 		$("#messages-table-body").children().removeClass("highlight-row");
 		$("#pattern"+id).addClass("highlight-row");	
 		$(".header-label").css("visibility","visible");
 	}
 	
-	function fillMessageTable(messages){
-		dwr.util.removeAllRows("messages-table-body", { filter:function(tr) {return (tr.id != "pattern");}});
-		var message, id;
-		// iterate through the messages, cloning the pattern row
-		// and placing each message values into that row
-		for (var i = 0; i < messages.length; i++) {
-			message = messages[i];
-		    id = message.id;
-		    dwr.util.cloneNode("pattern", { idSuffix:id });
-		    var to="";
-			for(var j = 0; j < message.to.length; j++){
-				to+= message.to[j];
-				if(j != message.to.length-1){
-					to+=", ";
-				}
+	function fillMessageTable(){
+		DWRModuleMessageService.getMessagesForAuthenticatedUserWithPageSize(pageNum,pageSize,false,function(messages){
+			dwr.util.removeAllRows("messages-table-body", { filter:function(tr) {return (tr.id != "pattern");}});
+			var message, id;
+			// iterate through the messages, cloning the pattern row
+			// and placing each message values into that row
+			for (var i = 0; i < messages.length; i++) {
+				message = messages[i];
+			    id = message.id;
+			    dwr.util.cloneNode("pattern", { idSuffix:id });
+				dwr.util.setValue("message-dest" + id, message.recipients);
+			    dwr.util.setValue("message-subj" + id, message.subject);
+			    dwr.util.setValue("message-date" + id, message.date);
+			    document.getElementById("pattern" + id).style.display = "table-row";
+			    messageCache[id] = message;
 			}
-			dwr.util.setValue("message-dest" + id, to);
-		    dwr.util.setValue("message-subj" + id, message.subject);
-		    dwr.util.setValue("message-date" + id, message.date);
-		    document.getElementById("pattern" + id).style.display = "table-row";
-		    messageCache[id] = message;
-		}
-	}
-	
-	function messageClicked(event){
-		
-	}
-	
-	function replyClicked(event){
-		
-		
-	}
-	
-	function replyAllClicked(event){
-		
-		
+		});
 	}
 </script>
