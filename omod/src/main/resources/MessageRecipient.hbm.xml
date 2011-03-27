@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class table="messaging_message_recipients" name="@MODULE_PACKAGE@.domain.MessageRecipient">
+    
+		<id name="messageRecipientId" type="int" column="recipient_id"  unsaved-value="0">
+				<generator class="native" />
+		</id>
+        <property name="uuid" type="string" length="38" not-null="true" />
+        
+        <many-to-one name="message" class="@MODULE_PACKAGE@.domain.Message"/>
+        
+        <many-to-one name="recipient" class="@MODULE_PACKAGE@.domain.MessagingAddress"/>
+        <property name="read" column="is_read" type="boolean" not-null="true" length="1"/>
+     </class>
+</hibernate-mapping>

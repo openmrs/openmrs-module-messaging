@@ -14,8 +14,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
-import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.Message.MessageFields;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 
@@ -145,8 +145,8 @@ public class HibernateMessageDAO implements MessageDAO {
 				List<Message> messages = c.list();
 				List<Message> result = new ArrayList<Message>();
 				for(Message m: messages){
-					for(MessagingAddress ma: m.getTo()){
-						if(ma.getPerson().equals(p)){
+					for(MessageRecipient recipient: m.getTo()){
+						if(recipient.getRecipient().getPerson().equals(p)){
 							result.add(m);
 							continue;
 						}

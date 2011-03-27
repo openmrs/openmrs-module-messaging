@@ -15,11 +15,13 @@
         <property name="origin" type="java.lang.String"/>
         <one-to-one name="sender" class="org.openmrs.Person"/>
         
-		<set name="to" table="messaging_message_recipients" lazy="false">
-			<key column="message"/>
-			<many-to-many column="recipient" class="@MODULE_PACKAGE@.domain.MessagingAddress"/>
-		</set>
-		
+		<set name="to" inverse="true" table="messaging_message_recipients" cascade="all">
+        	<key>
+        		<column name="message" not-null="true" />
+        	</key>
+        	<one-to-many class="@MODULE_PACKAGE@.domain.MessageRecipient" />
+     	</set>
+     	
 		<many-to-one name="inReplyTo" class="@MODULE_PACKAGE@.domain.Message" column="in_reply_to" cascade="none"/>
 		
         <property name="date" type="java.util.Date" length="19"/>

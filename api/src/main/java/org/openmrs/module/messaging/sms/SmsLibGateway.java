@@ -9,8 +9,8 @@ import java.util.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
-import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.Modem;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
@@ -68,8 +68,8 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 		// create a list to contain references to all the outbound
 		// messages we're about to create
 		List<OutboundMessageStatus> outboundStatuses = new ArrayList<OutboundMessageStatus>();
-		for (MessagingAddress toAddress : message.getTo()) {
-			OutboundMessage om = new OutboundMessage(toAddress.getAddress(), message.getContent());
+		for (MessageRecipient toAddress : message.getTo()) {
+			OutboundMessage om = new OutboundMessage(toAddress.getRecipient().getAddress(), message.getContent());
 			om.setId(UUID.randomUUID().toString());
 			outboundStatuses.add(new OutboundMessageStatus(om));
 			Service.getInstance().queueMessage(om);

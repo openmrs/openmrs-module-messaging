@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.messaging.schedulertask.DispatchMessagesTask;
 import org.openmrs.scheduler.SchedulerException;
 import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.util.OpenmrsConstants;
@@ -44,7 +45,6 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 	}
 
 	public void willStop() {
-		log.info("Shutting down Messaging Module");
 	}
 	
 	/**

@@ -14,7 +14,7 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
 /**
  * A text based message sent within the OpenMRS messaging
  * framework. In general, you should not call
- * the message constructor directly but should instead create them via a class
+ * the message constructor directly but should instead create Messages via a class
  * that implements the {@link Protocol} interface. Messages created
  * outside of message factories are not guaranteed to have properly formatted.
  * 
@@ -56,7 +56,7 @@ public class Message extends BaseOpenmrsObject {
 	 * A list of MessagingAddresses representing the recipients of this message.
 	 * MessagingAddresses do not necessarily have a non-null person field.
 	 */
-	protected Set<MessagingAddress> to;
+	protected Set<MessageRecipient> to;
 	
 	/**
 	 * The message that this message is replying to.
@@ -87,8 +87,8 @@ public class Message extends BaseOpenmrsObject {
 	private String protocolClass;
 
 	public Message(String to, String content){
-		this.setTo(new HashSet<MessagingAddress>());
-		getTo().add(new MessagingAddress(to,null));
+		this.to = new HashSet<MessageRecipient>();
+		getTo().add(new MessageRecipient(new MessagingAddress(to,null),this));
 		this.content = content;
 	}
 	/**
@@ -99,8 +99,8 @@ public class Message extends BaseOpenmrsObject {
 	 *            the content of the message
 	 */
 	public Message(MessagingAddress to, String content) {
-		this.setTo(new HashSet<MessagingAddress>());
-		getTo().add(to);
+		this.to = new HashSet<MessageRecipient>();
+		getTo().add(new MessageRecipient(to,this));
 		this.content = content;
 	}
 
@@ -113,8 +113,8 @@ public class Message extends BaseOpenmrsObject {
 	 * @param content
 	 */
 	public Message(MessagingAddress to, MessagingAddress from, String content) {
-		this.setTo(new HashSet<MessagingAddress>());
-		getTo().add(to);
+		this.to = new HashSet<MessageRecipient>();
+		getTo().add(new MessageRecipient(to,this));
 		this.setOrigin(from.getAddress());
 		this.setSender(from.getPerson());
 		this.content = content;
@@ -129,7 +129,7 @@ public class Message extends BaseOpenmrsObject {
 	 * @param content
 	 */
 	public Message(Set<MessagingAddress> to, MessagingAddress from, String content) {
-		this.setTo(to);
+		this.setRecipients(to);
 		this.setOrigin(from.getAddress());
 		this.setSender(from.getPerson());
 		this.content = content;
@@ -216,32 +216,39 @@ public class Message extends BaseOpenmrsObject {
 	}
 
 	/**
+	 * @return the recipients
+	 */
+	public Set<MessageRecipient> getTo() {
+		return to;
+	}
+	
+	public void setTo(Set<MessageRecipient> to){
+		this.to = to;
+	}
+	
+	/**
 	 * @param recipients the recipients to set
 	 */
-	public void setTo(Set<MessagingAddress> to) {
-		this.to = to;
+	public void setRecipients(Set<MessagingAddress> to) {
+		this.to = new HashSet<MessageRecipient>();
+		for(MessagingAddress addr:to){
+			this.to.add(new MessageRecipient(addr,this));
+		}
 	}
 	
 	public boolean addDestination(MessagingAddress destination){
 		if(destination == null){
 			return false;
 		}else{
-			return to.add(destination);
+			return to.add(new MessageRecipient(destination,this));
 		}	
-	}
-
-	/**
-	 * @return the recipients
-	 */
-	public Set<MessagingAddress> getTo() {
-		return to;
 	}
 	
 	public Set<String> getToAddresses(){
 		Set<String> addresses = new HashSet<String>();
-		for(MessagingAddress address: to){
-			if(address.getAddress() != null){
-				addresses.add(address.getAddress());
+		for(MessageRecipient recipient: to){
+			if(recipient.getRecipient().getAddress() != null){
+				addresses.add(recipient.getRecipient().getAddress());
 			}
 		}
 		return addresses;
@@ -249,9 +256,9 @@ public class Message extends BaseOpenmrsObject {
 	
 	public Set<Person> getToPeople(){
 		Set<Person> people = new HashSet<Person>();
-		for(MessagingAddress address: to){
-			if(address.getPerson() != null){
-				people.add(address.getPerson());
+		for(MessageRecipient recipient: to){
+			if(recipient.getRecipient().getPerson() != null){
+				people.add(recipient.getRecipient().getPerson());
 			}
 		}
 		return people;
@@ -270,11 +277,11 @@ public class Message extends BaseOpenmrsObject {
 	public String getDisplayDestination(){
 		if(to != null){
 			StringBuilder destination = new StringBuilder();
-			for(MessagingAddress address: to){
-				if(address.getPerson() != null){
-					destination.append(address.getPerson().getPersonName().toString()+ " ");
+			for(MessageRecipient recipient: to){
+				if(recipient.getRecipient().getPerson() != null){
+					destination.append(recipient.getRecipient().getPerson().getPersonName().toString()+ " ");
 				}
-				destination.append("<"+address.getAddress()+">");
+				destination.append("<"+recipient.getRecipient().getAddress()+">");
 			}
 			return destination.toString();
 		}

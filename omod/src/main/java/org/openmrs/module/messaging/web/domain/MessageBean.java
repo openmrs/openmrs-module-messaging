@@ -8,7 +8,7 @@ import java.util.Iterator;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
-import org.openmrs.module.messaging.domain.MessagingAddress;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 
 /**
  * MessageBean is a class for sending message objects over ajax. It's very
@@ -30,6 +30,7 @@ public class MessageBean implements Serializable {
 	private String date;
 	private String time;
 	private String protocolName;
+	private boolean read;
 
 	public MessageBean() {
 		id = -1;
@@ -42,9 +43,13 @@ public class MessageBean implements Serializable {
 		this.setOrigin(message.getOrigin());
 		this.sender = message.getSender().getPersonName().toString();
 		setRecipients("");
-		Iterator<MessagingAddress> itr = message.getTo().iterator();
+		Iterator<MessageRecipient> itr = message.getTo().iterator();
 		while(itr.hasNext()){
-			recipients += itr.next().getPerson().getPersonName().toString();
+			MessageRecipient recipient = itr.next();
+			recipients += recipient.getRecipient().getPerson().getPersonName().toString();
+			if(recipient.getRecipient().getPerson().equals(Context.getAuthenticatedUser().getPerson())){
+				this.read = recipient.isRead();
+			}
 			if(itr.hasNext()){
 				recipients +=", ";
 			}
@@ -167,5 +172,19 @@ public class MessageBean implements Serializable {
 	 */
 	public String getRecipients() {
 		return recipients;
+	}
+
+	/**
+	 * @param read the read to set
+	 */
+	public void setRead(boolean read) {
+		this.read = read;
+	}
+
+	/**
+	 * @return the read
+	 */
+	public boolean isRead() {
+		return read;
 	}
 }

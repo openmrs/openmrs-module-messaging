@@ -6,8 +6,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
-import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.CredentialSet;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
@@ -72,8 +72,8 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	@Override
 	public void sendMessage(Message message) throws Exception{
 		try{
-			for(MessagingAddress address: message.getTo()){
-				googleVoice.sendSMS(address.getAddress(),message.getContent());
+			for(MessageRecipient recipient: message.getTo()){
+				googleVoice.sendSMS(recipient.getRecipient().getAddress(),message.getContent());
 			}
 			message.setMessageStatus(MessageStatus.SENT);
 		}catch(Throwable t){

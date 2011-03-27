@@ -79,7 +79,6 @@
 <openmrs:htmlInclude file="/dwr/engine.js"/>
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <script src="<openmrs:contextPath/>/dwr/interface/DWRModuleMessageService.js"></script>
-<script src="<openmrs:contextPath/>/moduleResources/messaging/data/messages.js"></script>
 
 <script type="text/javascript">	
 	window.onload = init;
@@ -92,7 +91,7 @@
 	function init() {
 		$("#inbox-search").watermark("search mail");
 		$("#messages-table-body tr").live("click",rowClicked);
-		fillMessageTable(msgs);
+		fillMessageTable();
 	}
 	
 	function rowClicked(event){
@@ -110,7 +109,7 @@
 		$(".header-label").css("visibility","visible");
 	}
 	
-	function fillMessageTable(messages){
+	function fillMessageTable(){
 		toggleMessageLoading();
 		DWRModuleMessageService.getMessagesForAuthenticatedUserWithPageSize(pageNum,pageSize,true,function(messages){
 			dwr.util.removeAllRows("messages-table-body", { filter:function(tr) {return (tr.id != "pattern");}});
@@ -147,6 +146,7 @@
 			document.getElementById("messages-table").style.display="";
 			document.getElementById("paging-controls-container").style.display="";
 			document.getElementById("loading-container").style.display="none";
+			messageTableVisible=true;
 		}
 	}
 </script>

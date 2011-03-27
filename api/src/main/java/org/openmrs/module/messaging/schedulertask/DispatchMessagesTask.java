@@ -140,7 +140,5 @@ public class DispatchMessagesTask extends AbstractTask{
 				maxRetryAttempts = 3;
 			}
 		return maxRetryAttempts;
-	}
-	
-	
+	}	
 }
