@@ -91,7 +91,6 @@ public class DispatchMessagesTask extends AbstractTask{
 		int messageIndex = rand.nextInt(gateways.size());
 		int gatewayCount = gateways.size();
 		for(Message message: messages){
-			
 			//increment the number of send attempts
 			message.setSendAttempts(message.getSendAttempts()+1);
 			

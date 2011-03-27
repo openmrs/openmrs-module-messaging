@@ -41,6 +41,11 @@ public class MessageBean implements Serializable {
 		this.setContent(message.getContent());
 		this.setSubject(message.getSubject());
 		this.setOrigin(message.getOrigin());
+		System.out.println("SENDER 1 MB: "+ message.getSender().getPersonName().toString());
+		System.out.println("SENDER 2 MB: "+ message.getSender().getPersonName().toString());
+		System.out.println("SENDER 3 MB: "+ message.getSender().getPersonName().toString());
+		System.out.println("SENDER 4 MB: "+ message.getSender().getPersonName().toString());
+		System.out.println("SENDER 5 MB: "+ message.getSender().getPersonName().toString());
 		this.sender = message.getSender().getPersonName().toString();
 		setRecipients("");
 		Iterator<MessageRecipient> itr = message.getTo().iterator();

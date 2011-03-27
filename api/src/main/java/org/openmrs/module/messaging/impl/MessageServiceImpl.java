@@ -86,4 +86,8 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to){
 		return dao.getMessagesForPersonPaged(pageNumber, pageSize, personId, to);
 	}
+
+	public List<Message> getMessagesForProtocolAndStatus(Class<? extends Protocol> protocol, Integer status) {
+		return dao.findMessagesWithPeople(protocol, null, null, null, status);
+	}
 }

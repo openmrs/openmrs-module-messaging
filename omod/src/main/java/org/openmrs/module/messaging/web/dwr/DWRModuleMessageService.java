@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
@@ -124,6 +123,8 @@ public class DWRModuleMessageService {
 				return "Cannot send from authenticated user - no from address";
 			}else{
 				from = fromAdrResults.get(0);
+				if(from.getAddress() !=null) System.out.println("FROM ADDRESS SET: "+ from.getAddress());
+				if(from.getPerson() != null) System.out.println("FROM PERSON SET: " + from.getPerson().getPersonName().toString());
 			}
 		}
 		try{

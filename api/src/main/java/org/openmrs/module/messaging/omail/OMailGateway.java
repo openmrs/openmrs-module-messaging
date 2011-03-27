@@ -1,6 +1,5 @@
 package org.openmrs.module.messaging.omail;
 
-import java.util.Date;
 import java.util.List;
 
 import org.openmrs.Person;
@@ -56,7 +55,7 @@ public class OMailGateway extends MessagingGateway {
 
 	@Override
 	public void receiveMessages() {
-		List<Message> incomingMsgs = getMessageService().getOutboxMessagesByProtocol(OMailProtocol.class);
+		List<Message> incomingMsgs = getMessageService().getMessagesForProtocolAndStatus(OMailProtocol.class, MessageStatus.SENT.getNumber());
 		for(Message m: incomingMsgs){
 			m.setMessageStatus(MessageStatus.RECEIVED);
 			getMessageService().saveMessage(m);
@@ -64,11 +63,7 @@ public class OMailGateway extends MessagingGateway {
 	}
 
 	@Override
-	public void sendMessage(Message message) throws Exception {
-		message.setMessageStatus(MessageStatus.OUTBOX);
-		message.setDate(new Date());
-		getMessageService().saveMessage(message);
-	}
+	public void sendMessage(Message message) throws Exception {/* do nothing */}
 
 	@Override
 	public void shutdown() {/*do nothing*/}

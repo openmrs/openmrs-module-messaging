@@ -40,7 +40,7 @@
 				`protocol_id` varchar(255) NOT NULL default '',
 				`origin` varchar(255) default '',
 				`destination` varchar(255) default '',
-				`sender` int(11) default NULL,
+				`sender` int(11) NOT NULL default 0,
 				`recipient` int(11) default NULL,
 				`date` datetime default NULL,
 				`send_attempts` int(3) default 0,
@@ -76,9 +76,9 @@
 			CREATE TABLE IF NOT EXISTS messaging_message_recipients(
 				`recipient_id` int(11) NOT NULL auto_increment,
 				`uuid` char(38) NOT NULL,
-				`message` int(11) default NULL,
+				`message` int(11) NOT NULL default 0,
 				`is_read` tinyint(1) NOT NULL default '0',
-				`recipient` int(11) default NULL,
+				`recipient` int(11) NOT NULL default 0,
 				PRIMARY KEY (recipient_id)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 			

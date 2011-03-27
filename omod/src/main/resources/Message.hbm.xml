@@ -13,7 +13,7 @@
         <property name="subject" type="java.lang.String"/>
         
         <property name="origin" type="java.lang.String"/>
-        <one-to-one name="sender" class="org.openmrs.Person"/>
+        <many-to-one name="sender" class="org.openmrs.Person" lazy="false" not-null="true"/>
         
 		<set name="to" inverse="true" table="messaging_message_recipients" cascade="all">
         	<key>

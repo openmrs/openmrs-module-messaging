@@ -132,6 +132,8 @@ public class Message extends BaseOpenmrsObject {
 		this.setRecipients(to);
 		this.setOrigin(from.getAddress());
 		this.setSender(from.getPerson());
+		if(origin !=null) System.out.println("FROM ADDRESS SET IN MESSAGE: "+ origin);
+		if(sender != null) System.out.println("FROM PERSON SET IN MESSAGE: " + sender.getPersonName().toString());
 		this.content = content;
 	}
 

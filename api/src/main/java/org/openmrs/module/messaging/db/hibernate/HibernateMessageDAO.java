@@ -11,7 +11,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
@@ -78,7 +77,7 @@ public class HibernateMessageDAO implements MessageDAO {
 		if(protocolClass !=null){
 			c.add(Restrictions.eq(MessageFields.PROTOCOL_CLASS.fieldName,protocolClass.getName()));
 		}
-		if(sender.equals(recipient) && sender != null){
+		if(sender != null && sender.equals(recipient)){
 			c.createAlias(MessageFields.TO.fieldName, "tos");
 			c.add(Restrictions.or(Restrictions.eq(MessageFields.SENDER.fieldName,sender), Restrictions.eq("tos.person",recipient)));
 		}else{
@@ -105,10 +104,26 @@ public class HibernateMessageDAO implements MessageDAO {
 	}
 
 	public void saveMessage(Message message) {
+		if(message.getOrigin() !=null){ 
+			System.out.println("FROM ADDRESS SET before DAO: "+ message.getOrigin());
+		}else{
+			System.out.println("Origin is null before DAO");
+		}
+		if(message.getSender()!= null){
+			System.out.println("FROM PERSON SET before DAO: " + message.getSender().getPersonName().toString());
+		}else{
+			System.out.println("SENDER IS NULL before DAO");
+		}
 		sessionFactory.getCurrentSession().saveOrUpdate(message);
-		//if the message is newly received, notify all the incoming message listeners
-		if(message.getId() <=0 && message.getMessageStatus() == MessageStatus.RECEIVED){
-			Context.getService(MessagingService.class).notifyListeners(message);
+		if(message.getOrigin() !=null){ 
+			System.out.println("FROM ADDRESS SET after DAO: "+ message.getOrigin());
+		}else{
+			System.out.println("Origin is null after DAO");
+		}
+		if(message.getSender()!= null){
+			System.out.println("FROM PERSON SET after DAO: " + message.getSender().getPersonName().toString());
+		}else{
+			System.out.println("SENDER IS NULL after DAO");
 		}
 	}
 
