@@ -53,6 +53,18 @@
 	padding: 0.2em;
 	cursor:pointer;
 }
+#paging-controls-container{
+	text-align:right;
+	border-right:1px solid black;
+	border-left:1px solid black;
+	padding:5px;
+}
+#paging-info{
+	margin-right:10px;
+}
+#paging-controls-container a{
+	margin-left:2px;
+}
 #search-bar-container{
 	float:right;
 	margin-bottom:3px;
@@ -94,4 +106,9 @@
 	padding: 7px;
 	overflow:scroll;
 	overflow-x:hidden;
+}
+a.disabled:link, a.disabled:visited, a.disabled:active, a.disabled:hover{
+	text-decoration:none;
+	color:black;
+	cursor:default;
 }

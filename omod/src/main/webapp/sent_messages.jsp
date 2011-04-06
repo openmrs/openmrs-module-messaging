@@ -34,6 +34,18 @@
 					</tr>			
 				</tbody>
 			</table>
+			<div id="paging-controls-container">
+				<span id="paging-controls">
+					<span id="paging-info">
+						<span id="paging-start">1</span> to 
+						<span id ="paging-end"></span> of 
+						<span id="paging-total"></span>
+					</span>
+					<a href="#" id="previous-page" onclick="pageToPreviousPage()">&lt;</a>
+					<span id="current-page">1</span>
+					<a href="#" id="next-page" onclick="pageToNextPage()">&gt;</a>
+				</span>
+			</div>
 		</div>
 		<div id="message-panel">
 		<div id="message-info-panel" class="boxHeader">
@@ -87,21 +99,64 @@
 	}
 	
 	function fillMessageTable(){
-		DWRModuleMessageService.getMessagesForAuthenticatedUserWithPageSize(pageNum,pageSize,false,function(messages){
+		DWRModuleMessageService.getMessagesForAuthenticatedUserWithPageSize(pageNum,pageSize,false,function(messageSet){
 			dwr.util.removeAllRows("messages-table-body", { filter:function(tr) {return (tr.id != "pattern");}});
 			var message, id;
+			var messages = messageSet.messages;
 			// iterate through the messages, cloning the pattern row
 			// and placing each message values into that row
 			for (var i = 0; i < messages.length; i++) {
 				message = messages[i];
 			    id = message.id;
 			    dwr.util.cloneNode("pattern", { idSuffix:id });
-				dwr.util.setValue("message-dest" + id, message.recipients);
+			    dwr.util.setValue("message-dest" + id, message.recipients);
 			    dwr.util.setValue("message-subj" + id, message.subject);
-			    dwr.util.setValue("message-date" + id, message.date);
+			    dwr.util.setValue("message-date" + id, message.time+ " " + message.date);
 			    document.getElementById("pattern" + id).style.display = "table-row";
 			    messageCache[id] = message;
 			}
+			pageNum = messageSet.pageNumber;
+			pageSize = messageSet.pageSize;
+			setPagingControls(messageSet);
 		});
+	}
+
+	function setPagingControls(messageSet){
+		document.getElementById("paging-start").innerHTML = (messageSet.pageNumber * messageSet.pageSize) + 1;
+		document.getElementById("paging-end").innerHTML =  (messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length;
+		document.getElementById("paging-total").innerHTML =   messageSet.total;
+		document.getElementById("current-page").innerHTML =   messageSet.pageNumber+1;
+		//enable or disable the paging controls properly
+		if(messageSet.pageNumber === 0){
+			$('#previous-page').attr('class','disabled');
+		}else{
+			$('#previous-page').attr('class','');
+		}
+
+		if(messageSet.pageSize > messageSet.messages.length){
+			$('#next-page').attr('class','disabled');
+		}else{
+			$('#next-page').attr('class','');
+		}
+	}
+
+	function pageToPreviousPage(){
+		if($('#previous-page').hasClass('disabled')){
+			return false;
+		}else{
+			pageNum--;
+			fillMessageTable();
+		}
+	}
+
+	function pageToNextPage(){
+		if($('#next-page').hasClass('disabled')){
+			return false;
+		}else{
+			pageNum++;
+			console.log("PageNum: "+pageNum);
+			fillMessageTable();
+			console.log("Message table loading done");
+		}
 	}
 </script>
