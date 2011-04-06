@@ -47,7 +47,7 @@
 		<textarea id="writing-area" name="writing-area"/></textarea>
 		<div id="buttons-container" class="boxHeader">
 			<input type="button" value="Send" id="send-button" onclick="sendMessage()"></input>
-			<input type="button" value="Discard" id="discard-button"></input>
+			<input type="button" value="Discard" id="discard-button" onclick="clearFields()"></input>
 		</div>
 	</td>
 	</tr>
@@ -122,8 +122,12 @@ $(function() {
 	    DWRModuleMessageService.sendMessage(html, document.getElementById('to-addresses').value,document.getElementById('subject').value,true,function(response){
 			alert("Message sent!");
 	    });
-	    myEditor.clearEditorDoc();
-	    document.getElementById('to-addresses').innerHTML="";
+	    clearFields();
+	}
+
+	function clearFields(){
+		myEditor.clearEditorDoc();
+	    document.getElementById('to-addresses').value="";
 	    document.getElementById('subject').value="";
 	}
 </script>
