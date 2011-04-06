@@ -21,7 +21,7 @@
 			<div id="loading-container">
 				<div id="inner-loading-container">
 					<span id="loading-text">Loading...</span>
-					<img src="resources/images/ajax-loading-bar.gif"/>
+					<img src="<openmrs:contextPath/>/moduleResources/messaging/images/ajax-loading-bar.gif"/>
 				</div>
 			</div>
 			<table id="messages-table" class="message-table">
@@ -42,12 +42,14 @@
 			</table>
 			<div id="paging-controls-container">
 				<span id="paging-controls">
-					<span id="paging-info">1 to 15 of 234</span>
-					<a href="" id="1">&lt;&lt;</a>
-					<a href="" id="1">&lt;</a>
+					<span id="paging-info">
+						<span id="paging-start">1</span> to 
+						<span id ="paging-end">15</span> of 
+						<span id="paging-total">234</span>
+					</span>
+					<a href="#" id="previous-page" onclick="pageToPreviousPage()">&lt;</a>
 					<span id="current-page">1</span>
-					<a href="" id="1">&gt;</a>
-					<a href="" id="1">&gt;&gt;</a>
+					<a href="#" id="next-page" onclick="pageToNextPage()">&gt;</a>
 				</span>
 			</div>
 		</div>
@@ -84,7 +86,7 @@
 	window.onload = init;
 	
 	var messageCache = { };
-	var messageTableVisible =true;
+	var messageTableVisible= true;
 	var pageNum=0;
 	var pageSize=10;
 	
@@ -111,9 +113,10 @@
 	
 	function fillMessageTable(){
 		toggleMessageLoading();
-		DWRModuleMessageService.getMessagesForAuthenticatedUserWithPageSize(pageNum,pageSize,true,function(messages){
+		DWRModuleMessageService.getMessagesForAuthenticatedUserWithPageSize(pageNum,pageSize,true,function(messageSet){
 			dwr.util.removeAllRows("messages-table-body", { filter:function(tr) {return (tr.id != "pattern");}});
 			var message, id;
+			var messages = messageSet.messages;
 			// iterate through the messages, cloning the pattern row
 			// and placing each message values into that row
 			for (var i = 0; i < messages.length; i++) {
@@ -126,6 +129,9 @@
 			    document.getElementById("pattern" + id).style.display = "table-row";
 			    messageCache[id] = message;
 			}
+			pageNum = messageSet.pageNumber;
+			pageSize = messageSet.pageSize;
+			setPagingControls(messageSet);
 			toggleMessageLoading();
 		});
 	}
@@ -135,6 +141,45 @@
 	function replyClicked(event){}
 	
 	function replyAllClicked(event){}
+
+	function setPagingControls(messageSet){
+		document.getElementById("paging-start").innerHTML = (messageSet.pageNumber * messageSet.pageSize) + 1;
+		document.getElementById("paging-end").innerHTML =  (messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length;
+		document.getElementById("paging-total").innerHTML =   messageSet.total;
+		document.getElementById("current-page").innerHTML =   messageSet.pageNumber+1;
+		//enable or disable the paging controls properly
+		if(messageSet.pageNumber === 0){
+			$('#previous-page').attr('class','disabled');
+		}else{
+			$('#previous-page').attr('class','');
+		}
+
+		if(messageSet.pageSize > messageSet.messages.length){
+			$('#next-page').attr('class','disabled');
+		}else{
+			$('#next-page').attr('class','');
+		}
+	}
+
+	function pageToPreviousPage(){
+		if($('#previous-page').hasClass('disabled')){
+			return false;
+		}else{
+			pageNum--;
+			fillMessageTable();
+		}
+	}
+
+	function pageToNextPage(){
+		if($('#next-page').hasClass('disabled')){
+			return false;
+		}else{
+			pageNum++;
+			console.log("PageNum: "+pageNum);
+			fillMessageTable();
+			console.log("Message table loading done");
+		}
+	}
 
 	function toggleMessageLoading(){
 		if(messageTableVisible){

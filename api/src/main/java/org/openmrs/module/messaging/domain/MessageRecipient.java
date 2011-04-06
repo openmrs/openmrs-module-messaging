@@ -73,4 +73,14 @@ public class MessageRecipient extends BaseOpenmrsObject{
 	public Message getMessage() {
 		return message;
 	}
+	
+	public enum MessageRecipientFields{
+		MESSAGE_RECIPIENT_ID("messageRecipientId"),
+		MESSAGE("message"),
+		RECIPIENT("recipient"),
+		READ("read");
+		public final String name;
+		private MessageRecipientFields(String name){ this.name = name; }
+		public String toString(){ return name; }
+	}
 }

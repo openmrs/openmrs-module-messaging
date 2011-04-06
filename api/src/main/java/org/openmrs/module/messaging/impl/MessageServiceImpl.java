@@ -83,11 +83,25 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 		return dao.getOutboxMessagesByProtocol(protocol);
 	}
 	
-	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to){
-		return dao.getMessagesForPersonPaged(pageNumber, pageSize, personId, to);
+	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to, boolean dateOrderAscending){
+		return dao.getMessagesForPersonPaged(pageNumber, pageSize, personId, to, dateOrderAscending);
 	}
 
 	public List<Message> getMessagesForProtocolAndStatus(Class<? extends Protocol> protocol, Integer status) {
 		return dao.findMessagesWithPeople(protocol, null, null, null, status);
+	}
+	
+	public Integer countMessagesForPerson(int personId, boolean to){
+		return dao.countMessagesForPerson(personId, to);
+	}
+
+	public List<Message> getMessagesForAddress(String address, boolean to) {
+		if(to) return dao.findMessagesWithAddresses(null, address, null, null, null);
+		else return dao.findMessagesWithAddresses(null, null, address, null, null);
+	}
+
+	public List<Message> getMessagesForPerson(Person person, boolean to) {
+		if(to) return dao.findMessagesWithPeople(null, null, person, null,null);
+		else return dao.findMessagesWithPeople(null, person, null, null, null);
 	}
 }

@@ -177,4 +177,14 @@ public class MessagingAddress extends BaseOpenmrsData {
 			return address;
 		}
 	}
+	public enum MessagingAddressFields{
+		ADDRESS("address"),
+		PERSON("person"),
+		PREFERRED("preferred"),
+		FINDABLE("findable"),
+		PROTOCOL("protocolClass");
+		public final String name;
+		private MessagingAddressFields(String name){ this.name = name; }
+		public String toString(){ return name; }
+	}
 }

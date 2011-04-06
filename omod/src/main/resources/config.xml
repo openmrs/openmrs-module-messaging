@@ -19,6 +19,7 @@
 			<convert converter="bean" match="org.openmrs.module.messaging.domain.MessagingAddress" />
 			<convert converter="bean" match="org.openmrs.module.messaging.domain.Message" />
 			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.MessageBean"/>
+			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.MessageBeanSet"/>
 			<convert converter="bean" match="org.openmrs.module.messaging.domain.Modem"/>
 			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.AddressAutocompleteBean" />
 						

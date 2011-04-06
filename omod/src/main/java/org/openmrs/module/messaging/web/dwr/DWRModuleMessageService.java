@@ -16,6 +16,7 @@ import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.web.domain.MessageBean;
+import org.openmrs.module.messaging.web.domain.MessageBeanSet;
 
 public class DWRModuleMessageService {
 	
@@ -142,20 +143,22 @@ public class DWRModuleMessageService {
 		}
 	}
 	
-	public List<MessageBean> getMessagesForAuthenticatedUser(Integer pageNumber, boolean to){
+	public MessageBeanSet getMessagesForAuthenticatedUser(Integer pageNumber, boolean to){
 		return getMessagesForAuthenticatedUserWithPageSize(pageNumber, 10, to);
 	}
 	
-	public List<MessageBean> getMessagesForAuthenticatedUserWithPageSize(Integer pageNumber, Integer pageSize, boolean to){
+	public MessageBeanSet getMessagesForAuthenticatedUserWithPageSize(Integer pageNumber, Integer pageSize, boolean to){
 		return getMessagesForPerson(pageNumber,pageSize, Context.getAuthenticatedUser().getPerson().getId(),to);
 	} 
 	
-	public List<MessageBean> getMessagesForPerson(Integer pageNumber, Integer pageSize, Integer personId, boolean to){
+	public MessageBeanSet getMessagesForPerson(Integer pageNumber, Integer pageSize, Integer personId, boolean to){
 		List<MessageBean> beans = new ArrayList<MessageBean>();
-		List<Message> messages = messageService.getMessagesForPersonPaged(pageNumber, pageSize, personId, to);
+		List<Message> messages = messageService.getMessagesForPersonPaged(pageNumber, pageSize, personId, to,false);
 		for(Message m: messages){
 			beans.add(new MessageBean(m));
 		}
-		return beans;
+		Integer total = messageService.countMessagesForPerson(personId, to);
+		MessageBeanSet resultSet = new MessageBeanSet(beans,total,pageNumber);
+		return resultSet;
 	}
 }

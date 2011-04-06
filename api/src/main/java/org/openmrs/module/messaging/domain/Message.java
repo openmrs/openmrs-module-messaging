@@ -356,8 +356,8 @@ public class Message extends BaseOpenmrsObject {
 		MESSAGE_ID("messageId"),
 		PROTOCOL_CLASS("protocolClass");
 		
-		public final String fieldName;
-		private MessageFields(String name){ this.fieldName = name; }
-		public String toString(){ return fieldName; }
+		public final String name;
+		private MessageFields(String name){ this.name = name; }
+		public String toString(){ return name; }
 	}
 }

@@ -12,7 +12,10 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
 
 public class OMailGateway extends MessagingGateway {
 
-	public OMailGateway(){
+	private boolean initialized = false;
+	public OMailGateway(){}
+	
+	private void init(){
 		List<Person> people = Context.getPersonService().getPeople("", false);
 		for(Person p: people){
 			List<MessagingAddress> addresses = getAddressService().getMessagingAddressesForPerson(p);
@@ -26,6 +29,7 @@ public class OMailGateway extends MessagingGateway {
 				getAddressService().saveMessagingAddress(ma);
 			}
 		}
+		initialized = true;
 	}
 	
 	@Override
@@ -69,7 +73,11 @@ public class OMailGateway extends MessagingGateway {
 	public void shutdown() {/*do nothing*/}
 
 	@Override
-	public void startup() {/*do nothing*/}
+	public void startup() {
+		if(!initialized){
+			init();
+		}
+	}
 
 	@Override
 	public boolean supportsProtocol(Protocol p) {
