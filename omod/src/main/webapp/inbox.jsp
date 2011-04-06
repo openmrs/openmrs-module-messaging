@@ -153,8 +153,8 @@
 		}else{
 			$('#previous-page').attr('class','');
 		}
-
-		if(messageSet.pageSize > messageSet.messages.length){
+		
+		if(messageSet.pageSize > messageSet.messages.length || ((messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length) === messageSet.total){
 			$('#next-page').attr('class','disabled');
 		}else{
 			$('#next-page').attr('class','');
