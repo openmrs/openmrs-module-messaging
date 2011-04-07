@@ -1,10 +1,12 @@
 package org.openmrs.module.messaging.omail;
 
+import java.util.Date;
 import java.util.List;
 
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
@@ -13,9 +15,11 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
 public class OMailGateway extends MessagingGateway {
 
 	private boolean initialized = false;
-	public OMailGateway(){}
+	public OMailGateway(){
+		initialize();
+	}
 	
-	private void init(){
+	private void initialize(){
 		List<Person> people = Context.getPersonService().getPeople("", false);
 		for(Person p: people){
 			List<MessagingAddress> addresses = getAddressService().getMessagingAddressesForPerson(p);
@@ -61,13 +65,16 @@ public class OMailGateway extends MessagingGateway {
 	public void receiveMessages() {
 		List<Message> incomingMsgs = getMessageService().getMessagesForProtocolAndStatus(OMailProtocol.class, MessageStatus.SENT.getNumber());
 		for(Message m: incomingMsgs){
-			m.setMessageStatus(MessageStatus.RECEIVED);
+			for(MessageRecipient recipient: m.getTo()){
+				recipient.setMessageStatus(MessageStatus.RECEIVED);
+				recipient.setDate(new Date());
+			}
 			getMessageService().saveMessage(m);
 		}
 	}
 
 	@Override
-	public void sendMessage(Message message) throws Exception {/* do nothing */}
+	public void sendMessage(Message message, MessageRecipient recipient) throws Exception {/* do nothing */}
 
 	@Override
 	public void shutdown() {/*do nothing*/}
@@ -75,7 +82,7 @@ public class OMailGateway extends MessagingGateway {
 	@Override
 	public void startup() {
 		if(!initialized){
-			init();
+			initialize();
 		}
 	}
 

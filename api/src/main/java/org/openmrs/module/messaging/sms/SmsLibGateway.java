@@ -28,12 +28,12 @@ import org.smslib.Service.ServiceStatus;
 public class SmsLibGateway extends MessagingGateway implements IOutboundMessageNotification {
 
 	private static Log log = LogFactory.getLog(SmsLibGateway.class);
-	private Map<List<OutboundMessageStatus>, Message> sentMessages;
+	private Map<String, MessageRecipient> sentMessages;
 
 	private SmsServiceManager serviceManager;
 
 	public SmsLibGateway() {
-		sentMessages = new HashMap<List<OutboundMessageStatus>, Message>();
+		sentMessages = new HashMap<String, MessageRecipient>();
 		serviceManager = new SmsServiceManager();
 	}
 
@@ -64,17 +64,11 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 	}
 
 	@Override
-	public void sendMessage(Message message) throws Exception {
-		// create a list to contain references to all the outbound
-		// messages we're about to create
-		List<OutboundMessageStatus> outboundStatuses = new ArrayList<OutboundMessageStatus>();
-		for (MessageRecipient toAddress : message.getTo()) {
-			OutboundMessage om = new OutboundMessage(toAddress.getRecipient().getAddress(), message.getContent());
-			om.setId(UUID.randomUUID().toString());
-			outboundStatuses.add(new OutboundMessageStatus(om));
-			Service.getInstance().queueMessage(om);
-		}
-		sentMessages.put(outboundStatuses, message);
+	public void sendMessage(Message message, MessageRecipient recipient) throws Exception {
+		OutboundMessage om = new OutboundMessage(recipient.getRecipient().getAddress(), message.getContent());
+		om.setId(UUID.randomUUID().toString());
+		sentMessages.put(om.getId(), recipient);
+		Service.getInstance().queueMessage(om);	
 	}
 
 	public void receiveMessages() {
@@ -89,7 +83,6 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 			Message m = new Message(Service.getInstance().getGateway(iMessage.getGatewayId()).getFrom(), iMessage.getText());
 			m.setSender(getAddressService().getPersonForAddress("+" + iMessage.getOriginator()));
 			m.setOrigin("+" + iMessage.getOriginator());
-			m.setMessageStatus(MessageStatus.RECEIVED);
 			m.setDate(iMessage.getDate());
 			m.setProtocol(SmsProtocol.class);
 			getMessageService().saveMessage(m);
@@ -148,78 +141,21 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 	 *      org.smslib.OutboundMessage)
 	 */
 	public void process(AGateway gateway, OutboundMessage oMessage) {
-		// retrieve the OpenMRS message associated with this OutboundMessage
-		Message mesg = null;
-		List<OutboundMessageStatus> outboundStatuses = null;
-		OutboundMessageStatus outboundStatus = null;
-		outerloop:
-		for (List<OutboundMessageStatus> statuses : sentMessages.keySet()) {
-			for(OutboundMessageStatus status:statuses){
-				if(status.getUuid().equals(oMessage.getId())){
-					mesg = sentMessages.get(statuses);
-					outboundStatuses = statuses;
-					outboundStatus = status;
-					break outerloop;
-				}
-			}
-		}
-		//if any parts have not been found, return
-		if(mesg == null || outboundStatuses == null || outboundStatus == null){
-			return;
-		}
+		MessageRecipient recipient = sentMessages.get(oMessage.getId());
 		// set the new status
 		if (oMessage.getMessageStatus() == MessageStatuses.SENT) {
-			//remove the status list and its associated message from the map
-			sentMessages.remove(outboundStatuses);
 			//set the status of the changed outbound messge to sent
-			outboundStatus.setStatus(MessageStatus.SENT);
-			//check if all the outbound messages have been sent (we're done if they are)
-			boolean allSent = true;
-			for(OutboundMessageStatus stat: outboundStatuses){
-				if(stat.getStatus() != MessageStatus.SENT) allSent = false;
-			}
-			//if all messages have been sent, then we're done - 
-			//we don't have to re-add the message & statuses to the map,
-			//and we can just modify the OpenMRS message status and be done
-			if(allSent){
-				mesg.setMessageStatus(MessageStatus.SENT);				
-			}else{ //otherwise, we have to re-add the message & statuses
-				sentMessages.put(outboundStatuses, mesg);
-			}
+			recipient.setMessageStatus(MessageStatus.SENT);
+			//remove the status list and its associated message from the map
+			sentMessages.remove(oMessage.getId());
 		} else if (oMessage.getMessageStatus() == MessageStatuses.FAILED) { // if the message failed
 			log.error("Message failed: " + oMessage.getErrorMessage());
 			//set the OpenMRS message status
-			mesg.setMessageStatus(MessageStatus.FAILED);
+			recipient.setMessageStatus(MessageStatus.FAILED);
 			//remove the status list and its associated message from the map
-			sentMessages.remove(outboundStatuses);
+			sentMessages.remove(oMessage.getId());
 		}
 		//save the message
-		getMessageService().saveMessage(mesg);
-	}
-
-	private class OutboundMessageStatus {
-		private String uuid;
-		private MessageStatus status;
-
-		public OutboundMessageStatus(OutboundMessage message) {
-			this.uuid = message.getId();
-			this.status = MessageStatus.OUTBOX;
-		}
-		
-		public String getUuid() { return uuid; }
-		public void setStatus(MessageStatus status) { this.status = status; }
-		public MessageStatus getStatus() { return status; }
-		
-		@Override
-		public boolean equals(Object other) {
-			if (other instanceof OutboundMessageStatus) {
-				OutboundMessageStatus castOther = (OutboundMessageStatus) other;
-				if (castOther.getUuid().equals(this.getUuid())
-						&& castOther.getStatus().equals(this.getStatus())) {
-					return true;
-				}
-			}
-			return false;
-		}
+		getMessageService().saveMessage(recipient.getMessage());
 	}
 }

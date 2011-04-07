@@ -59,32 +59,14 @@ public class Message extends BaseOpenmrsObject {
 	protected Set<MessageRecipient> to;
 	
 	/**
-	 * The message that this message is replying to.
-	 */
-	private Message inReplyTo;
-	
-	/**
 	 * The date that the message was sent or received. Intentionally left a little ambiguous.
 	 */
 	protected Date date = new Date();
 
 	/**
-	 * The status of this message
+	 * The message that this message is replying to.
 	 */
-	protected Integer status;
-	
-	/**
-	 * The number of times that the system has tried to send the message. Once
-	 * this number reaches the max_retries global property value, the message
-	 * will be marked as 'failed' and the system will no longer try to
-	 * send it.
-	 */
-	private Integer sendAttempts = 0;
-
-	/**
-	 * The Id of the protocol associated with this message
-	 */
-	private String protocolClass;
+	private Message inReplyTo;
 
 	public Message(String to, String content){
 		this.to = new HashSet<MessageRecipient>();
@@ -167,46 +149,6 @@ public class Message extends BaseOpenmrsObject {
 
 	public void setId(Integer messageId) {
 		this.messageId = messageId;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Class<? extends Protocol> getProtocol() {
-		try {
-			return (Class<? extends Protocol>) Class.forName(getProtocolClass());
-		} catch (ClassNotFoundException e) {
-			log.error("Message Protocol class is not correct",e);
-			return null;
-		}
-	}
-
-	public void setProtocol(Class<? extends Protocol> protocolClass) {
-		this.setProtocolClass(protocolClass.getName());
-	}
-
-	private Integer getStatus() {
-		return status;
-	}
-	
-	private void setStatus(Integer status){
-		this.status = status;
-	}
-	/**
-	 * @return The message status, in the {@link MessageStatus} enum.
-	 */
-	public MessageStatus getMessageStatus() {
-		return MessageStatus.getStatusByNumber(this.getStatus());
-	}
-
-	public void setMessageStatus(MessageStatus status) {
-		this.status = status.getNumber();
-	}
-
-	public Integer getSendAttempts() {
-		return sendAttempts;
-	}
-	
-	public void setSendAttempts(Integer sendAttempts) {
-		this.sendAttempts = sendAttempts;
 	}
 
 	public String getSubject() {
@@ -317,19 +259,6 @@ public class Message extends BaseOpenmrsObject {
 	public Person getSender() {
 		return sender;
 	}
-	
-	/**
-	 * @param protocolClass the protocolClass to set
-	 */
-	private void setProtocolClass(String protocolClass) {
-		this.protocolClass = protocolClass;
-	}
-	/**
-	 * @return the protocolClass
-	 */
-	private String getProtocolClass() {
-		return protocolClass;
-	}
 
 	/**
 	 * @param inReplyTo the inReplyTo to set
@@ -345,7 +274,6 @@ public class Message extends BaseOpenmrsObject {
 	}
 
 	public enum MessageFields{
-		STATUS("status"),
 		DATE("date"),
 		IN_REPLY_TO("inReplyTo"),
 		TO("to"),
@@ -353,11 +281,16 @@ public class Message extends BaseOpenmrsObject {
 		ORIGIN("origin"),
 		SUBJECT("subject"),
 		CONTENT("content"),
-		MESSAGE_ID("messageId"),
-		PROTOCOL_CLASS("protocolClass");
+		MESSAGE_ID("messageId");
 		
 		public final String name;
 		private MessageFields(String name){ this.name = name; }
 		public String toString(){ return name; }
+	}
+	
+	public void setProtocol(Class<? extends Protocol> clazz){
+		for(MessageRecipient mr: to){
+			mr.setProtocol(clazz);
+		}
 	}
 }

@@ -8,6 +8,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
@@ -59,18 +60,9 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	}
 
 	@Override
-	public void sendMessage(Message message) throws Exception{
+	public void sendMessage(Message message,MessageRecipient recipient) throws Exception{
 		updateCredentials();
-		try{
-			for(MessageRecipient recipient: message.getTo()){
-				googleVoice.sendSMS(recipient.getRecipient().getAddress(),message.getContent());
-			}
-			message.setMessageStatus(MessageStatus.SENT);
-		}catch(Throwable t){
-			log.error("Google Voice Gateway failed to send message",t);
-			message.setMessageStatus(MessageStatus.FAILED);
-		}
-		getMessageService().saveMessage(message);
+		googleVoice.sendSMS(recipient.getRecipient().getAddress(), message.getContent());
 	}
 
 	@Override

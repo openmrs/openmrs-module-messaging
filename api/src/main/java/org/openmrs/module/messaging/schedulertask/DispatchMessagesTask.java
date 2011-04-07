@@ -10,6 +10,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
@@ -91,29 +92,33 @@ public class DispatchMessagesTask extends AbstractTask{
 		int messageIndex = rand.nextInt(gateways.size());
 		int gatewayCount = gateways.size();
 		for(Message message: messages){
-			//increment the number of send attempts
-			message.setSendAttempts(message.getSendAttempts()+1);
-			
-			//set the sent/last attempt date
-			message.setDate(new Date());
-			
-			try{
-				//round robin
-				gateways.get(messageIndex++ % gatewayCount).sendMessage(message);
-				//set the status as sent
-				message.setMessageStatus(MessageStatus.SENT);
-			}catch(Exception e){
-				log.error("Error sending message",e);
-				//if the sending didn't work, update the message status
-				if(message.getSendAttempts() < getMaxRetryAttempts()){
-					message.setMessageStatus(MessageStatus.RETRYING);
-					log.info("Retrying message #" + message.getId());
-				}else{
-					message.setMessageStatus(MessageStatus.FAILED);
-					log.info("Message #" + message.getId()+ " failed");
+			for(MessageRecipient mRecipient: message.getTo()){
+				if(mRecipient.getMessageStatus() == MessageStatus.OUTBOX || mRecipient.getMessageStatus() == MessageStatus.RETRYING){
+					//increment the number of send attempts
+					mRecipient.setSendAttempts(mRecipient.getSendAttempts()+1);
+					//set the sent/last attempt date
+					mRecipient.setDate(new Date());
+					try{
+						//round robin
+						gateways.get(messageIndex++ % gatewayCount).sendMessage(message,mRecipient);
+						//set the status as sent
+						mRecipient.setMessageStatus(MessageStatus.SENT);
+					}catch(Exception e){
+						log.error("Error sending message",e);
+						//if the sending didn't work, update the message status
+						if(mRecipient.getSendAttempts() < getMaxRetryAttempts()){
+							mRecipient.setMessageStatus(MessageStatus.RETRYING);
+							log.info("Retrying message #" + message.getId());
+						}else{
+							mRecipient.setMessageStatus(MessageStatus.FAILED);
+							log.info("Message #" + message.getId()+ " failed");
+						}
+					}
+					
 				}
 			}
-			
+			//set the sent/last attempt date
+			message.setDate(new Date());
 			//save the message
 			getMessageService().saveMessage(message);
 		}

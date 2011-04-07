@@ -24,10 +24,6 @@
      	
 		<many-to-one name="inReplyTo" class="@MODULE_PACKAGE@.domain.Message" column="in_reply_to" cascade="none"/>
 		
-        <property name="date" type="java.util.Date" length="19"/>
-        <property name="status" type="int" length="4"/>
-        <property name="sendAttempts" type="int" length="3" column="send_attempts"/>
-		<property name="protocolClass" type="java.lang.String" column="protocol_class"/>	
-        		
+        <property name="date" type="java.util.Date" length="19"/>        		
     </class>
 </hibernate-mapping>

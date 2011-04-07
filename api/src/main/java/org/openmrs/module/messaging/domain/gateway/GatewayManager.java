@@ -20,7 +20,6 @@ public class GatewayManager {
 	
 	public GatewayManager(){
 		gateways = new HashMap<Class<? extends MessagingGateway>,MessagingGateway>();
-		
 		//add the gateways
 		gateways.put(SmsLibGateway.class, new SmsLibGateway());
 		//gateways.put(TwitterGateway.class, new TwitterGateway());		

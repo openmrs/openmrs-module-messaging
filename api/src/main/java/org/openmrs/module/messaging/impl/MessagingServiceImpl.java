@@ -15,6 +15,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
@@ -70,7 +71,9 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	}
 	
 	public void sendMessage(Message message){
-		message.setMessageStatus(MessageStatus.OUTBOX);
+		for(MessageRecipient mRecipient:message.getTo()){
+			mRecipient.setMessageStatus(MessageStatus.OUTBOX);
+		}
 		Context.getService(MessageService.class).saveMessage(message);
 	}
 	

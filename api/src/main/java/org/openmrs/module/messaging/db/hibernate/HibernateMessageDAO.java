@@ -51,15 +51,16 @@ public class HibernateMessageDAO implements MessageDAO {
 	
 	public List<Message> findMessagesWithAddresses(Class<? extends Protocol> protocolClass, String toAddress, String fromAddress, String content, Integer status){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
+		Criteria toCrit = c.createCriteria(MessageFields.TO.name);
 		if(protocolClass !=null){
-			c.add(Restrictions.eq(MessageFields.PROTOCOL_CLASS.name,protocolClass.getName()));
+			toCrit.add(Restrictions.eq(MessageRecipientFields.PROTOCOL_CLASS.name,protocolClass.getName()));
 		}
 		if(toAddress!= null && !toAddress.equals("") && toAddress.equals(fromAddress)){
 			c.createAlias(MessageFields.TO.name, "tos");
 			c.add(Restrictions.or(Restrictions.eq(MessageFields.ORIGIN.name,fromAddress), Restrictions.eq("tos.address",toAddress)));
 		}else{
 			if(toAddress!= null && !toAddress.equals("")){
-				c.createCriteria(MessageFields.TO.name).createCriteria("recipient").add(Restrictions.eq("address",toAddress));
+				toCrit.createCriteria("recipient").add(Restrictions.eq("address",toAddress));
 			}
 			if(fromAddress!= null && !fromAddress.equals("")){
 				c.add(Restrictions.eq(MessageFields.ORIGIN.name, fromAddress));
@@ -69,17 +70,16 @@ public class HibernateMessageDAO implements MessageDAO {
 			c.add(Restrictions.like(MessageFields.CONTENT.name, content,MatchMode.ANYWHERE));
 		}
 		if(status != null){
-			c.add(Restrictions.eq(MessageFields.STATUS.name, status));
+			toCrit.add(Restrictions.eq(MessageRecipientFields.STATUS.name, status));
 		}
 		return c.list();
 	}
 	
-	
-
 	public List<Message> findMessagesWithPeople(Class<? extends Protocol> protocolClass, Person sender, Person recipient, String content, Integer status){
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
+		Criteria toCrit = c.createCriteria(MessageFields.TO.name); 
 		if(protocolClass !=null){
-			c.add(Restrictions.eq(MessageFields.PROTOCOL_CLASS.name,protocolClass.getName()));
+			toCrit.add(Restrictions.eq(MessageRecipientFields.PROTOCOL_CLASS.name,protocolClass.getName()));
 		}
 		if(sender != null && sender.equals(recipient)){
 			c.createAlias("to.recipient.person", "recipients");
@@ -89,19 +89,18 @@ public class HibernateMessageDAO implements MessageDAO {
 				c.add(Restrictions.eq(MessageFields.SENDER.name, sender));
 			}
 			if(recipient!= null){
-				c.createCriteria(MessageFields.TO.name).createCriteria("recipient").add(Restrictions.eq("person", recipient));
+				toCrit.createCriteria("recipient").add(Restrictions.eq("person", recipient));
 			}
 		}
 		if(content!= null && !content.equals("")){
 			c.add(Restrictions.like(MessageFields.CONTENT.name, "%"+content+"%"));
 		}
 		if(status != null){
-			c.add(Restrictions.eq(MessageFields.STATUS.name, status));
+			toCrit.add(Restrictions.eq(MessageRecipientFields.STATUS.name, status));
 		}
 		c.addOrder(Order.asc(MessageFields.DATE.name));
 		return c.list();
 	}
-
 
 	public void deleteMessage(Message message) {
 		sessionFactory.getCurrentSession().delete(message);
@@ -113,14 +112,18 @@ public class HibernateMessageDAO implements MessageDAO {
 
 	public List<Message> getOutboxMessages() {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.eq(MessageFields.STATUS.name, MessageStatus.OUTBOX.getNumber()));
+		c.createCriteria(MessageFields.TO.name)
+		.add(Restrictions.eq(MessageRecipientFields.STATUS.name, MessageStatus.OUTBOX.getNumber()));
 		return c.list();
 	}
 
 	public List<Message> getOutboxMessagesByProtocol(Class<? extends Protocol> protocolClass) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		c.add(Restrictions.or(Restrictions.eq(MessageFields.STATUS.name, MessageStatus.OUTBOX.getNumber()),Restrictions.eq(MessageFields.STATUS.name, MessageStatus.RETRYING.getNumber())));
-		c.add(Restrictions.eq(MessageFields.PROTOCOL_CLASS.name, protocolClass.getName()));
+		c.createCriteria(MessageFields.TO.name)
+		.add(Restrictions.or(
+				Restrictions.eq(MessageRecipientFields.STATUS.name, MessageStatus.OUTBOX.getNumber()),
+				Restrictions.eq(MessageRecipientFields.STATUS.name, MessageStatus.RETRYING.getNumber())))
+		.add(Restrictions.eq(MessageRecipientFields.PROTOCOL_CLASS.name, protocolClass.getName()));
 		return c.list();
 	}
 	

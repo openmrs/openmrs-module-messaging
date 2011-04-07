@@ -3,7 +3,9 @@ package org.openmrs.module.messaging.web.domain;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingService;
@@ -41,11 +43,6 @@ public class MessageBean implements Serializable {
 		this.setContent(message.getContent());
 		this.setSubject(message.getSubject());
 		this.setOrigin(message.getOrigin());
-		System.out.println("SENDER 1 MB: "+ message.getSender().getPersonName().toString());
-		System.out.println("SENDER 2 MB: "+ message.getSender().getPersonName().toString());
-		System.out.println("SENDER 3 MB: "+ message.getSender().getPersonName().toString());
-		System.out.println("SENDER 4 MB: "+ message.getSender().getPersonName().toString());
-		System.out.println("SENDER 5 MB: "+ message.getSender().getPersonName().toString());
 		this.sender = message.getSender().getPersonName().toString();
 		setRecipients("");
 		Iterator<MessageRecipient> itr = message.getTo().iterator();
@@ -60,7 +57,22 @@ public class MessageBean implements Serializable {
 			}
 		}
 		setDateAndTime(message.getDate());
-		this.setProtocolName(Context.getService(MessagingService.class).getProtocolByClass(message.getProtocol()).getProtocolName());
+		//get a set of all the protocols
+		Set<String> protSet = new HashSet<String>();
+		for(MessageRecipient mr: message.getTo()){
+			protSet.add(Context.getService(MessagingService.class).getProtocolByClass(mr.getProtocol()).getProtocolName());
+		}
+		//build a string with the protocol set
+		StringBuilder protocols = new StringBuilder();
+		Iterator<String> protIterator = protSet.iterator();
+		while(protIterator.hasNext()){
+			if(protIterator.hasNext()){
+				protocols.append(protIterator.next()+ ", ");
+			}else{
+				protocols.append(protIterator.next());
+			}
+		}
+		this.setProtocolName(protocols.toString());
 	}
 	
 	public String getSender() {

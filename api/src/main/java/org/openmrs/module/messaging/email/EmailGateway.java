@@ -8,7 +8,6 @@ import java.util.Properties;
 import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.Flags;
-import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -16,6 +15,7 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.Transport;
+import javax.mail.Flags.Flag;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.search.FlagTerm;
@@ -27,12 +27,11 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.EncryptionService;
 import org.openmrs.module.messaging.domain.Message;
-import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.notification.MessageException;
-import org.openmrs.util.OpenmrsUtil;
 import org.springframework.util.StringUtils;
 
 /**
@@ -59,7 +58,7 @@ public class EmailGateway extends MessagingGateway {
 	 * send a message
 	 */
 	@Override
-	public void sendMessage(Message message) throws Exception {
+	public void sendMessage(Message message, MessageRecipient recipient) throws Exception {
 		
 		// fail when outSession does not exist
 		if (outSession == null)
@@ -256,7 +255,7 @@ public class EmailGateway extends MessagingGateway {
 			// post the message
 			org.openmrs.module.messaging.domain.Message m = new org.openmrs.module.messaging.domain.Message("", content);
 		//	m.setFrom(sender);
-			m.setMessageStatus(MessageStatus.RECEIVED);
+		//	m.setMessageStatus(MessageStatus.RECEIVED);
 			m.setDate(message.getSentDate());
 			//m.setProtocol(EmailProtocol.class.getName());
 			this.getMessageService().saveMessage(m);

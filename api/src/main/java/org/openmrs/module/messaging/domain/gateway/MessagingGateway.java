@@ -4,6 +4,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 
 /**
  * An abstract superclass that represents a service that can send and receive
@@ -15,7 +16,7 @@ public abstract class MessagingGateway {
 	
 	private MessageService messageService;
 	
-	public abstract void sendMessage(Message message) throws Exception;
+	public abstract void sendMessage(Message message, MessageRecipient recipient) throws Exception;
 	
 	public abstract void receiveMessages();
 
