@@ -20,7 +20,7 @@
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 
-<div id="index" class="home yui-skin-sam">
+<div id="index" class="home">
 	<table id="compose-message-table">
 	<tr>
 	<td id="link-cell">
@@ -44,7 +44,9 @@
 				</tr>
 			</table>
 		</div>
-		<textarea id="writing-area" name="writing-area"/></textarea>
+		<div id="writing-area-container" class="yui-skin-sam">
+			<textarea id="writing-area" name="writing-area"/></textarea>
+		</div>
 		<div id="buttons-container" class="boxHeader">
 			<input type="button" value="Send" id="send-button" onclick="sendMessage()"></input>
 			<input type="button" value="Discard" id="discard-button" onclick="clearFields()"></input>
