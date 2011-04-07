@@ -8,11 +8,11 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
-import org.openmrs.module.messaging.domain.gateway.CredentialSet;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
 import org.openmrs.module.messaging.util.MessagingConstants;
+import org.openmrs.module.messaging.util.Pair;
 
 import com.techventus.server.voice.Voice;
 
@@ -23,21 +23,13 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	 */
 	private Voice googleVoice;
 	
-	/**
-	 * The credentials of the currently logged in user
-	 */
-	private CredentialSet currentCredentials;
-
+	private Pair<String,String> credentials;
+	
 	/**
 	 * Boolean indicating whether or not this gateway is connected to Twitter
 	 */
 	private volatile boolean isActive = false;
 	
-	/**
-	 * Boolean used for starting and stopping the activity-checking thread
-	 */
-	private volatile boolean stopThread = false;
-
 	private static Log log = LogFactory.getLog(GoogleVoiceGateway.class);
 	
 	@Override
@@ -62,15 +54,13 @@ public class GoogleVoiceGateway extends MessagingGateway {
 
 	@Override
 	public boolean isActive() {
+		updateCredentials();
 		return isActive;
-	}
-
-	private void setActive(boolean isActive) {
-		this.isActive = isActive;
 	}
 
 	@Override
 	public void sendMessage(Message message) throws Exception{
+		updateCredentials();
 		try{
 			for(MessageRecipient recipient: message.getTo()){
 				googleVoice.sendSMS(recipient.getRecipient().getAddress(),message.getContent());
@@ -86,84 +76,41 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	@Override
 	public void shutdown() {
 		googleVoice = null;
-		stopThread();
+		isActive=false;
 	}
 	
 	@Override
 	public void startup() {
-		//update the stored credentials
-		currentCredentials = getCredentials();
-		try {
-			googleVoice = new Voice(currentCredentials.getUsername(),currentCredentials.getPassword());
-			//turn off GV logging
+		updateCredentials();
+		if(googleVoice != null){
 			googleVoice.PRINT_TO_CONSOLE = false;
-		} catch (Exception e) {
-			log.error("Error starting the Google Voice Gateway",e);
 		}
-		startActivityCheckingThread();
+		isActive=true;
 	}
 	
-	/**
-	 * Starts a thread that polls twitter every 2 seconds to see if the gateway
-	 * is still connected.
-	 */
-	private void startActivityCheckingThread() {
-		stopThread = false;
-		Thread activeCheckingThread = new Thread(new Runnable() {
-			public void run() {
-				while (!stopThread) {
-					if (googleVoice != null) {
-						try {
-							if (googleVoice.isLoggedIn()) {
-								setActive(true);
-								System.out.println("Google voice was active");
-							}else{
-								setActive(false);
-								System.out.println("Google voice was inactive");
-							}
-						} catch (Throwable t) {
-							setActive(false);
-						}
-						try {
-							Thread.sleep(2000);
-						} catch (InterruptedException e) {
-							log.error("Error sleeping in Google Voice activity checking thread",e);
-						}
-					}
-				}
-				System.out.println("Stopping the thread");
-			}
-		});
-		activeCheckingThread.start();
-	}
-
-	private void stopThread() {
-		stopThread = true;
-	}
-
 	/**
 	 * Returns a pair of strings. The first string is the username
 	 * and the second string is the password
 	 * @return
 	 */
-	private CredentialSet getCredentials(){
-		Context.openSession();
+	private Pair<String, String> getCredentials(){
 		String username = Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME);
 		String password= Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD);
-		Context.closeSession();
-		CredentialSet credentials = new CredentialSet(username,password);
-		return credentials;
+		Pair<String,String> creds= new Pair<String,String>(username,password);
+		return creds;
 	}
 	
-	public void updateCredentials(String username, String password){
-		this.currentCredentials = new CredentialSet(username, password);
+	public void updateCredentials(){
+		if(credentials == null || !credentials.equals(getCredentials())){
+			this.credentials = getCredentials();
+		}
 		try {
-			this.googleVoice = new Voice(username,password);
+			this.googleVoice = new Voice(credentials.first,credentials.second);
 		} catch (IOException e) {
+			isActive = false;
 			log.error("Error updating Google Voice login info",e);
 		}
 	}
-
 	
 	@Override
 	public boolean supportsProtocol(Protocol p) {

@@ -80,10 +80,10 @@ public class EmailGateway extends MessagingGateway {
 			sender.setPersonal("OpenMRS");
 			mimeMessage.setSender(sender);
 		}
-		
-		// set recipient
-		mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO,
-				InternetAddress.parse(message.getDestination(), false));
+//		
+//		// set recipient
+//		mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO,
+//				InternetAddress.parse(message.getDestination(), false));
 
 		// set subject
 		// TODO allow for text replacement in the subject (i.e. %U = sender's username)
@@ -127,7 +127,7 @@ public class EmailGateway extends MessagingGateway {
 			throw new MessageException(e);
 		}
 		
-		log.debug("Email message sent to " + message.getDestination() + " successfully");
+	//	log.debug("Email message sent to " + message.getDestination() + " successfully");
 	}
 
 	/**
@@ -255,16 +255,16 @@ public class EmailGateway extends MessagingGateway {
 			
 			// post the message
 			org.openmrs.module.messaging.domain.Message m = new org.openmrs.module.messaging.domain.Message("", content);
-			m.setFrom(sender);
+		//	m.setFrom(sender);
 			m.setMessageStatus(MessageStatus.RECEIVED);
 			m.setDate(message.getSentDate());
-			m.setProtocol(EmailProtocol.class.getName());
+			//m.setProtocol(EmailProtocol.class.getName());
 			this.getMessageService().saveMessage(m);
 			
 			// mark the message as seen
 			message.setFlag(Flag.SEEN, true);
 			
-			log.debug("Received message from " + m.getFrom());
+		//	log.debug("Received message from " + m.getFrom());
 			
 		} catch (IOException e) {
 			log.error("could not read message content due to an I/O error", e);
@@ -385,7 +385,7 @@ public class EmailGateway extends MessagingGateway {
 	public boolean supportsProtocol(Protocol p) {
 		if (p == null)
 			return false;
-		return OpenmrsUtil.nullSafeEquals(p.getProtocolId(), EmailProtocol.class.getName());
+		return p.getClass().equals(EmailProtocol.class);
 	}
 	
 

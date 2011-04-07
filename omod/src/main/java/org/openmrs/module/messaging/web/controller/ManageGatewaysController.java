@@ -8,6 +8,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.EncryptionService;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
+import org.openmrs.module.messaging.email.EmailGateway;
 import org.openmrs.module.messaging.googlevoice.GoogleVoiceGateway;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
 import org.openmrs.module.messaging.util.MessagingConstants;
@@ -42,10 +43,15 @@ public class ManageGatewaysController {
 		if(gatewayManager.getGatewayByClass(GoogleVoiceGateway.class) != null){
 			request.setAttribute("googleVoiceUsername", adminService.getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME));
 			request.setAttribute("googleVoicePassword", adminService.getGlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD));
-			String gvStatus = gatewayManager.getGatewayByClass(GoogleVoiceGateway.class).isActive()? "Active":"Inactive";
+			boolean gvStatus = gatewayManager.getGatewayByClass(GoogleVoiceGateway.class).isActive();
 			request.setAttribute("googleVoiceStatus", gvStatus);
 		}
-		
+		if(gatewayManager.getGatewayByClass(SmsLibGateway.class)!=null){
+			request.setAttribute("smsLibStatus", gatewayManager.getGatewayByClass(SmsLibGateway.class).isActive());
+		}
+		if(gatewayManager.getGatewayByClass(EmailGateway.class)!=null){
+			request.setAttribute("emailStatus", gatewayManager.getGatewayByClass(EmailGateway.class).isActive());
+		}
 		// add email config values
 //		if(gatewayManager.getGatewayByClass(EmailGateway.class) != null){
 //			request.setAttribute("emailMessageSubject", adminService.getGlobalProperty(MessagingConstants.GP_EMAIL_SUBJECT));
@@ -69,9 +75,9 @@ public class ManageGatewaysController {
 	
 	@RequestMapping(value="/module/messaging/changeGoogleVoiceCreds", method=RequestMethod.POST)
 	public ModelAndView changeGoogleVoiceCredentials(
-			@RequestParam("username") String username,
-			@RequestParam("password1") String password1,
-			@RequestParam("password2") String password2,
+			@RequestParam("googleVoiceUsername") String username,
+			@RequestParam("googleVoicePassword") String password1,
+			@RequestParam("googleVoicePassword2") String password2,
 			@RequestParam(value="returnUrl", required=false) String returnUrl,
 			HttpServletRequest request){
 		
@@ -85,8 +91,6 @@ public class ManageGatewaysController {
 				//save the global properties
 				Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_UNAME, username));
 				Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(MessagingConstants.GP_GOOGLE_VOICE_PWORD, password1));
-				//update the gateway itself
-				gatewayManager.getGatewayByClass(GoogleVoiceGateway.class).updateCredentials(username, password1);
 				//tell the user it worked
 				httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Credentials saved");
 			} catch (Exception e) {

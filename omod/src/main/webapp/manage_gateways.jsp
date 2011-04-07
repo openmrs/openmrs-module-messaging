@@ -7,7 +7,12 @@
 <h2>Manage Messaging Gateways</h2><br/>
 
 <div id="modemsBoxHeader" class="boxHeader"> 
-	<img id="modemsStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
+	<c:if test="${smsLibStatus =='true'}">
+		<img id="modemsStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_green.png" style="vertical-align:bottom;"/>
+	</c:if>
+	<c:if test="${smsLibStatus =='false'}">
+		<img id="modemsStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
+	</c:if>
 	Phones and Modems
 </div>
 <div id="modemsBox" class="box">
@@ -36,32 +41,65 @@
 		</thead>
 		<tbody id="modemsTableBody"></tbody>
 	</table><br/><br/>
-	<button id="modemsStartStopButton" onclick="toggleSmsLibGateway()"></button>
+	<c:if test="${smsLibStatus =='true'}">
+		<button id="modemsStartStopButton" onclick="toggleSmsLibGateway()">Stop Gateway</button>
+	</c:if>
+	<c:if test="${smsLibStatus =='false'}">
+		<button id="modemsStartStopButton" onclick="toggleSmsLibGateway()">Start Gateway</button>
+	</c:if>
 </div>
-
 <br/>
 
 <div id="googleVoiceBoxHeader" class="boxHeader"> 
-	<img id="googleVoiceStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
+	<c:if test="${googleVoiceStatus =='true'}">
+		<img id="googleVoiceStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_green.png" style="vertical-align:bottom;"/>
+	</c:if>
+	<c:if test="${googleVoiceStatus =='false'}">
+		<img id="googleVoiceStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
+	</c:if>
 	Google Voice
 </div>
+
 <div id="googleVoiceBox" class="box">
-	Google Voice username: ${googleVoiceUsername}<br/><br/>
-	Change the Google Voice login:
+	Username: <c:if test="${googleVoiceUsername == ''}">Not yet set</c:if><c:if test="${googleVoiceUsername != ''}">${googleVoiceUsername}</c:if>
+	<button id="changeGoogleVoiceCredsButton" onclick="toggleGoogleVoiceCreds()" style="display:block;margin-bottom:1em;margin-top:1em">Change Google Account</button>
+	<div id="changeGoogleVoiceCreds" style="display:none;">
 	<form method="post" action="<openmrs:contextPath/>/module/messaging/changeGoogleVoiceCreds.form">
-		Username:  <input type="text" name="username"/><br/>
-		Password:  <input type="password" name="password1"/><br/>
-		Confirm Password:  <input type="password" name="password2"/><br/>
-		<input type="submit" value="Save Changes" />
+		<fieldset style="padding:1em;margin:1em">
+		<table>
+			<tr>
+				<td><label for="googleVoiceUsername">Username:</label></td>
+				<td><input type="text" name="googleVoiceUsername" value="${googleVoiceUsername}"></input></td>
+			</tr>
+			<tr>
+				<td><label for="googleVoicePassword">Password:</label></td>
+				<td><input type="password" name="googleVoicePassword" value="${googleVoicePassword}"></input></td>
+			</tr>
+			<tr>
+				<td><label for="googleVoicePassword2">Confirm Password:</label></td>
+				<td><input type="password" name="googleVoicePassword2" value="${googleVoicePassword}"></input></td>
+			</tr>
+		</table>
+		</fieldset>
+		<input type="submit" value="Save Changes" style="margin-bottom:1em"/>
 	</form>
-	<br/>
-	<button id="googleVoiceStartStopButton" onclick="toggleGatewayStatus('googlevoice.GoogleVoiceGateway','googleVoice')"></button>
+	</div>
+	<c:if test="${googleVoiceStatus =='true'}">
+		<button id="googleVoiceStartStopButton" onclick="toggleGatewayStatus('googlevoice.GoogleVoiceGateway','googleVoice')">Stop Gateway</button>
+	</c:if>
+	<c:if test="${googleVoiceStatus =='false'}">
+		<button id="googleVoiceStartStopButton"onclick="toggleGatewayStatus('googlevoice.GoogleVoiceGateway','googleVoice')">Start Gateway</button>
+	</c:if>
 </div>
 
 <br />
-
 <b id="emailBoxHeader" class="boxHeader">
-	<img id="emailStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
+	<c:if test="${emailStatus =='true'}">
+		<img id="emailStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_green.png" style="vertical-align:bottom;"/>
+	</c:if>
+	<c:if test="${emailStatus =='false'}">
+		<img id="emailStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
+	</c:if>
 	Email
 </b>
 <div id="emailBox" class="box">
@@ -211,9 +249,13 @@
 		<input type="submit" value="Save Changes" />
 	</form>
 	<br/>
-	<button id="emailStartStopButton" onclick="toggleGatewayStatus('email.EmailGateway','email')"></button>
+	<c:if test="${emailStatus =='true'}">
+		<button id="emailStartStopButton" onclick="toggleGatewayStatus('email.EmailGateway','email')">Stop Gateway</button>
+	</c:if>
+	<c:if test="${emailStatus =='false'}">
+		<button id="emailStartStopButton" onclick="toggleGatewayStatus('email.EmailGateway','email')">Start Gateway</button>
+	</c:if>
 </div>
-
 <%@ include file="/WEB-INF/template/footer.jsp" %>
 
 <openmrs:htmlInclude file="/dwr/engine.js" />
@@ -225,11 +267,12 @@
 	window.onload = init;
 
 	var classPrefix = "org.openmrs.module.messaging.";
-
+	var googleVoiceCreds = false;
+	
 	function init(){
-		updateStatus("sms.SmsLibGateway","modems");
-		updateStatus("googlevoice.GoogleVoiceGateway","googleVoice");
-		updateStatus("email.EmailGateway","email");
+	//	updateStatus("sms.SmsLibGateway","modems");
+	//	updateStatus("googlevoice.GoogleVoiceGateway","googleVoice");
+		//updateStatus("email.EmailGateway","email");
 		updateModemList();
 	}
 
@@ -321,6 +364,20 @@
 		} else {
 			$j("#emailBox [name^='out']").removeAttr("disabled");
 			$j("#emailOut").fadeIn();
+		}
+	}
+
+	function toggleGoogleVoiceCreds(){
+		if ($j("#changeGoogleVoiceCreds").is(":hidden")) {
+			$j("#changeGoogleVoiceCreds").slideDown("fast", function(){
+				$j("#changeGoogleVoiceCredsButton").text("Cancel");
+			});
+		}else{
+			$j("#changeGoogleVoiceCreds").slideUp("fast", function(){
+				$j("#changeGoogleVoiceCredsButton").text("Change Google Account");
+				$j("#googleVoicePassword").val("");
+				$j("#googleVoicePassword2").val("");
+			});
 		}
 	}
 	
