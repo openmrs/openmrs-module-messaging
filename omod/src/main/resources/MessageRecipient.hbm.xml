@@ -15,7 +15,8 @@
         
         <property name="status" type="int" length="4"/>
         <property name="sendAttempts" type="int" length="3" column="send_attempts"/>
-		<property name="protocolClass" type="java.lang.String" column="protocol_class"/>	
+        <property name="origin" type="java.lang.String"/>
+        
         <property name="read" column="is_read" type="boolean" not-null="true" length="1"/>
         <property name="date" type="java.util.Date" length="19"/> 
      </class>

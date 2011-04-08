@@ -37,8 +37,7 @@ public interface MessagingService {
 	 *            The protocol that the message uses
 	 * @throws Exception
 	 */
-	public void sendMessage(String message, String address,
-			Class<? extends Protocol> protocolClass) throws Exception;
+	public void sendMessage(String message, String address, Class<? extends Protocol> protocolClass) throws Exception;
 
 	/**
 	 * Sends a message. Create your own message object using one of the
@@ -49,7 +48,7 @@ public interface MessagingService {
 	 * 
 	 * @param message
 	 */
-	public void sendMessage(Message message);
+	public void sendMessage(Message message)  throws Exception;
 
 	/**
 	 * Sends a message to the provided person using their preferred address.
@@ -65,7 +64,7 @@ public interface MessagingService {
 	 * 
 	 * @param messages
 	 */
-	public void sendMessages(Set<Message> messages);
+	public void sendMessages(Set<Message> messages)  throws Exception;
 
 	/**
 	 * @return All protocols
@@ -90,7 +89,7 @@ public interface MessagingService {
 	 * @param p
 	 * @return
 	 */
-	public boolean canSendToProtocol(Protocol p);
+	public boolean canSendToProtocol(Class <? extends Protocol> protocolClass);
 
 	/**
 	 * Adds a message listener. Currently the only supported listeners are

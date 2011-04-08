@@ -50,7 +50,7 @@ public interface MessageDAO {
 
 	public List<Message> getOutboxMessagesByProtocol(Class<? extends Protocol> protocolClass);
 	
-	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to, boolean dateOrderAscending);
+	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to, boolean dateOrderAscending, Class<? extends Protocol> protocolClass);
 	
 	public Integer countMessagesForPerson(int personId, boolean to);
 }

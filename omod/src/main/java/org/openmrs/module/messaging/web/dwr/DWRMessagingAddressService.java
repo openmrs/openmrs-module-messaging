@@ -75,13 +75,9 @@ public class DWRMessagingAddressService {
 		Protocol protocol = Context.getService(MessagingService.class).getProtocolByClass(address.getProtocol());
 		MessagingAddress ma = null;
 		if(address.getId() == -1){
-			try {
-				ma = protocol.createAddress(address.getAddress(), Context.getPersonService().getPerson(personId));
-				ma.setDateCreated(new Date());
-				ma.setCreator(Context.getAuthenticatedUser());
-			} catch (AddressFormattingException e) {
-				log.error("Error creating address in DWR", e);
-			}
+			ma = new MessagingAddress(address.getAddress(), Context.getPersonService().getPerson(personId),address.getProtocol());
+			ma.setDateCreated(new Date());
+			ma.setCreator(Context.getAuthenticatedUser());
 		}else{ //otherwise, we're modifying a previously existing address
 			ma = Context.getService(MessagingAddressService.class).getMessagingAddress(address.getId());
 			ma.setAddress(address.getAddress());

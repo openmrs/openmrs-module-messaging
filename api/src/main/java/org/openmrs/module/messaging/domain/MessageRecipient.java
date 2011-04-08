@@ -16,6 +16,11 @@ public class MessageRecipient extends BaseOpenmrsObject{
 	private MessagingAddress recipient;
 	
 	/**
+	 * The origin address of this message.
+	 */
+	protected String origin;
+	
+	/**
 	 * The status of this message
 	 */
 	protected Integer status;
@@ -28,27 +33,14 @@ public class MessageRecipient extends BaseOpenmrsObject{
 	 */
 	private Integer sendAttempts = 0;
 
-	/**
-	 * The Id of the protocol associated with this message
-	 */
-	private String protocolClass;
-
-	private boolean read;
+	private boolean read = false;
 	
 	private Date date = new Date();
 	
-	public MessageRecipient(MessagingAddress recipient, Message message) {
+	public MessageRecipient(MessagingAddress destination, Message message) {
 		super();
 		this.message = message;
-		this.recipient = recipient;
-		this.read = false;
-	}
-	
-	public MessageRecipient(MessagingAddress recipient, boolean read, Message message) {
-		super();
-		this.message = message;
-		this.recipient = recipient;
-		this.read = read;
+		this.recipient = destination;
 	}
 	
 	public MessagingAddress getRecipient() {
@@ -128,18 +120,11 @@ public class MessageRecipient extends BaseOpenmrsObject{
 		this.sendAttempts = sendAttempts;
 	}
 	
-	
-	/**
-	 * @param protocolClass the protocolClass to set
-	 */
-	private void setProtocolClass(String protocolClass) {
-		this.protocolClass = protocolClass;
-	}
 	/**
 	 * @return the protocolClass
 	 */
 	private String getProtocolClass() {
-		return protocolClass;
+		return getRecipient().getProtocolClass();
 	}
 	
 
@@ -151,11 +136,6 @@ public class MessageRecipient extends BaseOpenmrsObject{
 			return null;
 		}
 	}
-
-	public void setProtocol(Class<? extends Protocol> protocolClass) {
-		this.setProtocolClass(protocolClass.getName());
-	}
-
 	
 	/**
 	 * @param date the date to set
@@ -171,17 +151,30 @@ public class MessageRecipient extends BaseOpenmrsObject{
 		return date;
 	}
 
+	/**
+	 * @param origin the origin to set
+	 */
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	/**
+	 * @return the origin
+	 */
+	public String getOrigin() {
+		return origin;
+	}
 
 	public enum MessageRecipientFields{
 		MESSAGE_RECIPIENT_ID("messageRecipientId"),
 		MESSAGE("message"),
 		RECIPIENT("recipient"),
 		SEND_ATTEMPTS("sendAttempts"),
+		ORIGIN("origin"),
 		READ("read"),
 		STATUS("status"),
-		DATE("date"),
-		PROTOCOL_CLASS("protocolClass");
-
+		DATE("date");
+		
 		public final String name;
 		private MessageRecipientFields(String name){ this.name = name; }
 		public String toString(){ return name; }

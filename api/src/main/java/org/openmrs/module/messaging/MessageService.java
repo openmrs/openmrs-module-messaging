@@ -172,7 +172,7 @@ public interface MessageService extends OpenmrsService {
 	 * @should return in ascending order by date if dateOrderAscending is true
 	 */
 	@Transactional(readOnly = true)
-	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to, boolean dateOrderAscending);
+	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to, boolean dateOrderAscending, Class<? extends Protocol> protocolClass);
 
 	/**
 	 * @param personId the Id of the person

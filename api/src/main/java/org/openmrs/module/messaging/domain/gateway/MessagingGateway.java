@@ -76,7 +76,7 @@ public abstract class MessagingGateway {
 	 * @param protocol
 	 * @return
 	 */
-	public abstract boolean supportsProtocol(Protocol p);
+	public abstract boolean supportsProtocol(Class<? extends Protocol> protocolClass);
 
 	/**
 	 * @return the addressService

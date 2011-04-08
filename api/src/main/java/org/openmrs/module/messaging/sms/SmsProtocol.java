@@ -1,14 +1,7 @@
 package org.openmrs.module.messaging.sms;
 
-import java.util.Set;
-
-import org.openmrs.Person;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.domain.Message;
-import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
-import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
-import org.openmrs.module.messaging.domain.gateway.exception.MessageFormattingException;
 import org.openmrs.module.messaging.util.MessagingConstants;
 
 /**
@@ -21,20 +14,6 @@ public class SmsProtocol extends Protocol{
 	@Override
 	public String getProtocolName() {
 		return "SMS";
-	}
-
-	/* (non-Javadoc)
-	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createAddress(java.lang.String, org.openmrs.Person)
-	 */
-	@Override
-	public MessagingAddress createAddress(String address, Person person) throws AddressFormattingException {
-		if (!addressIsValid(address)) {
-			throw new AddressFormattingException("The phone number you entered was not valid. Either enter a number prefixed with a + "
-											   + "and your country code or enter a locally formatted number.");
-		}
-		MessagingAddress result = new MessagingAddress(getProperlyFormattedPhoneNumber(address), person);
-		result.setProtocol(this.getClass());
-		return result;
 	}
 	
 	/**
@@ -71,87 +50,6 @@ public class SmsProtocol extends Protocol{
 		address = address.replaceAll("[^0-9]", "");
 		return address.length() >= 10;
 	}
-	
-	/**
-	 * Creates an SMS message. Validates message content using the default
-	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). 'fromAddress' can be null
-	 * 
-	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createMessage(java.lang.String,
-	 *      java.lang.String, java.lang.String)
-	 */
-	@Override
-	public Message createMessage(String messageContent, String toAddress, String fromAddress) throws MessageFormattingException, AddressFormattingException {
-		MessagingAddress to = null,from = null;
-		try{
-			to = createAddress(toAddress,null);
-		}catch(AddressFormattingException e){
-			AddressFormattingException f = new AddressFormattingException(e.getMessage().replace("phone number", "\"to\" number"));
-			throw f;
-		}
-		if (fromAddress != null && !fromAddress.equals("")) {
-			try {
-				from = createAddress(fromAddress, null);
-			} catch (AddressFormattingException e) {
-				AddressFormattingException f = new AddressFormattingException(e.getMessage().replace("phone number", "\"from\" number"));
-				throw f;
-			}
-		}
-		if(!messageContentIsValid(messageContent)){
-			throw new MessageFormattingException("SMS message is too long.");
-		}
-		Message result = new Message(to,from,messageContent);
-		result.setProtocol(this.getClass());
-		return result; 
-	}
-	
-	/**
-	 * Creates an SMS message. Validates message content using the default
-	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). 'from' can be null
-	 * 
-	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createMessage(java.lang.String,
-	 *      java.lang.String, java.lang.String)
-	 */
-	@Override
-	public Message createMessage(String messageContent, MessagingAddress to, MessagingAddress from) throws MessageFormattingException {
-		if(!messageContentIsValid(messageContent)){
-			throw new MessageFormattingException("SMS message is too long.");
-		}
-		Message result = new Message(to,from,messageContent);
-		result.setProtocol(this.getClass());
-		return result;
-	}
-
-	/**
-	 * Creates an SMS message. Validates message content using the default
-	 * assumptions (7-bit GSM alphabet, max 3 concatenated SMS). 'from' can be null
-	 * 
-	 * @see org.openmrs.module.messaging.domain.gateway.Protocol#createMessage(java.lang.String,
-	 *      java.lang.String, java.lang.String)
-	 */
-	@Override
-	public Message createMessage(String messageContent, Set<MessagingAddress> to, MessagingAddress from) throws MessageFormattingException {
-		if(!messageContentIsValid(messageContent)){
-			throw new MessageFormattingException("SMS message is too long.");
-		}
-		Message result = new Message(to, from, messageContent);
-		result.setProtocol(this.getClass());
-		return result;
-	}
-	
-	/**
-	 * Validates the message content using the supplied parameters instead of the defaults
-	 * @throws MessageFormattingException
-	 */
-	public Message createMessage(String messageContent, MessagingAddress toAddress, MessagingAddress fromAddress, int maxSmsNumber, SmsAlphabet alphabet) throws MessageFormattingException {
-		if(!messageContentIsValid(messageContent,maxSmsNumber,alphabet)){
-			throw new MessageFormattingException("SMS message is too long.");
-		}
-		//validation complete, create the message
-		Message result = new Message(toAddress,fromAddress,messageContent);
-		result.setProtocol(this.getClass());
-		return result;
-	}
-	
 
 	/**
 	 * Checking for SMS content validity is rather complex, so this method

@@ -42,18 +42,20 @@ public class MessageBean implements Serializable {
 		this.id =message.getId();
 		this.setContent(message.getContent());
 		this.setSubject(message.getSubject());
-		this.setOrigin(message.getOrigin());
 		this.sender = message.getSender().getPersonName().toString();
 		setRecipients("");
+		setOrigin("");
 		Iterator<MessageRecipient> itr = message.getTo().iterator();
 		while(itr.hasNext()){
 			MessageRecipient recipient = itr.next();
 			recipients += recipient.getRecipient().getPerson().getPersonName().toString();
+			origin += recipient.getOrigin();
 			if(recipient.getRecipient().getPerson().equals(Context.getAuthenticatedUser().getPerson())){
 				this.read = recipient.isRead();
 			}
 			if(itr.hasNext()){
 				recipients +=", ";
+				origin+= ", ";
 			}
 		}
 		setDateAndTime(message.getDate());

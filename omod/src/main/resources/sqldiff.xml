@@ -89,12 +89,13 @@
 		<author>Dieterich Lawson</author>
 		<date>April 7th, 2011</date>
 		<description>
-			This diff moves send_attempts, protocol_class, and status
-			from the messaging_messages table to the messaging_message_recipients table.
+			This diff removes send_attempts, protocol_class, and status
+			from the messaging_messages, and adds send_attempts, status,
+			origin, and a date field to the messaging_message_recipients table.
 		</description>
 		<sql>
-			ALTER TABLE messaging_messages DROP COLUMN protocol_class, DROP COLUMN status, DROP COLUMN send_attempts;
-			ALTER TABLE messaging_message_recipients ADD COLUMN protocol_class varchar(255) NOT NULL default '', ADD COLUMN status int(4) default NULL, ADD COLUMN send_attempts int(3) default 0, ADD COLUMN date datetime default NULL;
+			ALTER TABLE messaging_messages DROP COLUMN protocol_class, DROP COLUMN status, DROP COLUMN send_attempts, DROP COLUMN origin;
+			ALTER TABLE messaging_message_recipients ADD COLUMN status int(4) default NULL, ADD COLUMN send_attempts int(3) default 0, ADD COLUMN date datetime default NULL, ADD COLUMN origin varchar(255) default '';
 		</sql>
 	</diff>
 </sqldiff>

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
@@ -15,6 +16,7 @@ import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.omail.OMailProtocol;
 import org.openmrs.module.messaging.web.domain.MessageBean;
 import org.openmrs.module.messaging.web.domain.MessageBeanSet;
 
@@ -87,11 +89,8 @@ public class DWRModuleMessageService {
 	}
 	
 	public String sendMessage(String content, String toAddressString, String subject, boolean isFromCurrentUser){
-		Message message = null;
 		Set<MessagingAddress> toAddresses = new HashSet<MessagingAddress>();
-		MessagingAddress from = null;
-		Class<? extends Protocol> protocolClass;
-		//first we see if the addresses are already in the system
+		//first we split apart the addresses
 		String[] addresses = toAddressString.split(",");
 		for(String s: addresses){
 			String adrString = null;
@@ -100,46 +99,33 @@ public class DWRModuleMessageService {
 			}catch(Throwable t){
 				continue;
 			}
-			Class<? extends Protocol> clazz = messagingService.getProtocolByAbbreviation(adrString.split(":")[0]).getClass();
-			List<MessagingAddress> existingAddresses = addressService.findMessagingAddresses(adrString.split(":")[1], clazz, null);
+			//now we check to make sure that we're sending to valid, pre-existing addresses
+			Class<? extends Protocol> protocolClass = messagingService.getProtocolByAbbreviation(adrString.split(":")[0]).getClass();
+			List<MessagingAddress> existingAddresses = addressService.findMessagingAddresses(adrString.split(":")[1], protocolClass, null);
 			if(existingAddresses.size() != 1){
-				return "Could not find address "+ s;
+				return "Could not find address: "+ s;
 			}else{
 				toAddresses.add(existingAddresses.get(0));
 			}
 		}
+		//check that we're actually sending to an address
 		if(toAddresses.size() < 1){
 			return "No addresses entered";
 		}
-		protocolClass = ((MessagingAddress) toAddresses.toArray()[0]).getProtocol();
-		for(MessagingAddress adr: toAddresses){
-			if(protocolClass != adr.getProtocol()){
-				return "Cannot currently send to different types of addresses.";
-			}
-		}
-		//here we have a list of previously existing messaging addresses that all use the same protocol
-		if(isFromCurrentUser){
-			List<MessagingAddress> fromAdrResults = addressService.findMessagingAddresses("", protocolClass, Context.getAuthenticatedUser().getPerson());
-			if(fromAdrResults.size() < 1 ){
-				return "Cannot send from authenticated user - no from address";
-			}else{
-				from = fromAdrResults.get(0);
-				if(from.getAddress() !=null) System.out.println("FROM ADDRESS SET: "+ from.getAddress());
-				if(from.getPerson() != null) System.out.println("FROM PERSON SET: " + from.getPerson().getPersonName().toString());
-			}
-		}
-		try{
-			message = messagingService.getProtocolByClass(protocolClass).createMessage(content, toAddresses, from);
-		}catch(Exception e){
-			return "Could not create message";
-		}
+		//figure out the sender
+		Person sender = null;
+		if(isFromCurrentUser) sender = Context.getAuthenticatedUser().getPerson();
+		
+		//create the message
+		Message message = new Message(toAddresses,sender,content);
 		message.setSubject(subject!=null?subject:"");
+		
 		//if it is possible to send the message, do so
-		if (!messagingService.canSendToProtocol(messagingService.getProtocolByClass(protocolClass))) {
-			return "There is not currently a gateway running that can send that type of message.";
-		} else {
+		try{	
 			messagingService.sendMessage(message);
 			return null;
+		}catch(Throwable t){
+			return t.getMessage();
 		}
 	}
 	
@@ -153,7 +139,7 @@ public class DWRModuleMessageService {
 	
 	public MessageBeanSet getMessagesForPerson(Integer pageNumber, Integer pageSize, Integer personId, boolean to){
 		List<MessageBean> beans = new ArrayList<MessageBean>();
-		List<Message> messages = messageService.getMessagesForPersonPaged(pageNumber, pageSize, personId, to,false);
+		List<Message> messages = messageService.getMessagesForPersonPaged(pageNumber, pageSize, personId, to,false,OMailProtocol.class);
 		for(Message m: messages){
 			beans.add(new MessageBean(m));
 		}

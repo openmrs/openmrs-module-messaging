@@ -28,8 +28,7 @@ public class OMailGateway extends MessagingGateway {
 				if(add.getProtocol() == OMailProtocol.class) hasOMailAddress=true;
 			}
 			if(!hasOMailAddress){
-				MessagingAddress ma = new MessagingAddress(p.getPersonId().toString(),p);
-				ma.setProtocol(OMailProtocol.class);
+				MessagingAddress ma = new MessagingAddress(p.getPersonId().toString(),p,OMailProtocol.class);
 				getAddressService().saveMessagingAddress(ma);
 			}
 		}
@@ -66,15 +65,19 @@ public class OMailGateway extends MessagingGateway {
 		List<Message> incomingMsgs = getMessageService().getMessagesForProtocolAndStatus(OMailProtocol.class, MessageStatus.SENT.getNumber());
 		for(Message m: incomingMsgs){
 			for(MessageRecipient recipient: m.getTo()){
-				recipient.setMessageStatus(MessageStatus.RECEIVED);
-				recipient.setDate(new Date());
+				if(recipient.getProtocol().equals(OMailProtocol.class)){
+					recipient.setMessageStatus(MessageStatus.RECEIVED);
+					recipient.setDate(new Date());
+				}
 			}
 			getMessageService().saveMessage(m);
 		}
 	}
 
 	@Override
-	public void sendMessage(Message message, MessageRecipient recipient) throws Exception {/* do nothing */}
+	public void sendMessage(Message message, MessageRecipient recipient) throws Exception {
+		recipient.setOrigin(message.getSender().getId().toString());
+	}
 
 	@Override
 	public void shutdown() {/*do nothing*/}
@@ -87,7 +90,7 @@ public class OMailGateway extends MessagingGateway {
 	}
 
 	@Override
-	public boolean supportsProtocol(Protocol p) {
-		return p.getClass() == OMailProtocol.class;
+	public boolean supportsProtocol(Class<? extends Protocol> p) {
+		return p.equals(OMailProtocol.class);
 	}
 }

@@ -19,88 +19,78 @@ import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
 /**
- * A scheduler task that polls the database every 2 seconds 
- * looking for messages with a status of 'outbox'
- * Once such messages are found, they are dispatched 
+ * A scheduler task that polls the database every 2 seconds looking for messages
+ * with a status of 'outbox' Once such messages are found, they are dispatched
  * to the proper gateway for sending.
  */
-public class DispatchMessagesTask extends AbstractTask{
-	
+public class DispatchMessagesTask extends AbstractTask {
+
 	private static Log log = LogFactory.getLog(DispatchMessagesTask.class);
-	
+
 	/**
 	 * private cached instance of the module MessageService
 	 */
 	private MessageService messageService;
-	
-	/** 
-	 * The maximum number of times that this system will try 
-	 * to send a message before marking it as failed 
+
+	/**
+	 * The maximum number of times that this system will try to send a message
+	 * before marking it as failed
 	 */
 	private Integer maxRetryAttempts;
-		
+
 	private final Random rand = new Random();
 
 	/**
-	 * This method does the dispatching of outgoing messages.
-	 * It pulls any messages from the database that have a status
-	 * of 'outbox' and then dispatches them to the proper gateway. 
+	 * This method does the dispatching of outgoing messages. It pulls any
+	 * messages from the database that have a status of 'outbox' and then
+	 * dispatches them to the proper gateway.
 	 */
-	public void execute(){
+	public void execute() {
 		Context.openSession();
 
 		try {
 			// authenticate (for pre-1.7)
 			if (!Context.isAuthenticated())
 				authenticate();
-			
-			GatewayManager manager = Context.getService(MessagingService.class).getGatewayManager(); 
-			if(manager == null) return;
-			
-			//organize outgoing messages by protocol
-			log.debug("Dispatching messages");
-			List<Protocol> protocols = Context.getService(MessagingService.class).getProtocols();
-			for(Protocol p: protocols){
-				
-				//start by receiving the messages
-				for(MessagingGateway gateway: manager.getSupportingGateways(p)){
-					if(gateway.canReceive())
-						gateway.receiveMessages();
+
+			GatewayManager manager = getGatewayManager();
+			if (manager == null)
+				return;
+
+			// receive messages
+			log.debug("Receiving messages");
+			for (MessagingGateway mg : manager.getActiveGateways()) {
+				if (mg.canReceive()) {
+					mg.receiveMessages();
 				}
-				
-				//get all outgoing messages and the gateways that can send them
-				List<Message> messages = getMessageService().getOutboxMessagesByProtocol(p.getClass());
-				if(messages.size() <=0) continue;
-				
-				//get the supporting gateways
-				List<MessagingGateway> gateways = manager.getActiveSupportingGateways(p);
-				
-				//if there are no active supporting gateways, then we can't do anything
-				if(gateways.size() < 1) continue;
-				
-				//dispatch the messages
-				dispatchMessages(gateways,messages);
 			}
+
+			// send messages
+			log.debug("Dispatching messages");
+			dispatchMessages(getMessageService().getOutboxMessages());
+
 		} catch (Exception e) {
 			log.error("Exception occurred during DispatchMessagesTask", e);
 		} finally {
 			Context.closeSession();
 		}
 	}
-	
-	private void dispatchMessages(List<MessagingGateway> gateways, List<Message> messages){
-		int messageIndex = rand.nextInt(gateways.size());
-		int gatewayCount = gateways.size();
+
+	private void dispatchMessages(List<Message> messages){
+		List<MessagingGateway> gateways;
 		for(Message message: messages){
 			for(MessageRecipient mRecipient: message.getTo()){
 				if(mRecipient.getMessageStatus() == MessageStatus.OUTBOX || mRecipient.getMessageStatus() == MessageStatus.RETRYING){
+					gateways = getGatewayManager().getActiveSupportingGateways(mRecipient.getRecipient().getProtocol());
+					//TODO maybe we should change the message status if there aren't any available gateways
+					if(gateways.size() <=0) continue;
 					//increment the number of send attempts
 					mRecipient.setSendAttempts(mRecipient.getSendAttempts()+1);
-					//set the sent/last attempt date
-					mRecipient.setDate(new Date());
 					try{
-						//round robin
-						gateways.get(messageIndex++ % gatewayCount).sendMessage(message,mRecipient);
+						//TODO code better gateway routing logic
+						gateways.get(0).sendMessage(message,mRecipient);
+						//set the last attempt date
+						mRecipient.setDate(new Date());
 						//set the status as sent
 						mRecipient.setMessageStatus(MessageStatus.SENT);
 					}catch(Exception e){
@@ -129,20 +119,25 @@ public class DispatchMessagesTask extends AbstractTask{
 	 */
 	private MessageService getMessageService() {
 		if (messageService == null)
-			messageService = Context.getService(MessageService.class);		
+			messageService = Context.getService(MessageService.class);
 		return messageService;
 	}
 
+	private GatewayManager getGatewayManager(){
+		return Context.getService(MessagingService.class).getGatewayManager();
+	}
 	/**
 	 * @return the maxRetryAttempts
 	 */
 	private Integer getMaxRetryAttempts() {
 		if (maxRetryAttempts == null)
-			try{
-				maxRetryAttempts = Integer.parseInt(Context.getAdministrationService().getGlobalProperty(MessagingConstants.GP_MAX_RETRIES));
-			}catch(Exception e){
+			try {
+				maxRetryAttempts = Integer.parseInt(Context
+						.getAdministrationService().getGlobalProperty(
+								MessagingConstants.GP_MAX_RETRIES));
+			} catch (Exception e) {
 				maxRetryAttempts = 3;
 			}
 		return maxRetryAttempts;
-	}	
+	}
 }

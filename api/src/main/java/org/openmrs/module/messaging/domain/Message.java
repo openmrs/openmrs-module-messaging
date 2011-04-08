@@ -43,11 +43,6 @@ public class Message extends BaseOpenmrsObject {
 	//header info
 	
 	/**
-	 * The origin address of this message.
-	 */
-	protected String origin;
-	
-	/**
 	 * The person that sent this message
 	 */
 	protected Person sender;
@@ -68,11 +63,13 @@ public class Message extends BaseOpenmrsObject {
 	 */
 	private Message inReplyTo;
 
-	public Message(String to, String content){
+	public Message(String content, String to, Class<? extends Protocol> protocolClass){
+		super();
 		this.to = new HashSet<MessageRecipient>();
-		getTo().add(new MessageRecipient(new MessagingAddress(to,null),this));
 		this.content = content;
+		getTo().add(new MessageRecipient(new MessagingAddress(to,null,protocolClass),this));
 	}
+	
 	/**
 	 * Creates a message with only a destination and content. The date and
 	 * origin are filled in automatically at the time of sending.
@@ -81,42 +78,37 @@ public class Message extends BaseOpenmrsObject {
 	 *            the content of the message
 	 */
 	public Message(MessagingAddress to, String content) {
+		super();
 		this.to = new HashSet<MessageRecipient>();
-		getTo().add(new MessageRecipient(to,this));
 		this.content = content;
+		getTo().add(new MessageRecipient(to,this));
 	}
 
 	/**
-	 * Creates a messaging address with 1 destination and an origin. If the message is sent 
-	 * from a gateway with only 1 exit point from OpenMRS (like email or SMS), the 'from' address
-	 * may be overwritten.
+	 * Creates a messaging address with 1 destination and an origin.
 	 * @param to
 	 * @param from
 	 * @param content
 	 */
-	public Message(MessagingAddress to, MessagingAddress from, String content) {
+	public Message(MessagingAddress to, Person from, String content) {
+		super();
 		this.to = new HashSet<MessageRecipient>();
-		getTo().add(new MessageRecipient(to,this));
-		this.setOrigin(from.getAddress());
-		this.setSender(from.getPerson());
 		this.content = content;
+		this.setSender(from);
+		getTo().add(new MessageRecipient(to,this));
 	}
 	
 	/**
-	 * Creates a messaging address with several destinations and an origin. If the message is sent 
-	 * from a gateway with only 1 exit point from OpenMRS (like email or SMS), the 'from' address
-	 * may be overwritten.
+	 * Creates a messaging address with several destinations and an origin.
 	 * @param to
 	 * @param from
 	 * @param content
 	 */
-	public Message(Set<MessagingAddress> to, MessagingAddress from, String content) {
-		this.setRecipients(to);
-		this.setOrigin(from.getAddress());
-		this.setSender(from.getPerson());
-		if(origin !=null) System.out.println("FROM ADDRESS SET IN MESSAGE: "+ origin);
-		if(sender != null) System.out.println("FROM PERSON SET IN MESSAGE: " + sender.getPersonName().toString());
+	public Message(Set<MessagingAddress> to, Person from, String content) {
+		super();
 		this.content = content;
+		this.setRecipients(to);
+		this.setSender(from);
 	}
 
 	public String getContent() {
@@ -211,8 +203,6 @@ public class Message extends BaseOpenmrsObject {
 	public String getDisplayOrigin(){
 		if(getSender() != null){
 			return getSender().getPersonName().toString();
-		}else if(getOrigin() != null && !getOrigin().equals("")){
-			return getOrigin();
 		}else{
 			return "";
 		}
@@ -231,21 +221,7 @@ public class Message extends BaseOpenmrsObject {
 		}
 		return "";
 	}
-
-	/**
-	 * @param origin the origin to set
-	 */
-	public void setOrigin(String origin) {
-		this.origin = origin;
-	}
-
-	/**
-	 * @return the origin
-	 */
-	public String getOrigin() {
-		return origin;
-	}
-
+	
 	/**
 	 * @param sender the sender to set
 	 */
@@ -278,19 +254,11 @@ public class Message extends BaseOpenmrsObject {
 		IN_REPLY_TO("inReplyTo"),
 		TO("to"),
 		SENDER("sender"),
-		ORIGIN("origin"),
 		SUBJECT("subject"),
 		CONTENT("content"),
 		MESSAGE_ID("messageId");
-		
 		public final String name;
 		private MessageFields(String name){ this.name = name; }
 		public String toString(){ return name; }
-	}
-	
-	public void setProtocol(Class<? extends Protocol> clazz){
-		for(MessageRecipient mr: to){
-			mr.setProtocol(clazz);
-		}
 	}
 }

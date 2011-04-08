@@ -1,14 +1,13 @@
 package org.openmrs.module.messaging.googlevoice;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
-import org.openmrs.module.messaging.domain.MessageStatus;
-import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
@@ -16,6 +15,7 @@ import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.module.messaging.util.Pair;
 
 import com.techventus.server.voice.Voice;
+import com.techventus.server.voice.datatypes.Phone;
 
 public class GoogleVoiceGateway extends MessagingGateway {
 
@@ -63,6 +63,8 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	public void sendMessage(Message message,MessageRecipient recipient) throws Exception{
 		updateCredentials();
 		googleVoice.sendSMS(recipient.getRecipient().getAddress(), message.getContent());
+		Phone phone = googleVoice.getSettings(false).getPhones()[0];
+		if(phone != null) recipient.setOrigin(phone.getFormattedNumber());
 	}
 
 	@Override
@@ -105,8 +107,8 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	}
 	
 	@Override
-	public boolean supportsProtocol(Protocol p) {
-		return p.getClass() == SmsProtocol.class;
+	public boolean supportsProtocol(Class<? extends Protocol> p) {
+		return p.equals(SmsProtocol.class);
 	}
 
 	@Override

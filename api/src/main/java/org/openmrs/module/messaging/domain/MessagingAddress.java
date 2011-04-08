@@ -19,10 +19,11 @@ public class MessagingAddress extends BaseOpenmrsData {
 
 	public MessagingAddress() {}
 	
-	public MessagingAddress(String address, Person person) {
+	public MessagingAddress(String address, Person person, Class<? extends Protocol> protocolClass) {
 		super();
 		this.address = address;
 		this.person = person;
+		this.setProtocol(protocolClass);
 	}
  
 	private Integer messagingAddressId;

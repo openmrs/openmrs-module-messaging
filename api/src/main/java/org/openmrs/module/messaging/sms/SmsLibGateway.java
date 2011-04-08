@@ -1,6 +1,7 @@
 package org.openmrs.module.messaging.sms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Person;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
@@ -80,11 +82,19 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 		}
 		for (InboundMessage iMessage : inboundMessages) {
 			//create the message
-			Message m = new Message(Service.getInstance().getGateway(iMessage.getGatewayId()).getFrom(), iMessage.getText());
-			m.setSender(getAddressService().getPersonForAddress("+" + iMessage.getOriginator()));
-			m.setOrigin("+" + iMessage.getOriginator());
-			m.setDate(iMessage.getDate());
-			m.setProtocol(SmsProtocol.class);
+			String to = Service.getInstance().getGateway(iMessage.getGatewayId()).getFrom();
+			String content =  iMessage.getText();
+			String origin = "+" + iMessage.getOriginator(); 
+			Person sender = getAddressService().getPersonForAddress(origin); 
+			Date date = iMessage.getDate();
+			Message m = new Message(content, to, SmsProtocol.class);
+			m.setSender(sender);
+			for(MessageRecipient r: m.getTo()){
+				r.setOrigin(origin);
+				r.setDate(date);
+			}
+			m.setDate(date);
+		
 			getMessageService().saveMessage(m);
 			//try to delete the message from the phone
 			try {
@@ -128,8 +138,8 @@ public class SmsLibGateway extends MessagingGateway implements IOutboundMessageN
 	}
 
 	@Override
-	public boolean supportsProtocol(Protocol p) {
-		return p.getClass().equals(SmsProtocol.class);
+	public boolean supportsProtocol(Class<? extends Protocol> p) {
+		return p.equals(SmsProtocol.class);
 	}
 
 	/**

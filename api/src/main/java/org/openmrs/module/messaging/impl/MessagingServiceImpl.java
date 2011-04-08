@@ -19,9 +19,13 @@ import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
+import org.openmrs.module.messaging.domain.gateway.exception.MessageFormattingException;
 import org.openmrs.module.messaging.domain.listener.IncomingMessageListener;
 import org.openmrs.module.messaging.omail.OMailProtocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
+
+import freemarker.template.utility.StringUtil;
 
 /**
  * The implementation of the MessagingService interface 
@@ -64,20 +68,39 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	}
 	
 	public void sendMessage(String message, String address, Class<? extends Protocol> protocolClass) throws Exception{
-		Protocol p = getProtocolByClass(protocolClass);
-		if(p == null) throw new Exception("Invalid protocol class");
-		Message m = p.createMessage(message, address, null);
-		sendMessage(m);
+		if(protocolClass == null) throw new Exception("Invalid protocol class");
+		if(address == null || address.equals("")) throw new Exception("Cannot send to empty address");
+		if(message == null) throw new Exception("Cannot send null message");
+		sendMessage(new Message(message, address, protocolClass));
 	}
 	
-	public void sendMessage(Message message){
+	public void sendMessage(Message message) throws Exception{
+		//check if there are destinations
+		if(message.getTo() == null || message.getTo().size() == 0){
+			throw new Exception("No destination specified.");
+		}
 		for(MessageRecipient mRecipient:message.getTo()){
+			Protocol p = getProtocolByClass(mRecipient.getProtocol());
+			//check the protocol
+			if(p == null) throw new Exception("Invalid protocol");
+			//check the address
+			if(!p.addressIsValid(mRecipient.getRecipient().getAddress())){
+				throw new AddressFormattingException("Badly formatted address: "+mRecipient.getRecipient().getAddress());
+			}
+			//check the message
+			if(!p.messageContentIsValid(message.getContent())){
+				throw new MessageFormattingException("Cannot send this message to " + p.getProtocolName() + " addresses.");
+			}
+			if(!canSendToProtocol(p.getClass())){
+				throw new Exception("There is not currently a gateway running" +
+						" that can send " + p.getProtocolName() + " messages.");
+			}
 			mRecipient.setMessageStatus(MessageStatus.OUTBOX);
 		}
 		Context.getService(MessageService.class).saveMessage(message);
 	}
 	
-	public void sendMessages(Set<Message> messages){
+	public void sendMessages(Set<Message> messages) throws Exception{
 		for(Message m: messages){
 			sendMessage(m);
 		}
@@ -102,7 +125,7 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		return null;
 	}
 	
-	public boolean canSendToProtocol(Protocol p){
+	public boolean canSendToProtocol(Class<? extends Protocol> p){
 		if(gatewayManager == null) return false;
 		return gatewayManager.getActiveSupportingGateways(p).size() > 0;
 	}

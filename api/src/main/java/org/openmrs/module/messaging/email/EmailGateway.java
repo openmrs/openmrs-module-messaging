@@ -74,7 +74,7 @@ public class EmailGateway extends MessagingGateway {
 		// set sender
 		if (message.getSender() != null) {
 			InternetAddress sender = new InternetAddress();
-			sender.setAddress(message.getOrigin());
+		//	sender.setAddress(message.getOrigin());
 			// TODO make the sender's name a global property / configurable
 			sender.setPersonal("OpenMRS");
 			mimeMessage.setSender(sender);
@@ -253,7 +253,7 @@ public class EmailGateway extends MessagingGateway {
 			}
 			
 			// post the message
-			org.openmrs.module.messaging.domain.Message m = new org.openmrs.module.messaging.domain.Message("", content);
+			org.openmrs.module.messaging.domain.Message m = new org.openmrs.module.messaging.domain.Message("", content,EmailProtocol.class);
 		//	m.setFrom(sender);
 		//	m.setMessageStatus(MessageStatus.RECEIVED);
 			m.setDate(message.getSentDate());
@@ -381,10 +381,10 @@ public class EmailGateway extends MessagingGateway {
 	 * validate support of a given protocol
 	 */
 	@Override
-	public boolean supportsProtocol(Protocol p) {
+	public boolean supportsProtocol(Class<? extends Protocol> p) {
 		if (p == null)
 			return false;
-		return p.getClass().equals(EmailProtocol.class);
+		return p.equals(EmailProtocol.class);
 	}
 	
 

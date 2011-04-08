@@ -1,9 +1,12 @@
 package org.openmrs.module.messaging.domain.gateway;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,10 +52,10 @@ public class GatewayManager {
 	 * Returns all gateways that are active and support sending
 	 * messages encoding in the supplied protocol
 	 */
-	public List<MessagingGateway> getActiveSupportingGateways(Protocol p){
+	public List<MessagingGateway> getActiveSupportingGateways(Class <? extends Protocol> protocolClass){
 		List<MessagingGateway> results = new ArrayList<MessagingGateway>();
 		for(MessagingGateway mg: gateways.values()){
-			if(mg.canSend() && mg.isActive() && mg.supportsProtocol(p)){
+			if(mg.canSend() && mg.isActive() && mg.supportsProtocol(protocolClass)){
 				results.add(mg);
 			}
 		}
@@ -63,10 +66,10 @@ public class GatewayManager {
 	 * Returns all gateways that support sending
 	 * messages encoding in the supplied protocol
 	 */
-	public List<MessagingGateway> getSupportingGateways(Protocol p){
+	public List<MessagingGateway> getSupportingGateways(Class <? extends Protocol> protocolClass){
 		List<MessagingGateway> results = new ArrayList<MessagingGateway>();
 		for(MessagingGateway mg: gateways.values()){
-			if(mg.supportsProtocol(p)){
+			if(mg.supportsProtocol(protocolClass)){
 				results.add(mg);
 			}
 		}
@@ -76,6 +79,20 @@ public class GatewayManager {
 	@SuppressWarnings("unchecked")
 	public <G extends MessagingGateway> G getGatewayByClass(Class<? extends G> gatewayClass){
 		return (G) gateways.get(gatewayClass);
+	}
+	
+	public Collection<MessagingGateway> getGateways(){
+		return gateways.values();
+	}
+	
+	public Set<MessagingGateway> getActiveGateways(){
+		Set<MessagingGateway> activeGateways = new HashSet<MessagingGateway>();
+		for(MessagingGateway mg: getGateways()){
+			if(mg.isActive()){
+				activeGateways.add(mg);
+			}
+		}
+		return activeGateways;
 	}
 	
 }

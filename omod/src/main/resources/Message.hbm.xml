@@ -12,7 +12,6 @@
         <property name="content" type="text"/>
         <property name="subject" type="java.lang.String"/>
         
-        <property name="origin" type="java.lang.String"/>
         <many-to-one name="sender" class="org.openmrs.Person" lazy="false" not-null="true"/>
         
 		<set name="to" inverse="true" table="messaging_message_recipients" cascade="all">
