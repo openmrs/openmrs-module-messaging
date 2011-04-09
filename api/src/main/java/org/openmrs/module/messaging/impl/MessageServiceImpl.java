@@ -104,4 +104,12 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 		if(to) return dao.findMessagesWithPeople(null, null, person, null,null);
 		else return dao.findMessagesWithPeople(null, person, null, null, null);
 	}
+	
+	public List<Message> searchMessages(int pageNumber, int pageSize, String searchString, Person p, boolean inbox, boolean outbox){
+		return dao.searchMessages(pageNumber, pageSize, searchString, p, inbox,outbox);
+	}
+
+	public Integer countSearch(Person p, String searchString, boolean inbox, boolean outbox) {
+		return dao.countSearch(p, searchString, inbox, outbox);
+	}
 }

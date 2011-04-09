@@ -15,7 +15,12 @@
 	</td>
 	<td id="inbox">
 		<div id="search-bar-container">
-			<input id="inbox-search" type="text"/>
+			<form method="post" action="<openmrs:contextPath/>/module/messaging/search.form">
+				<input id="inbox-search" name="searchString" type="text" style="display:inline;"/>
+				<input id="search-button" type="submit" value="Search"/>
+				<input type="hidden" name="searchingInbox" value="true"/>
+				<input type="hidden" name="searchingSent" value="false"/>
+			</form>
 		</div><br/>
 		<div id="message-table-container">
 			<div id="loading-container">

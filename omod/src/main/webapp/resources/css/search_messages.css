@@ -5,7 +5,7 @@
 }
 #link-cell{
 	vertical-align:top;
-	width:12%;
+	width:13%;
 }
 #link-panel{
 	text-align:right;
@@ -25,15 +25,8 @@
 	margin:1px 0px 1px 0px;
 	padding:1px 10px 1px 0px;
 }
-#inbox-link{
-	background:#dcdcdc;
-}
-#inbox-link:link, #inbox-link:visited, #inbox-link:active, #inbox-link:hover {
-	text-decoration:none;
-	color:black;
-}
 #inbox{
-	width:88%;
+	width:87%;
 }
 #message-table-container{
 
@@ -86,13 +79,16 @@
 	margin-left:2px;
 }
 #search-bar-container{
-	float:right;
 	margin-bottom:3px;
-	width:35%;
 	padding: 0px 7px 0px 0px;
 }
-#inbox-search{
-	width: 78%;
+#search-textbox{
+	width:50%;
+	display:inline;
+}
+#search-label{
+	display:inline;
+	margin-right:0.5em;
 }
 .highlight-row{
 	background:#E3E4FA;
@@ -108,13 +104,6 @@
 }
 #message-header-table td{
 	padding:0px 7px 0px 0px;
-}
-#reply-buttons{
-	position:absolute;
-	bottom:0;
-	right:0;
-	padding:0px 7px 7px 0px;
-	visibility:hidden;
 }
 #message-header-panel .header-label{
 	font-weight:bold;

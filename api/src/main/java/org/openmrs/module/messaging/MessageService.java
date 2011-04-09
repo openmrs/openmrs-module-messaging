@@ -182,5 +182,10 @@ public interface MessageService extends OpenmrsService {
 	 */
 	@Transactional(readOnly = true)
 	public Integer countMessagesForPerson(int personId, boolean to);
+	
+	@Transactional(readOnly=true)
+	public List<Message> searchMessages(int pageNumber, int pageSize, String searchString, Person p, boolean inbox, boolean outbox);
+
+	public Integer countSearch(Person person, String searchString,boolean inbox, boolean outbox);
 
 }

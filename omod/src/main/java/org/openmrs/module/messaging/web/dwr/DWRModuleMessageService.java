@@ -147,4 +147,21 @@ public class DWRModuleMessageService {
 		MessageBeanSet resultSet = new MessageBeanSet(beans,total,pageNumber);
 		return resultSet;
 	}
+	
+	public MessageBeanSet searchMessages(Integer pageNumber, Integer pageSize, Integer personId, String searchString, boolean inbox, boolean outbox){
+		List<MessageBean> beans = new ArrayList<MessageBean>();
+		Person p = Context.getPersonService().getPerson(personId);
+		List<Message> messages = messageService.searchMessages(pageNumber, pageSize, searchString, p, inbox,outbox);
+		for(Message m: messages){
+			beans.add(new MessageBean(m));
+		}
+		Integer total = messageService.countSearch(p, searchString,inbox,outbox);
+		MessageBeanSet resultSet = new MessageBeanSet(beans,total,pageNumber);
+		return resultSet;			
+	}
+	
+	public MessageBeanSet searchMessagesForAuthenticatedUser(Integer pageNumber, Integer pageSize, String searchString, boolean inbox, boolean outbox){
+		Integer personId = Context.getAuthenticatedUser().getPerson().getId();
+		return searchMessages(pageNumber, pageSize, personId, searchString, inbox,outbox);
+	}
 }

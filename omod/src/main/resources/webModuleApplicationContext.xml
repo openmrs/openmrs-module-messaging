@@ -24,11 +24,13 @@
 				<prop key="module/messaging/external_conversations.form">externalConversationsController</prop>
 				<prop key="module/messaging/settings.form">settingsController</prop>
 				<prop key="module/messaging/manage_gatways.form">manageGatewaysController</prop>
+				<prop key="module/messaging/search_messages.form">searchMessagesController</prop>
 			</props>
 		</property>
 	</bean>
 		
 	<bean id="inboxController" class="org.openmrs.module.messaging.web.controller.InboxController" />
+	<bean id="searchMessagesController" class="org.openmrs.module.messaging.web.controller.SearchMessagesController" />
 	<bean id="composeMessageController" class="org.openmrs.module.messaging.web.controller.ComposeMessageController" />
 	<bean id="sentMessagesController" class="org.openmrs.module.messaging.web.controller.SentMessagesController" />
 	<bean id="externalConversationsController" class="org.openmrs.module.messaging.web.controller.ExternalConversationsController" />

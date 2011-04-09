@@ -42,6 +42,8 @@
 				<include method="getMessagesForAuthenticatedUser"/>
 				<include method="getMessagesForAuthenticatedUserWithPageSize"/>
 				<include method="sendMessage"/>
+				<include method="searchMessages"/>
+				<include method="searchMessagesForAuthenticatedUser"/>
 			</create>
 			
 			<create creator="new" javascript="DWRGatewayStatusService">
