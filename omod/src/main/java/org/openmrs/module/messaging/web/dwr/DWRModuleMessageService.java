@@ -14,6 +14,7 @@ import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.omail.OMailProtocol;
@@ -170,5 +171,17 @@ public class DWRModuleMessageService {
 	public MessageBeanSet searchMessagesForAuthenticatedUser(Integer pageNumber, Integer pageSize, String searchString, boolean inbox, boolean outbox){
 		Integer personId = Context.getAuthenticatedUser().getPerson().getId();
 		return searchMessages(pageNumber, pageSize, personId, searchString, inbox,outbox);
+	}
+	
+	public void markMessageAsReadForAuthenticatedUser(int messageId){
+		Message m = Context.getService(MessageService.class).getMessage(messageId);
+		Person p = Context.getAuthenticatedUser().getPerson();
+		for(MessageRecipient mr: m.getTo()){
+			if(mr.getRecipient().getPerson().equals(p)){
+				mr.setRead(true);
+				break;
+			}
+		}
+		Context.getService(MessageService.class).saveMessage(m);
 	}
 }

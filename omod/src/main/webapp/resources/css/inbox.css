@@ -94,9 +94,6 @@
 #inbox-search{
 	width: 78%;
 }
-.highlight-row{
-	background:#E3E4FA;
-}
 #message-info-panel{
 	width:auto;
 	border-color:black;
@@ -124,9 +121,6 @@
 #header-subject{
 	font-weight:bold;
 }
-#subject-row{
-	font-weight:bold;
-}
 #message-text-panel{
 	border:1px solid black;
 	height:15em;
@@ -138,4 +132,24 @@ a.disabled:link, a.disabled:visited, a.disabled:active, a.disabled:hover{
 	text-decoration:none;
 	color:black;
 	cursor:default;
+}
+.unread-row{
+	background:white;
+}
+.read-row{
+	background:#EFEFEF;
+}
+.highlight-row{
+	background:#E3E4FA;
+}
+.unread-row .msg-msg{
+	color:#888;
+}
+.unread-row .msg-subj{
+}
+.read-row{
+	color:#666;
+}
+.read-row .msg-msg{
+	color:#A5A5A5;
 }

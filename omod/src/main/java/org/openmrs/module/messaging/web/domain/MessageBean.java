@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
@@ -33,6 +35,7 @@ public class MessageBean implements Serializable {
 	private String time;
 	private String protocolName;
 	private boolean read;
+	private String messageSnippet;
 
 	public MessageBean() {
 		id = -1;
@@ -75,6 +78,19 @@ public class MessageBean implements Serializable {
 			}
 		}
 		this.setProtocolName(protocols.toString());
+		String cleanMessage = message.getContent().replace("<br>", " ").
+												   replace("<br/>" , " ").
+												   replace("<p>"," ").
+												   replace("</p>", " ").
+												   replace("&nbsp;", " ").
+												   replace("<div>"," ").
+												   replace("</div>"," ");
+			
+		cleanMessage = Jsoup.clean(cleanMessage,Whitelist.none());
+		if(cleanMessage.length()>50){
+			cleanMessage = cleanMessage.substring(0, 50);
+		}
+		messageSnippet = cleanMessage;
 	}
 	
 	public String getSender() {
@@ -205,5 +221,19 @@ public class MessageBean implements Serializable {
 	 */
 	public boolean isRead() {
 		return read;
+	}
+
+	/**
+	 * @param messageSnippet the messageSnippet to set
+	 */
+	public void setMessageSnippet(String messageSnippet) {
+		this.messageSnippet = messageSnippet;
+	}
+
+	/**
+	 * @return the messageSnippet
+	 */
+	public String getMessageSnippet() {
+		return messageSnippet;
 	}
 }

@@ -40,7 +40,7 @@
 				<tbody id="messages-table-body">
 					<tr class="message-row" id="pattern" style="display:none;">
 						<td class="message-row-from" id="message-from"></td>
-						<td class="message-row-subject" id="message-subj"></td>
+						<td class="message-row-subject" id="msg-subj-con"><span class="msg-subj" id="message-subj"></span><span class="msg-msg" id="message-mesg"></span></td>
 						<td class="message-row-date" id="message-date"></td>
 					</tr>			
 				</tbody>
@@ -105,13 +105,19 @@
 	
 	function init() {
 		$("#inbox-search").watermark("search inbox");
-		$("#messages-table-body tr").live("click",rowClicked);
+		$("#messages-table-body *").live("click",rowClicked);
 		fillMessageTable();
 	}
 	
 	function rowClicked(event){
 		var id = event.srcElement.id.substring(12);
 		var message = messageCache[id];
+		if(!message.read){
+			DWRModuleMessageService.markMessageAsReadForAuthenticatedUser(message.id);
+			message.read=true;
+			$("#pattern"+id).removeClass("unread-row");	
+			$("#pattern"+id).addClass("read-row");	
+		}
 		document.getElementById("message-panel").style.display="";
 		document.getElementById("header-from").innerHTML = message.sender;
 		document.getElementById("header-subject").innerHTML = message.subject;
@@ -127,7 +133,6 @@
 	}
 	
 	function fillMessageTable(){
-		toggleMessageLoading();
 		DWRModuleMessageService.getMessagesForAuthenticatedUserWithPageSize(pageNum,pageSize,true,function(messageSet){
 			dwr.util.removeAllRows("messages-table-body", { filter:function(tr) {return (tr.id != "pattern");}});
 			var message, id;
@@ -139,15 +144,20 @@
 			    id = message.id;
 			    dwr.util.cloneNode("pattern", { idSuffix:id });
 			    dwr.util.setValue("message-from" + id, message.sender);
-			    dwr.util.setValue("message-subj" + id, message.subject);
+				$("#pattern"+id+" .msg-subj").html(message.subject);
+				$("#pattern"+id+" .msg-msg").html(" - "+ message.messageSnippet);
 			    dwr.util.setValue("message-date" + id, message.time+ " " + message.date);
 			    document.getElementById("pattern" + id).style.display = "table-row";
+				if(message.read){
+					$("#pattern" + id).addClass("read-row");
+				}else{
+					$("#pattern" + id).addClass("unread-row");
+				}
 			    messageCache[id] = message;
 			}
 			pageNum = messageSet.pageNumber;
 			pageSize = messageSet.pageSize;
 			setPagingControls(messageSet);
-			toggleMessageLoading();
 		});
 	}
 	
