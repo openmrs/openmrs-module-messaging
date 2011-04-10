@@ -96,7 +96,7 @@
 	var pageSize=10;
 	
 	function init() {
-		$("#inbox-search").watermark("search mail");
+		$("#inbox-search").watermark("search inbox");
 		$("#messages-table-body tr").live("click",rowClicked);
 		fillMessageTable();
 	}
