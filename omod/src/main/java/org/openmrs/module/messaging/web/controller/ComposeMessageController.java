@@ -55,7 +55,7 @@ public class ComposeMessageController {
 		String subject = "Re: "+ m.getSubject();
 		String message = "<div style=\"border-left:1px solid #104E8B; padding-left:5px;color:#104E8B\">" + m.getContent() + "</div><br>" ;
 		String messageHeader = "<br><br>On " + Context.getDateFormat().format(m.getDate())+
-								", at " + new SimpleDateFormat("h:mm a").format(m.getDate()) + ", " + 
+								" at " + new SimpleDateFormat("h:mm a").format(m.getDate()) + ", " + 
 								m.getSender().getPersonName().toString() + " wrote:<br>";
 		message = messageHeader + message;
 		session.setAttribute("toAddresses", addresses);

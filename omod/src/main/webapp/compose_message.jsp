@@ -12,7 +12,7 @@
 <script type="text/javascript" src="<openmrs:contextPath/>/moduleResources/messaging/yui-text-editor/editor-min.js"></script>
 <script type="text/javascript">	
 	var myEditor = new YAHOO.widget.SimpleEditor('writing-area', {
-	    height: '30em',
+	    height: '20em',
 		width: ''
 	});
 	myEditor.render();
@@ -50,6 +50,7 @@
 		<div id="buttons-container" class="boxHeader">
 			<input type="button" value="Send" id="send-button" onclick="sendMessage()"></input>
 			<input type="button" value="Discard" id="discard-button" onclick="clearFields()"></input>
+			<span id="sent-message-result" style="margin-left:10px;"></span>
 		</div>
 	</td>
 	</tr>
@@ -116,17 +117,28 @@ $(function() {
 });
 
 	function sendMessage(){
+		document.getElementById("send-button").disabled =true;
+		document.getElementById("discard-button").disabled =true;
+		document.getElementById("sent-message-result").innerHTML ="Sending...";
 		myEditor.saveHTML();
 	    //The var html will now have the contents of the textarea
 	    var html = myEditor.get('element').value, match;
 		match = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
 	    html = match ? match[1] : html;
 	    DWRModuleMessageService.sendMessage(html, document.getElementById('to-addresses').value,document.getElementById('subject').value,true,function(response){
-			alert("Message sent!");
+			document.getElementById("send-button").disabled =false;
+			document.getElementById("discard-button").disabled =false;
+			if(!response){
+				response = "Message Sent!";
+			}
+			document.getElementById("sent-message-result").innerHTML =response;
+			var t = setTimeout("clearMessage()",3000);
+			clearFields();
 	    });
-	    clearFields();
 	}
-
+	function clearMessage(){
+		document.getElementById("sent-message-result").innerHTML = "";
+	}
 	function clearFields(){
 		myEditor.clearEditorDoc();
 	    document.getElementById('to-addresses').value="";
