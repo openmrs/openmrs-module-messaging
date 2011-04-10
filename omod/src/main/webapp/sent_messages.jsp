@@ -109,7 +109,7 @@
 			var message, id;
 			var messages = messageSet.messages;
 			// iterate through the messages, cloning the pattern row
-			// and placing each message values into that row
+			// and placing each message value into that row
 			for (var i = 0; i < messages.length; i++) {
 				message = messages[i];
 			    id = message.id;

@@ -139,11 +139,18 @@ public class DWRModuleMessageService {
 	
 	public MessageBeanSet getMessagesForPerson(Integer pageNumber, Integer pageSize, Integer personId, boolean to){
 		List<MessageBean> beans = new ArrayList<MessageBean>();
-		List<Message> messages = messageService.getMessagesForPersonPaged(pageNumber, pageSize, personId, to,false,OMailProtocol.class);
+		List<Message> messages = new ArrayList<Message>();
+		Integer total=null;
+		if(to){
+			messages = messageService.getMessagesForPersonPaged(pageNumber, pageSize, personId, to,false,OMailProtocol.class);
+			total = messageService.countMessagesForPerson(personId, to,OMailProtocol.class);
+		}else{
+			messages = messageService.getMessagesForPersonPaged(pageNumber, pageSize, personId, to,false,null);
+			total = messageService.countMessagesForPerson(personId, to,null);
+		}
 		for(Message m: messages){
 			beans.add(new MessageBean(m));
 		}
-		Integer total = messageService.countMessagesForPerson(personId, to);
 		MessageBeanSet resultSet = new MessageBeanSet(beans,total,pageNumber);
 		return resultSet;
 	}
@@ -151,7 +158,7 @@ public class DWRModuleMessageService {
 	public MessageBeanSet searchMessages(Integer pageNumber, Integer pageSize, Integer personId, String searchString, boolean inbox, boolean outbox){
 		List<MessageBean> beans = new ArrayList<MessageBean>();
 		Person p = Context.getPersonService().getPerson(personId);
-		List<Message> messages = messageService.searchMessages(pageNumber, pageSize, searchString, p, inbox,outbox);
+		List<Message> messages = messageService.searchMessages(pageNumber, pageSize, searchString, p, inbox,outbox,false);
 		for(Message m: messages){
 			beans.add(new MessageBean(m));
 		}

@@ -91,8 +91,8 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 		return dao.findMessagesWithPeople(protocol, null, null, null, status);
 	}
 	
-	public Integer countMessagesForPerson(int personId, boolean to){
-		return dao.countMessagesForPerson(personId, to);
+	public Integer countMessagesForPerson(int personId, boolean to, Class<? extends Protocol> protocolClass){
+		return dao.countMessagesForPerson(personId, to,protocolClass);
 	}
 
 	public List<Message> getMessagesForAddress(String address, boolean to) {
@@ -105,8 +105,8 @@ public class MessageServiceImpl extends BaseOpenmrsService implements MessageSer
 		else return dao.findMessagesWithPeople(null, person, null, null, null);
 	}
 	
-	public List<Message> searchMessages(int pageNumber, int pageSize, String searchString, Person p, boolean inbox, boolean outbox){
-		return dao.searchMessages(pageNumber, pageSize, searchString, p, inbox,outbox);
+	public List<Message> searchMessages(int pageNumber, int pageSize, String searchString, Person p, boolean inbox, boolean outbox, boolean orderDateAscending){
+		return dao.searchMessages(pageNumber, pageSize, searchString, p, inbox,outbox, orderDateAscending);
 	}
 
 	public Integer countSearch(Person p, String searchString, boolean inbox, boolean outbox) {

@@ -18,18 +18,18 @@
 			<h3 id="search-label">Search</h3>
 						<input id="search-textbox" type="text" value="${searchString}"></input>
 			<c:if test="${searchingInbox == 'true'}">
-				<input type="checkbox" name="search-inbox" id="search-inbox-check" checked/>Inbox</input>
+				<input type="radio" name="inbox-group" id="search-inbox-check" value="inbox" checked/>Inbox</input>
 			</c:if>
 			<c:if test="${searchingInbox != 'true'}">
-				<input type="checkbox" name="search-inbox" id="search-inbox-check"/>Inbox</input>
+				<input type="radio" name="inbox-group" id="search-inbox-check" value="inbox"/>Inbox</input>
 			</c:if>
 			<c:if test="${searchingSent == 'true'}">
-				<input type="checkbox" name="search-sent" id="search-sent-check" checked/>Sent Messages</input>
+				<input type="radio" name="inbox-group" id="search-sent-check" value="sent" checked/>Sent Messages</input>
 			</c:if>
 			<c:if test="${searchingSent != 'true'}">
-				<input type="checkbox" name="search-sent" id="search-sent-check"/>Sent Messages</input>
+				<input type="radio" name="inbox-group" id="search-sent-check" value="sent"/>Sent Messages</input>
 			</c:if>
-			<button onclick="search()">Search</button>
+			<button onclick="search(true)">Search</button>
 		</div><br/>
 		<div id="message-table-container">
 			<div id="loading-container">
@@ -121,7 +121,10 @@
 		$(".header-label").css("visibility","visible");
 	}
 	
-	function search(){
+	function search(resetPaging){
+		if(resetPaging){
+			pageNum = 0;
+		}
 		toggleMessageLoading();
 		var searchString = document.getElementById("search-textbox").value;
 		var searchInbox = document.getElementById("search-inbox-check").checked == 1;
@@ -179,7 +182,7 @@
 			return false;
 		}else{
 			pageNum--;
-			fillMessageTable();
+			search(false);
 		}
 	}
 
@@ -188,9 +191,7 @@
 			return false;
 		}else{
 			pageNum++;
-			console.log("PageNum: "+pageNum);
-			fillMessageTable();
-			console.log("Message table loading done");
+			search(false);
 		}
 	}
 

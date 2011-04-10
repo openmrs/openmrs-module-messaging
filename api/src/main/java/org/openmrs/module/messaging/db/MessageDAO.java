@@ -52,9 +52,9 @@ public interface MessageDAO {
 	
 	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to, boolean dateOrderAscending, Class<? extends Protocol> protocolClass);
 	
-	public Integer countMessagesForPerson(int personId, boolean to);
+	public Integer countMessagesForPerson(int personId, boolean to, Class<? extends Protocol> protocolClass);
 	
-	public List<Message> searchMessages(int pageNumber, int pageSize, String searchString, Person p, boolean inbox, boolean outbox);
+	public List<Message> searchMessages(int pageNumber, int pageSize, String searchString, Person p, boolean inbox, boolean outbox, boolean orderDateAscending);
 
 	public Integer countSearch(Person p, String searchString, boolean inbox, boolean outbox);
 	

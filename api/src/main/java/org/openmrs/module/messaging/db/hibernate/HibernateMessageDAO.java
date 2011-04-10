@@ -7,7 +7,6 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -22,6 +21,7 @@ import org.openmrs.module.messaging.domain.Message.MessageFields;
 import org.openmrs.module.messaging.domain.MessageRecipient.MessageRecipientFields;
 import org.openmrs.module.messaging.domain.MessagingAddress.MessagingAddressFields;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.omail.OMailProtocol;
 
 public class HibernateMessageDAO implements MessageDAO {
 
@@ -144,15 +144,29 @@ public class HibernateMessageDAO implements MessageDAO {
 	 * @return
 	 */
 	public List<Message> getMessagesForPersonPaged(int pageNumber, int pageSize, int personId, boolean to, boolean orderDateAscending, Class<? extends Protocol> protocolClass){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		Criteria recipientCrit = c.createCriteria(MessageFields.TO.name).createCriteria(MessageRecipientFields.RECIPIENT.name);
+		Criteria c = getMessagesForPersonCriteria(personId, to, protocolClass);
 		if(pageNumber >-1){
 			c.setFirstResult(pageNumber * pageSize);
 			c.setMaxResults(pageSize);
 		}
+		if(!orderDateAscending) c.addOrder(Order.desc(MessageFields.DATE.name));
+		else c.addOrder(Order.asc(MessageFields.DATE.name));
+		c.setResultTransformer(new DistinctRootEntityResultTransformer());
+		return c.list();
+	}
+	
+	public Integer countMessagesForPerson(int personId, boolean to, Class<? extends Protocol> protocolClass){
+		Criteria c = getMessagesForPersonCriteria(personId, to, protocolClass);
+		c.setProjection(Projections.countDistinct(MessageFields.MESSAGE_ID.name));
+		return ((Integer) c.uniqueResult());
+	}
+	
+	private Criteria getMessagesForPersonCriteria(int personId, boolean to, Class<? extends Protocol> protocolClass){
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
 		Person p = Context.getPersonService().getPerson(personId);
 		if(p != null){
 			if(to){
+				Criteria recipientCrit = c.createCriteria(MessageFields.TO.name).createCriteria(MessageRecipientFields.RECIPIENT.name);
 				if(protocolClass != null){
 					recipientCrit.add(Restrictions.and(
 							Restrictions.eq(MessagingAddressFields.PERSON.name, p),
@@ -165,90 +179,50 @@ public class HibernateMessageDAO implements MessageDAO {
 				c.add(Restrictions.eq(MessageFields.SENDER.name, p));
 			}
 		}
-		if(!orderDateAscending) c.addOrder(Order.desc(MessageFields.DATE.name));
-		else c.addOrder(Order.asc(MessageFields.DATE.name));
-		
-		return c.list();
+		return c;
 	}
 	
-	public Integer countMessagesForPerson(int personId, boolean to){
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		Person p = Context.getPersonService().getPerson(personId);
-		if(p != null){
-			if(to == true){
-				c.createCriteria(MessageFields.TO.name).
-				createCriteria(MessageRecipientFields.RECIPIENT.name).
-				add(Restrictions.eq(MessagingAddressFields.PERSON.name, p));
-			}else{
-				c.add(Restrictions.eq(MessageFields.SENDER.name, p));
-			}
-		}
-		c.setProjection(Projections.rowCount());
-		return (Integer) c.uniqueResult();
-	}
-	
-	public List<Message> searchMessages(int pageNumber, int pageSize, String searchString, Person p, boolean inbox, boolean outbox){
-		//create the criteria and some aliases
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		Criteria toCrit = c.createCriteria(MessageFields.TO.name);
-		toCrit.createAlias(MessageRecipientFields.RECIPIENT.name, "recipientAddress");
-		//set up the paging
+	public List<Message> searchMessages(int pageNumber, int pageSize, String searchString, Person p, boolean inbox, boolean outbox, boolean orderDateAscending){
+		Criteria c = getSearchCriteria(p, searchString, inbox, outbox);
 		if(pageNumber >-1){
 			c.setFirstResult(pageNumber * pageSize);
 			c.setMaxResults(pageSize);
 		}
-		//create the search criteria
-		Criterion content = Restrictions.like(MessageFields.CONTENT.name,searchString,MatchMode.ANYWHERE);
-		Criterion subject = Restrictions.like(MessageFields.SUBJECT.name, searchString,MatchMode.ANYWHERE);
-		
-		//if we're searching the messages from the person, then we should search the recipients of those
-		// messages. If we're searching messages to the person , we should search the sender of the messages
-	//	List<Person> people = Context.getPersonService().getPeople(searchString, null);
-//		if(!to){
-//			Criterion recipient = Restrictions.in("recipientAddress.person", people);
-//			c.add(Restrictions.disjunction().add(content).add(subject).add(recipient));
-//		}else{
-//			Criterion sender = Restrictions.in(MessageFields.SENDER.name, people);
-//			c.add(Restrictions.disjunction().add(content).add(subject).add(sender));
-//		}
-		c.add(Restrictions.disjunction().add(content).add(subject));
-		//add the to/from criteria
-		if(inbox && outbox){
-			c.add(Restrictions.or(
-					Restrictions.eq("recipientAddress.person",p),
-					Restrictions.eq(MessageFields.SENDER.name,p)
-			));
-		}else if(inbox){
-			c.add(Restrictions.eq("recipientAddress.person",p));
-		}else if(outbox){
-			c.add(Restrictions.eq(MessageFields.SENDER.name,p));
-		}
-		
+		if(!orderDateAscending) c.addOrder(Order.desc(MessageFields.DATE.name));
+		else c.addOrder(Order.asc(MessageFields.DATE.name));
 		c.setResultTransformer(new DistinctRootEntityResultTransformer());
 		return c.list();
 	}
 
 	public Integer countSearch(Person p, String searchString, boolean inbox, boolean outbox) {
+		Criteria c = getSearchCriteria(p, searchString, inbox, outbox);
+		c.setProjection(Projections.countDistinct(MessageFields.MESSAGE_ID.name));
+		return (Integer) c.uniqueResult();
+	}
+	
+	private Criteria getSearchCriteria(Person p, String searchString, boolean inbox, boolean outbox){
+		//create criteria and an alias
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(Message.class);
-		Criteria toCrit = c.createCriteria(MessageFields.TO.name);
-		toCrit.createAlias(MessageRecipientFields.RECIPIENT.name, "recipientAddress");
-		
+		//add the content and subject restrictions
 		Criterion content = Restrictions.like(MessageFields.CONTENT.name,searchString,MatchMode.ANYWHERE);
 		Criterion subject = Restrictions.like(MessageFields.SUBJECT.name, searchString,MatchMode.ANYWHERE);
 		c.add(Restrictions.disjunction().add(content).add(subject));
-
+		//TODO add person name searching
+		//if we're searching the inbox and outbox, add an OR query
 		if(inbox && outbox){
+			c.createAlias("to.recipient", "recp");
 			c.add(Restrictions.or(
-					Restrictions.eq("recipientAddress.person",p),
+					Restrictions.eq("recp.person",p),
 					Restrictions.eq(MessageFields.SENDER.name,p)
 			));
 		}else if(inbox){
-			c.add(Restrictions.eq("recipientAddress.person",p));
+			Criteria recipientCrit = c.createCriteria(MessageFields.TO.name).createCriteria(MessageRecipientFields.RECIPIENT.name);
+			recipientCrit.add(Restrictions.and(
+					Restrictions.eq(MessagingAddressFields.PERSON.name, p),
+					Restrictions.eq(MessagingAddressFields.PROTOCOL.name, OMailProtocol.class.getName())));
 		}else if(outbox){
 			c.add(Restrictions.eq(MessageFields.SENDER.name,p));
 		}
-		c.setResultTransformer(new DistinctRootEntityResultTransformer());
-		c.setProjection(Projections.rowCount());
-		return (Integer) c.uniqueResult();
+		return c;
 	}
 }
