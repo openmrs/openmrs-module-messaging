@@ -67,8 +67,16 @@
 				<tr><td class="header-label">To: </td><td class="header-info" id="header-to"></td></tr>
 			</table>
 			<div id="reply-buttons">
-				<button id="reply-button" type="button">Reply</button>
-				<button id="reply-all-button" type="button">Reply All</button>
+				<form method="post" action="<openmrs:contextPath/>/module/messaging/reply_to_message.form" style="display:inline;">
+					<input type="hidden" name="replyToMessageId" value="" id="replyMessageId" style="display:inline;"/>
+					<input type="hidden" name="replyAll" value="false" style="display:inline;"/>
+					<input id="reply-button" type="submit" value="Reply" style="display:inline;"></input>
+				</form>
+				<form method="post" action="<openmrs:contextPath/>/module/messaging/reply_to_message.form" style="display:inline;">
+					<input type="hidden" name="replyToMessageId" value="" id="replyAllMessageId" style="display:inline;"/>
+					<input type="hidden" name="replyAll" value="true" style="display:inline;"/>
+					<input id="reply-all-button" type="submit" value="Reply All" style="display:inline;"></input>
+				</form>
 			</div>
 			<div style="clear:both;"></div>
 		</div>
@@ -114,6 +122,8 @@
 		$("#pattern"+id).addClass("highlight-row");	
 		$("#reply-buttons").css("visibility","visible");
 		$(".header-label").css("visibility","visible");
+		document.getElementById("replyAllMessageId").value=id;
+		document.getElementById("replyMessageId").value=id;
 	}
 	
 	function fillMessageTable(){

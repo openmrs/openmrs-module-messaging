@@ -36,16 +36,16 @@
 			<table id="header-table">
 				<tr>
 					<td><span id="to-label">To:</span></td>
-					<td class="header-left-column"><textarea id="to-addresses" rows="2"> </textarea></td>
+					<td class="header-left-column"><textarea id="to-addresses" rows="2">${toAddresses}</textarea></td>
 				</tr>
 				<tr>
 					<td><span id="subject-label">Subject:</span></td>
-					<td class="header-left-column"><input id="subject" type="text"/></td>
+					<td class="header-left-column"><input id="subject" type="text" value="${subject}"/></td>
 				</tr>
 			</table>
 		</div>
 		<div id="writing-area-container" class="yui-skin-sam">
-			<textarea id="writing-area" name="writing-area"/></textarea>
+			<textarea id="writing-area" name="writing-area"/>${messageText}</textarea>
 		</div>
 		<div id="buttons-container" class="boxHeader">
 			<input type="button" value="Send" id="send-button" onclick="sendMessage()"></input>
