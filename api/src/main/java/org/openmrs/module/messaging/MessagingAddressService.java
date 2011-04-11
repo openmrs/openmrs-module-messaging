@@ -32,13 +32,16 @@ public interface MessagingAddressService extends OpenmrsService{
 	@Transactional(readOnly=true)
 	public MessagingAddress getMessagingAddress(String address);
 
+	@Transactional(readOnly=true)
+	public List<MessagingAddress> getMessagingAddressesForPerson(Person person);
+	
 	/**
 	 * @param person
 	 *            The person
 	 * @return all messaging addresses for that person
 	 */
 	@Transactional(readOnly=true)
-	public List<MessagingAddress> getMessagingAddressesForPerson(Person person);
+	public List<MessagingAddress> getMessagingAddressesForPerson(Person person, boolean includeVoided);
 
 	/**
 	 * This method performs a like query on MessagingAddress.address with
@@ -48,7 +51,7 @@ public interface MessagingAddressService extends OpenmrsService{
 	 * @return
 	 */
 	@Transactional(readOnly=true)
-	public List<MessagingAddress> findMessagingAddresses(String search);
+	public List<MessagingAddress> findMessagingAddresses(String search, boolean includeVoided);
 
 	/**
 	 * Gets the preferred messaging address of the person
@@ -74,14 +77,14 @@ public interface MessagingAddressService extends OpenmrsService{
 	 */
 	@Transactional
 	public void deleteMessagingAddress(MessagingAddress address);
-
+	
 	/**
 	 * Retires a Messaging address with the supplied reason
 	 * @param address
 	 * @param reason
 	 */
 	@Transactional
-	public void retireMessagingAddress(MessagingAddress address, String reason);
+	public void voidMessagingAddress(MessagingAddress address, String reason);
 
 	/**
 	 * Unretires a MessagingAddress, leaving retiredBy, dateRetired, and retireReason set
@@ -89,12 +92,12 @@ public interface MessagingAddressService extends OpenmrsService{
 	 * @param address
 	 */
 	@Transactional
-	public void unretireMessagingAddress(MessagingAddress address);
+	public void unvoidMessagingAddress(MessagingAddress address);
 	
 	@Transactional(readOnly=true)
 	public List<MessagingAddress> getPublicAddressesForPerson(Person p);
 	
 	@Transactional(readOnly=true)
-	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocol, Person person);
+	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocol, Person person, boolean includeVoided);
 	
 }

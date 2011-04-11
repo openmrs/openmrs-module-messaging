@@ -102,7 +102,7 @@ public class DWRModuleMessageService {
 			}
 			//now we check to make sure that we're sending to valid, pre-existing addresses
 			Class<? extends Protocol> protocolClass = messagingService.getProtocolByAbbreviation(adrString.split(":")[0]).getClass();
-			List<MessagingAddress> existingAddresses = addressService.findMessagingAddresses(adrString.split(":")[1], protocolClass, null);
+			List<MessagingAddress> existingAddresses = addressService.findMessagingAddresses(adrString.split(":")[1], protocolClass, null,false);
 			if(existingAddresses.size() != 1){
 				return "Could not find address: "+ s;
 			}else{

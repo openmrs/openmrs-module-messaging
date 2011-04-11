@@ -26,20 +26,23 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 		return dao.getMessagingAddress(addressId);
 	}
 	
-	public List<MessagingAddress> getMessagingAddressesForPerson(Person person) {
-		return dao.findMessagingAddresses(null,null,person);
+	public List<MessagingAddress> getMessagingAddressesForPerson(Person person){
+		return dao.findMessagingAddresses(null, null, person, false);
+	}
+	public List<MessagingAddress> getMessagingAddressesForPerson(Person person, boolean includeVoided) {
+		return dao.findMessagingAddresses(null,null,person, includeVoided);
 	}
 
-	public List<MessagingAddress> findMessagingAddresses(String search) {
-		return dao.findMessagingAddresses(search,null,null);
+	public List<MessagingAddress> findMessagingAddresses(String search, boolean includeVoided) {
+		return dao.findMessagingAddresses(search,null,null, includeVoided);
 	}
 	
 	public MessagingAddress getPreferredMessagingAddressForPerson(Person person) {
 		return dao.getPreferredMessagingAddressForPerson(person);
 	}
 	
-	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocol, Person person){
-		return dao.findMessagingAddresses(address,protocol,person);
+	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocol, Person person, boolean includeVoided){
+		return dao.findMessagingAddresses(address,protocol,person, includeVoided);
 	}
 	
 	public void saveMessagingAddress(MessagingAddress address) throws APIException {
@@ -50,11 +53,11 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 		dao.deleteMessagingAddress(address);
 	}
 	
-	public void retireMessagingAddress(MessagingAddress address, String reason) throws APIException {
+	public void voidMessagingAddress(MessagingAddress address, String reason) throws APIException {
 		dao.voidMessagingAddress(address,reason);
 	}
 
-	public void unretireMessagingAddress(MessagingAddress address) throws APIException {
+	public void unvoidMessagingAddress(MessagingAddress address) throws APIException {
 		dao.unvoidMessagingAddress(address);
 	}
 

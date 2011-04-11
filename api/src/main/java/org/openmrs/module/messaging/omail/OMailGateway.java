@@ -22,7 +22,7 @@ public class OMailGateway extends MessagingGateway {
 	private void initialize(){
 		List<Person> people = Context.getPersonService().getPeople("", false);
 		for(Person p: people){
-			List<MessagingAddress> addresses = getAddressService().getMessagingAddressesForPerson(p);
+			List<MessagingAddress> addresses = getAddressService().getMessagingAddressesForPerson(p,false);
 			boolean hasOMailAddress=false;
 			for(MessagingAddress add:addresses){
 				if(add.getProtocol() == OMailProtocol.class) hasOMailAddress=true;

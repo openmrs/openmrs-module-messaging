@@ -48,7 +48,7 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	}
 	
 
-	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocolClass, Person person) {
+	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocolClass, Person person, boolean includeVoided) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
 		if(address != null && !address.equals("")){
 			c.add(Restrictions.like("address", address,MatchMode.ANYWHERE));
@@ -59,6 +59,9 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		if(person != null){
 			c.add(Restrictions.eq("person", person));
 		}
+		if(!includeVoided){
+			c.add(Restrictions.eq("voided",false));
+		}
 		return c.list();
 	}
 
@@ -68,16 +71,18 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		sessionFactory.getCurrentSession().delete(address);
 	}
 
-	public void voidMessagingAddress(MessagingAddress address, String reason) throws APIException {
+	public void voidMessagingAddress(MessagingAddress address, String reason) {
 		address.setVoided(true);
-		address.setVoidedBy(Context.getAuthenticatedUser());
+		try{
+			address.setVoidedBy(Context.getAuthenticatedUser());
+		}catch(Exception e){}
 		address.setVoidReason(reason);
 		sessionFactory.getCurrentSession().saveOrUpdate(address);
 	}
 
 	public void saveMessagingAddress(MessagingAddress address) throws DAOException{
 		if(address.getPreferred()){
-			List<MessagingAddress> addresses = findMessagingAddresses(null,null,address.getPerson());
+			List<MessagingAddress> addresses = findMessagingAddresses(null,null,address.getPerson(),true);
 			for(MessagingAddress ad:addresses){
 				if(ad.getId() != address.getId()){
 					ad.setPreferred(false);

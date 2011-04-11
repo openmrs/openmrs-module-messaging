@@ -89,3 +89,6 @@
 	margin-bottom:10px;
 	margin-top:10px;
 }
+.address-action-buttons a:link, .address-action-buttons a:visited, .address-action-buttons a:active, .address-action-buttons a:hover{
+	text-decoration:none;
+}

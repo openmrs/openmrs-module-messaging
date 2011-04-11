@@ -33,8 +33,12 @@
 								<td id="address-row-preferred"></td>
 								<td class="address-row-actions">
 									<div class="address-action-buttons">
-										<img src="<openmrs:contextPath/>/moduleResources/messaging/images/pencil.png" alt="Edit"/>
-										<img src="<openmrs:contextPath/>/moduleResources/messaging/images/delete.png" alt="Delete"/>
+										<a href="#" onclick="editClicked(this.id)" id="edit-link">
+											<img src="<openmrs:contextPath/>/moduleResources/messaging/images/pencil.png" alt="Edit"/>
+										</a>
+										<a href="#" onclick="deleteClicked(this.id)" id="delete-link">
+											<img src="<openmrs:contextPath/>/moduleResources/messaging/images/delete.png" alt="Delete"/>
+										</a>
 									</div>
 								</td>
 							</tr>
@@ -78,7 +82,7 @@
 <script type="text/javascript">
 	window.onload = init;
 	var viewed = -1;
-
+	var addressCache = { };
 	var protocolNames= {"org.openmrs.module.messaging.sms.SmsProtocol":"SMS","org.openmrs.module.messaging.omail.OMailProtocol":"OMail"};
 	
 	function init(){
@@ -107,6 +111,7 @@
 			    dwr.util.setValue("address-row-type" + id, protocolNames[address.protocolClass]);
 			    dwr.util.setValue("address-row-preferred" + id, address.preferred?"*":"");
 				document.getElementById("addressRow" + id).style.display = "table-row";
+				addressCache[id] = address;
 			}
 		});
 	}
@@ -129,6 +134,33 @@
 	
 	function saveAddressClick(event){
 		writeAddress();
+	}
+	
+	function editClicked(eleid) {
+		// we were an id of the form "edit{id}", eg "edit42". We lookup the "42"
+		var address = addressCache[eleid.substring(9)];
+		// put the address's values into the editing area
+		dwr.util.setValues(address);
+		if ($("#edit-address-panel").is(":hidden")){
+			toggleEditingAddress();
+		}
+	}
+	
+	function deleteClicked(eleid) {
+		// we were an id of the form "delete{id}", eg "delete42". We lookup the "42"
+		var address = addressCache[eleid.substring(11)];
+		//confirm the delete
+		if (confirm("Are you sure you want to delete address " + address.address + "?")) {
+	    	dwr.engine.beginBatch();
+	    	DWRMessagingAddressService.deleteAddress(address.messagingAddressId);
+	    	fillAddressTable();
+	    	fillAlertAddressSelect();
+	    	dwr.engine.endBatch();
+	    	clearAddress();
+			if ($("#edit-address-panel").is(":hidden")==false){
+				toggleEditingAddress();
+			}
+	  	}
 	}
 
 	function clearEditingArea() {

@@ -31,7 +31,7 @@ public class DWRMessagingAddressService {
 	 * @return
 	 */
 	public List<MessagingAddress> getAllAddressesForPersonId(Integer personId){
-		return addressService.getMessagingAddressesForPerson(Context.getPersonService().getPerson(personId));
+		return addressService.getMessagingAddressesForPerson(Context.getPersonService().getPerson(personId),false);
 	}
 	
 	/**
@@ -47,7 +47,7 @@ public class DWRMessagingAddressService {
 	 * Returns all messaging addresses for the currently authenticated user.
 	 */
 	public List<MessagingAddress> getAllAddressesForCurrentUser(){
-		return addressService.getMessagingAddressesForPerson(Context.getAuthenticatedUser().getPerson());
+		return addressService.getMessagingAddressesForPerson(Context.getAuthenticatedUser().getPerson(),false);
 	}
 	
 	/**
@@ -63,7 +63,7 @@ public class DWRMessagingAddressService {
 	 */
 	public void deleteAddress(Integer id){
 		MessagingAddress ma = Context.getService(MessagingAddressService.class).getMessagingAddress(id);
-		Context.getService(MessagingAddressService.class).deleteMessagingAddress(ma);
+		Context.getService(MessagingAddressService.class).voidMessagingAddress(ma, "None");
 	}
 	
 	/**
@@ -102,7 +102,7 @@ public class DWRMessagingAddressService {
 		List<Person> people = Context.getPersonService().getPeople(query, false);
 		MessagingAddressService addressService = Context.getService(MessagingAddressService.class);
 		for(Person p: people){
-			List<MessagingAddress> mAddresses = addressService.getMessagingAddressesForPerson(p);
+			List<MessagingAddress> mAddresses = addressService.getMessagingAddressesForPerson(p,false);
 			for(MessagingAddress ma: mAddresses){
 				AddressAutocompleteBean addressBean = new AddressAutocompleteBean(ma);
 				if(!addressBeans.contains(addressBean)){
@@ -110,7 +110,7 @@ public class DWRMessagingAddressService {
 				}
 			}
 		}
-		List<MessagingAddress> mAddresses2 = addressService.findMessagingAddresses(query);
+		List<MessagingAddress> mAddresses2 = addressService.findMessagingAddresses(query,false);
 		for(MessagingAddress ma2: mAddresses2){
 			AddressAutocompleteBean addressBean2 = new AddressAutocompleteBean(ma2);
 			if(!addressBeans.contains(addressBean2)){

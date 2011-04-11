@@ -2,14 +2,10 @@ package org.openmrs.module.messaging.db;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.domain.MessagingAddress;
-import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
-import org.openmrs.module.messaging.impl.MessagingServiceImpl;
 
 public interface MessagingAddressDAO {
 	
@@ -39,12 +35,12 @@ public interface MessagingAddressDAO {
 	public void deleteMessagingAddress(MessagingAddress address);
 
 	/**
-	 * @see MessagingAddressService#retireMessagingAddress(MessagingAddress, String)
+	 * @see MessagingAddressService#voidMessagingAddress(MessagingAddress, String)
 	 */
 	public void voidMessagingAddress(MessagingAddress address, String reason);
 
 	/**
-	 * @see MessagingAddressService#unretireMessagingAddress(MessagingAddress)
+	 * @see MessagingAddressService#unvoidMessagingAddress(MessagingAddress)
 	 */
 	public void unvoidMessagingAddress(MessagingAddress address);
 
@@ -52,7 +48,7 @@ public interface MessagingAddressDAO {
 
 	public MessagingAddress getMessagingAddress(String address);
 
-	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocolClass, Person person);
+	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocolClass, Person person, boolean includeVoided);
 
 	public List<MessagingAddress> getPublicAddressesForPerson(Person p);
 }
