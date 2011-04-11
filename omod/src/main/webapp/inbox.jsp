@@ -109,8 +109,9 @@
 		fillMessageTable();
 	}
 	
-	function rowClicked(event){
-		var id = event.srcElement.id.substring(12);
+	function rowClicked(e){
+		var who = e.target || e.srcElement;
+		var id = who.id.substring(12);
 		var message = messageCache[id];
 		if(!message.read){
 			DWRModuleMessageService.markMessageAsReadForAuthenticatedUser(message.id);

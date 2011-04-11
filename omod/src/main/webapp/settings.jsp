@@ -156,7 +156,7 @@
 	    	fillAddressTable();
 	    	fillAlertAddressSelect();
 	    	dwr.engine.endBatch();
-	    	clearAddress();
+	    	clearEditingArea();
 			if ($("#edit-address-panel").is(":hidden")==false){
 				toggleEditingAddress();
 			}

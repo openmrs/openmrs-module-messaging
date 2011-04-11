@@ -30,7 +30,7 @@
 				<input type="radio" name="inbox-group" id="search-sent-check" value="sent"/>Sent Messages</input>
 			</c:if>
 			<button onclick="search(true)">Search</button>
-		</div><br/>
+		</div>
 		<div id="message-table-container">
 			<div id="loading-container">
 				<div id="inner-loading-container">
@@ -106,8 +106,9 @@
 		}
 	}
 	
-	function rowClicked(event){
-		var id = event.srcElement.id.substring(12);
+	function rowClicked(e){
+		var who = e.target || e.srcElement;
+		var id = who.id.substring(12);
 		var message = messageCache[id];
 		document.getElementById("message-panel").style.display="";
 		document.getElementById("header-from").innerHTML = message.sender;
