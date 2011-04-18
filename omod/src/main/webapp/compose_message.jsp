@@ -19,7 +19,6 @@
 </script>
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
-
 <div id="index" class="home">
 	<table id="compose-message-table">
 	<tr>
@@ -57,21 +56,16 @@
 	</table>
 </div>
 <%@ include file="/WEB-INF/template/footer.jsp" %>
+
 <!--  jQuery includes -->
-<link rel="stylesheet" type="text/css" href="<openmrs:contextPath/>/moduleResources/messaging/jquery/jquery-ui-1.8.10.custom.css"/>
-<script type="text/javascript" src="<openmrs:contextPath/>/moduleResources/messaging/jquery/jquery-1.4.4.min.js"></script>
-<script type="text/javascript" src="<openmrs:contextPath/>/moduleResources/messaging/jquery/jquery-ui-1.8.10.custom.min.js"></script>
 <style>
 	.ui-autocomplete-loading { background: white url('<openmrs:contextPath/>/moduleResources/messaging/images/ajax-loader-circle.gif') right center no-repeat; }
 </style>
 
-<!--  DWR includes -->
-<openmrs:htmlInclude file="/dwr/engine.js"/>
-<openmrs:htmlInclude file="/dwr/util.js"/>
 <script src="<openmrs:contextPath/>/dwr/interface/DWRMessagingAddressService.js"></script>
 <script src="<openmrs:contextPath/>/dwr/interface/DWRModuleMessageService.js"></script>
 <script type="text/javascript">
-$(function() {
+$j(function() {
 	function split( val ) {
 		return val.split( /,\s*/ );
 	}
@@ -79,11 +73,11 @@ $(function() {
 		return split( term ).pop();
 	}
 
-	$( "#to-addresses" )
+	$j( "#to-addresses" )
 		// don't navigate away from the field on tab when selecting an item
 		.bind( "keydown", function( event ) {
-			if ( event.keyCode === $.ui.keyCode.TAB &&
-					$( this ).data( "autocomplete" ).menu.active ) {
+			if ( event.keyCode === $j.ui.keyCode.TAB &&
+					$j( this ).data( "autocomplete" ).menu.active ) {
 				event.preventDefault();
 			}
 		})
@@ -117,31 +111,31 @@ $(function() {
 });
 
 	function sendMessage(){
-		document.getElementById("send-button").disabled =true;
-		document.getElementById("discard-button").disabled =true;
-		document.getElementById("sent-message-result").innerHTML ="Sending...";
+		$j("#send-button").attr("disabled","disabled");
+		$j("#discard-button").attr("disabled","disabled");
+		$j("#sent-message-result").html("Sending...");
 		myEditor.saveHTML();
 	    //The var html will now have the contents of the textarea
 	    var html = myEditor.get('element').value, match;
 		match = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
 	    html = match ? match[1] : html;
 	    DWRModuleMessageService.sendMessage(html, document.getElementById('to-addresses').value,document.getElementById('subject').value,true,function(response){
-			document.getElementById("send-button").disabled =false;
-			document.getElementById("discard-button").disabled =false;
+			$j("#send-button").attr("disabled","");
+			$j("#discard-button").attr("disabled","");
 			if(!response){
 				response = "Message Sent!";
 			}
-			document.getElementById("sent-message-result").innerHTML =response;
+			$j("#sent-message-result").html(response);
 			var t = setTimeout("clearMessage()",3000);
 			clearFields();
 	    });
 	}
 	function clearMessage(){
-		document.getElementById("sent-message-result").innerHTML = "";
+		$j("#sent-message-result").html("");
 	}
 	function clearFields(){
 		myEditor.clearEditorDoc();
-	    document.getElementById('to-addresses').value="";
-	    document.getElementById('subject').value="";
+	    $j('#to-addresses').val("");
+	    $j('#subject').val("");
 	}
 </script>

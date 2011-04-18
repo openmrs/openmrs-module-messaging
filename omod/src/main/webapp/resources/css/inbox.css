@@ -5,9 +5,11 @@
 }
 #link-cell{
 	vertical-align:top;
-	width:12%;
+	width:1%;
+	white-space:nowrap;
 }
 #link-panel{
+	width:100%;
 	text-align:right;
 	margin-top:4em;
 	border-top-style:solid;
@@ -38,26 +40,6 @@
 #message-table-container{
 	margin-top:6px;
 }
-#loading-container{
-	display:none;
-	height:17em;
-	border:1p solid;
-	margin-top:10px;
-}
-#inner-loading-container{
-	position:absolute;
-	top:32%;
-	left:50%;
-	width:30em;
-	height:4em;
-	margin-top:-2em;
-	margin-left:-15em;
-	text-align:center;
-}
-#inner-loading-container img,#inner-loading-container span{
-	display:block;
-	margin:0 auto;
-}
 #messages-table{
 	width:100%;
 	border:1px solid #aaa;
@@ -70,8 +52,10 @@
 }
 #messages-table td{
 	border: 1px solid #aaa;
-	padding: 0.2em;
+	padding:0.2em 0.4em;
 	cursor:pointer;
+	white-space:nowrap;
+	width:1%;
 }
 #paging-controls-container{
 	text-align:right;
@@ -88,11 +72,10 @@
 #search-bar-container{
 	float:right;
 	margin-bottom:3px;
-	width:35%;
 	padding: 0px 7px 0px 0px;
 }
 #inbox-search{
-	width: 78%;
+	width: 350px;
 }
 #message-info-panel{
 	width:auto;
@@ -128,6 +111,12 @@
 	overflow:scroll;
 	overflow-x:hidden;
 }
+.subj-con{
+	display:inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 a.disabled:link, a.disabled:visited, a.disabled:active, a.disabled:hover{
 	text-decoration:none;
 	color:black;
@@ -152,4 +141,10 @@ a.disabled:link, a.disabled:visited, a.disabled:active, a.disabled:hover{
 }
 .read-row .msg-msg{
 	color:#A5A5A5;
+}
+.message-row-date{
+	width:auto;
+}
+.message-row-sender{
+	width:auto;
 }

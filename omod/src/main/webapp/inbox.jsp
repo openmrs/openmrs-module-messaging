@@ -23,12 +23,6 @@
 			</form>
 		</div><br/>
 		<div id="message-table-container">
-			<div id="loading-container">
-				<div id="inner-loading-container">
-					<span id="loading-text">Loading...</span>
-					<img src="<openmrs:contextPath/>/moduleResources/messaging/images/ajax-loading-bar.gif"/>
-				</div>
-			</div>
 			<table id="messages-table" class="message-table">
 				<thead>
 					<tr>
@@ -97,69 +91,72 @@
 
 <script type="text/javascript">	
 	window.onload = init;
-	
+//	var $j = jQuery.noConflict();
 	var messageCache = { };
 	var messageTableVisible= true;
 	var pageNum=0;
 	var pageSize=10;
 	
 	function init() {
-		$("#inbox-search").watermark("search inbox");
-		$("#messages-table-body *").live("click",rowClicked);
+//		$j("#inbox-search").watermark("search inbox");
+		$j("#messages-table-body *").live("click",rowClicked);
 		fillMessageTable();
 	}
 	
 	function rowClicked(e){
 		var who = e.target || e.srcElement;
-		var id = who.id.substring(12);
-		var message = messageCache[id];
-		if(!message.read){
+		var messageId = who.id.substring(12);
+		var message = messageCache[messageId];
+		if(message.read == false){
 			DWRModuleMessageService.markMessageAsReadForAuthenticatedUser(message.id);
 			message.read=true;
-			$("#pattern"+id).removeClass("unread-row");	
-			$("#pattern"+id).addClass("read-row");	
+			$j("#pattern"+message.id).removeClass("unread-row");	
+			$j("#pattern"+message.id).addClass("read-row");	
 		}
-		document.getElementById("message-panel").style.display="";
-		document.getElementById("header-from").innerHTML = message.sender;
-		document.getElementById("header-subject").innerHTML = message.subject;
-		document.getElementById("header-date").innerHTML = message.date;
-		document.getElementById("header-to").innerHTML = message.recipients;
-		document.getElementById("message-text-panel").innerHTML = message.content;
-		$("#messages-table-body").children().removeClass("highlight-row");
-		$("#pattern"+id).addClass("highlight-row");	
-		$("#reply-buttons").css("visibility","visible");
-		$(".header-label").css("visibility","visible");
-		document.getElementById("replyAllMessageId").value=id;
-		document.getElementById("replyMessageId").value=id;
+		$j("#header-from").html(message.sender);
+		$j("#header-subject").html(message.subject);
+		$j("#header-date").html(message.date);
+		$j("#header-to").html(message.recipients);
+		$j("#message-text-panel").html(message.content);
+		$j("#messages-table-body").children().removeClass("highlight-row");
+		$j("#pattern"+message.id).addClass("highlight-row");	
+		$j("#reply-buttons").css("visibility","visible");
+		$j(".header-label").css("visibility","visible");
+		$j("#replyAllMessageId").val(message.id);
+		$j("#replyMessageId").val(message.id);
 	}
 	
 	function fillMessageTable(){
 		DWRModuleMessageService.getMessagesForAuthenticatedUserWithPageSize(pageNum,pageSize,true,function(messageSet){
 			dwr.util.removeAllRows("messages-table-body", { filter:function(tr) {return (tr.id != "pattern");}});
-			var message, id;
+			var message, messageId;
 			var messages = messageSet.messages;
 			// iterate through the messages, cloning the pattern row
 			// and placing each message values into that row
 			for (var i = 0; i < messages.length; i++) {
 				message = messages[i];
-			    id = message.id;
-			    dwr.util.cloneNode("pattern", { idSuffix:id });
-			    dwr.util.setValue("message-from" + id, message.sender);
-				$("#pattern"+id+" .msg-subj").html(message.subject);
-				$("#pattern"+id+" .msg-msg").html(" - "+ message.messageSnippet);
-			    dwr.util.setValue("message-date" + id, message.time+ " " + message.date);
-			    document.getElementById("pattern" + id).style.display = "table-row";
+			    //messageId = message.id;
+			    $j(createMessageRow(message.id)).appendTo("#messages-table-body");
+			    $j("#message-from" + message.id).html(message.sender);
+				$j("#pattern"+message.id+" .msg-subj").html(message.subject);
+				$j("#pattern"+message.id+" .msg-msg").html(" - "+ message.messageSnippet);
+			    $j("#message-date" + message.id).html(message.time + " " + message.date);
 				if(message.read){
-					$("#pattern" + id).addClass("read-row");
+					$j("#pattern" + message.id).addClass("read-row");
 				}else{
-					$("#pattern" + id).addClass("unread-row");
+					$j("#pattern" + message.id).addClass("unread-row");
 				}
-			    messageCache[id] = message;
+			    messageCache[message.id] = message;
 			}
 			pageNum = messageSet.pageNumber;
 			pageSize = messageSet.pageSize;
 			setPagingControls(messageSet);
 		});
+	}
+	
+	function createMessageRow(mesgId){
+		msgString = "<tr class=\"message-row\" id=\"pattern#\"><td class=\"message-row-from\" id=\"message-from#\"></td><td class=\"message-row-subject\" id=\"msg-subj-con#\"><div class=\"subj-con\" id=\"subject-cont#\"><span class=\"msg-subj\" id=\"message-subj#\"></span><span class=\"msg-msg\" id=\"message-mesg#\"></span></div></td><td class=\"message-row-date\" id=\"message-date#\"></td></tr>";
+		return msgString.replace(new RegExp("#",'g'),mesgId);
 	}
 	
 	function messageClicked(event){}
@@ -169,26 +166,26 @@
 	function replyAllClicked(event){}
 
 	function setPagingControls(messageSet){
-		document.getElementById("paging-start").innerHTML = (messageSet.pageNumber * messageSet.pageSize) + 1;
-		document.getElementById("paging-end").innerHTML =  (messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length;
-		document.getElementById("paging-total").innerHTML =   messageSet.total;
-		document.getElementById("current-page").innerHTML =   messageSet.pageNumber+1;
+		$j("#paging-start").html((messageSet.pageNumber * messageSet.pageSize) + 1);
+		$j("#paging-end").html((messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length);
+		$j("#paging-total").html(messageSet.total);
+		$j("#current-page").html(messageSet.pageNumber+1);
 		//enable or disable the paging controls properly
 		if(messageSet.pageNumber === 0){
-			$('#previous-page').attr('class','disabled');
+			$j('#previous-page').attr('class','disabled');
 		}else{
-			$('#previous-page').attr('class','');
+			$j('#previous-page').attr('class','');
 		}
 		
 		if(messageSet.pageSize > messageSet.messages.length || ((messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length) === messageSet.total){
-			$('#next-page').attr('class','disabled');
+			$j('#next-page').attr('class','disabled');
 		}else{
-			$('#next-page').attr('class','');
+			$j('#next-page').attr('class','');
 		}
 	}
 
 	function pageToPreviousPage(){
-		if($('#previous-page').hasClass('disabled')){
+		if($j('#previous-page').hasClass('disabled')){
 			return false;
 		}else{
 			pageNum--;
@@ -197,26 +194,24 @@
 	}
 
 	function pageToNextPage(){
-		if($('#next-page').hasClass('disabled')){
+		if($j('#next-page').hasClass('disabled')){
 			return false;
 		}else{
 			pageNum++;
-			console.log("PageNum: "+pageNum);
 			fillMessageTable();
-			console.log("Message table loading done");
 		}
 	}
 
 	function toggleMessageLoading(){
 		if(messageTableVisible){
-			document.getElementById("messages-table").style.display="none";
-			document.getElementById("paging-controls-container").style.display="none";
-			document.getElementById("loading-container").style.display="";
+			$j("#messages-table").hide();
+			$j("#paging-controls-container").hide();
+			$j("#loading-container").show();
 			messageTableVisible=false;
 		}else{
-			document.getElementById("messages-table").style.display="";
-			document.getElementById("paging-controls-container").style.display="";
-			document.getElementById("loading-container").style.display="none";
+			$j("#messages-table").show();
+			$j("#paging-controls-container").show();
+			$j("#loading-container").hide();
 			messageTableVisible=true;
 		}
 	}

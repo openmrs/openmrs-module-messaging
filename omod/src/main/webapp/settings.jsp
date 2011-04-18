@@ -26,23 +26,7 @@
 								<th>Actions</th>
 							</tr>
 						</thead>
-						<tbody id="address-table-body">
-							<tr class="address-row" id="addressRow" style="display:none;">
-								<td id="address-row-address"></td>
-								<td id="address-row-type"></td>
-								<td id="address-row-preferred"></td>
-								<td class="address-row-actions">
-									<div class="address-action-buttons">
-										<a href="#" onclick="editClicked(this.id)" id="edit-link">
-											<img src="<openmrs:contextPath/>/moduleResources/messaging/images/pencil.png" alt="Edit"/>
-										</a>
-										<a href="#" onclick="deleteClicked(this.id)" id="delete-link">
-											<img src="<openmrs:contextPath/>/moduleResources/messaging/images/delete.png" alt="Delete"/>
-										</a>
-									</div>
-								</td>
-							</tr>
-						</tbody>
+						<tbody id="address-table-body"></tbody>
 					</table>
 					<div id="edit-address-panel">
 						<input type="text" id="address"></input>
@@ -63,10 +47,9 @@
 			<div id="alert-settings">
 				<hr/>
 				<span style="display:block;">Alerts</span>
-				<input type="checkbox" id="enable-alerts-checkbox">Alert me when I have new Omail at</input>
-				<select id="alert-address-select" disabled="true">
-					<option >+18069876543</option>
-					<option>dieterich.lawson@gmail.com</option>
+				<input type="checkbox" id="enable-alerts-checkbox" style="display:inline;"></input>
+				<label for="enable-alerts-checkbox" style="display:inline;">Alert me when I have new OMail at</label>
+				<select style="display:inline;" id="alert-address-select" disabled="true">
 				</select><br/>
 			</div>
 </td>
@@ -87,12 +70,12 @@
 	
 	function init(){
 		//add the "Add Address" event listener
-		document.getElementById('add-address-button').addEventListener('click',addAddressClick,false);
-		document.getElementById('save-address-button').addEventListener('click',saveAddressClick,false);
-		document.getElementById('cancel-address-button').addEventListener('click',cancelAddressClick,false);
-		document.getElementById('enable-alerts-checkbox').addEventListener('click',toggleAlerts,false);
+		$j('#add-address-button').live("click",addAddressClick);
+		$j('#save-address-button').live('click',saveAddressClick);
+		$j('#cancel-address-button').live('click',cancelAddressClick);
+		$j('#enable-alerts-checkbox').live('click',toggleAlerts);
 		//watermark the address button
-		$('#address-textbox').watermark('Address');
+		//$j('#address-textbox').watermark('Address');
 		fillAddressTable();
 		fillAlertAddressSelect();
 	}
@@ -100,18 +83,18 @@
 	function fillAddressTable(){
 		DWRMessagingAddressService.getAllAddressesForCurrentUser(function(addresses){
 			dwr.util.removeAllRows("address-table-body", { filter:function(tr) {return (tr.id != "addressRow");}});
-			var address, id;
+			var address;
 			// iterate through the messages, cloning the pattern row
 			// and placing each message values into that row
 			for (var i = 0; i < addresses.length; i++) {
 				address = addresses[i];
-			    id = address.id;
-			    dwr.util.cloneNode("addressRow", { idSuffix:id });
-			    dwr.util.setValue("address-row-address" + id, address.address);
-			    dwr.util.setValue("address-row-type" + id, protocolNames[address.protocolClass]);
-			    dwr.util.setValue("address-row-preferred" + id, address.preferred?"*":"");
-				document.getElementById("addressRow" + id).style.display = "table-row";
-				addressCache[id] = address;
+				$j(cloneAddressRow(address.id)).appendTo("#address-table-body");
+			    $j("#address-row-address" + address.id).html(address.address);
+			    $j("#address-row-type" + address.id).html(protocolNames[address.protocolClass]);
+			    $j("#address-row-preferred" + address.id).html(address.preferred?"*":"");
+				$j("#edit-link"+address.id).attr("href","#");
+				$j("#delete-link"+address.id).attr("href","#");
+				addressCache[address.id] = address;
 			}
 		});
 	}
@@ -141,7 +124,7 @@
 		var address = addressCache[eleid.substring(9)];
 		// put the address's values into the editing area
 		dwr.util.setValues(address);
-		if ($("#edit-address-panel").is(":hidden")){
+		if ($j("#edit-address-panel").is(":hidden")){
 			toggleEditingAddress();
 		}
 	}
@@ -157,7 +140,7 @@
 	    	fillAlertAddressSelect();
 	    	dwr.engine.endBatch();
 	    	clearEditingArea();
-			if ($("#edit-address-panel").is(":hidden")==false){
+			if ($j("#edit-address-panel").is(":hidden")==false){
 				toggleEditingAddress();
 			}
 	  	}
@@ -181,27 +164,32 @@
 	}
 	
 	function toggleEditingAddress(){
-		if ($("#edit-address-panel").is(":hidden")) {
-			$("#edit-address-panel").slideDown("fast", function(){
-				$("#add-address-button").toggle();
-				$("#save-address-button").toggle();
-				$("#cancel-address-button").toggle();
+		if ($j("#edit-address-panel").is(":hidden")) {
+			$j("#edit-address-panel").slideDown("fast", function(){
+				$j("#add-address-button").toggle();
+				$j("#save-address-button").toggle();
+				$j("#cancel-address-button").toggle();
 			});
 		}else{
-			$("#edit-address-panel").slideUp("fast", function(){
-				$("#add-address-button").toggle();
-				$("#save-address-button").toggle();
-				$("#cancel-address-button").toggle();
+			$j("#edit-address-panel").slideUp("fast", function(){
+				$j("#add-address-button").toggle();
+				$j("#save-address-button").toggle();
+				$j("#cancel-address-button").toggle();
 			});
 		}
 	}
 	
 	function toggleAlerts(event){
-		if(document.getElementById("enable-alerts-checkbox").checked){
-			document.getElementById("alert-address-select").disabled=false;
+		if($j("#enable-alerts-checkbox").is(":checked")){
+			$j("#alert-address-select").removeAttr("disabled");
 		}else{
-			document.getElementById("alert-address-select").disabled=true;
+			$j("#alert-address-select").attr("disabled","disabled");
 		}
 		
+	}
+	
+	function cloneAddressRow(adrId){
+		adrString = "<tr class=\"address-row\" id=\"addressRow#\"><td id=\"address-row-address#\"></td><td id=\"address-row-type#\"></td><td id=\"address-row-preferred#\"></td><td class=\"address-row-actions\"><div class=\"address-action-buttons\"><a href=\"\" onclick=\"editClicked(this.id)\" id=\"edit-link#\"><img src=\"<openmrs:contextPath/>/moduleResources/messaging/images/pencil.png\" alt=\"Edit\"/></a><a href=\"\" onclick=\"deleteClicked(this.id)\" id=\"delete-link#\"><img src=\"<openmrs:contextPath/>/moduleResources/messaging/images/delete.png\" alt=\"Delete\"/></a></div></td></tr>"
+		return adrString.replace(new RegExp("#",'g'),adrId);
 	}
 </script>

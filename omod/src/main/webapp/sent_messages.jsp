@@ -31,12 +31,7 @@
 						<th>Date</th>
 					</tr>
 				</thead>
-				<tbody id="messages-table-body">
-					<tr class="message-row" id="pattern" style="display:none;">
-						<td class="message-row-to" id="message-dest"></td>
-						<td class="message-row-subject" id="message-subj"></td>
-						<td class="message-row-date" id="message-date"></td>
-					</tr>			
+				<tbody id="messages-table-body">		
 				</tbody>
 			</table>
 			<div id="paging-controls-container">
@@ -85,8 +80,8 @@
 	var pageSize=10;
 	
 	function init() {
-		$("#sent-messages-search").watermark("search sent messages");
-		$("#messages-table-body tr").live("click",rowClicked);
+		//$j("#sent-messages-search").watermark("search sent messages");
+		$j("#messages-table-body *").live("click",rowClicked);
 		fillMessageTable();
 	}
 	
@@ -94,14 +89,13 @@
 		var who = e.target||e.srcElement;
 		var id =who.id.substring(12);
 		var message = messageCache[id];
-		document.getElementById("message-panel").style.display="";
-		document.getElementById("header-subject").innerHTML = message.subject;
-		document.getElementById("header-date").innerHTML = message.date;
-		document.getElementById("header-to").innerHTML = message.recipients;
-		document.getElementById("message-text-panel").innerHTML = message.content;
-		$("#messages-table-body").children().removeClass("highlight-row");
-		$("#pattern"+id).addClass("highlight-row");	
-		$(".header-label").css("visibility","visible");
+		$j("#header-subject").html(message.subject);
+		$j("#header-date").html(message.date);
+		$j("#header-to").html(message.recipients);
+		$j("#message-text-panel").html(message.content);
+		$j("#messages-table-body").children().removeClass("highlight-row");
+		$j("#pattern"+id).addClass("highlight-row");	
+		$j(".header-label").css("visibility","visible");
 	}
 	
 	function fillMessageTable(){
@@ -113,13 +107,11 @@
 			// and placing each message value into that row
 			for (var i = 0; i < messages.length; i++) {
 				message = messages[i];
-			    id = message.id;
-			    dwr.util.cloneNode("pattern", { idSuffix:id });
-			    dwr.util.setValue("message-dest" + id, message.recipients);
-			    dwr.util.setValue("message-subj" + id, message.subject);
-			    dwr.util.setValue("message-date" + id, message.time+ " " + message.date);
-			    document.getElementById("pattern" + id).style.display = "table-row";
-			    messageCache[id] = message;
+			    $j(createMessageRow(message.id)).appendTo("#messages-table-body");
+			    $j("#message-dest" + message.id).html(message.recipients);
+			    $j("#message-subj" + message.id).html(message.subject);
+			    $j("#message-date" + message.id).html(message.time+ " " + message.date);
+			    messageCache[message.id] = message;
 			}
 			pageNum = messageSet.pageNumber;
 			pageSize = messageSet.pageSize;
@@ -128,26 +120,26 @@
 	}
 
 	function setPagingControls(messageSet){
-		document.getElementById("paging-start").innerHTML = (messageSet.pageNumber * messageSet.pageSize) + 1;
-		document.getElementById("paging-end").innerHTML =  (messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length;
-		document.getElementById("paging-total").innerHTML =   messageSet.total;
-		document.getElementById("current-page").innerHTML =   messageSet.pageNumber+1;
+		$j("#paging-start").html((messageSet.pageNumber * messageSet.pageSize) + 1);
+		$j("#paging-end").html((messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length);
+		$j("#paging-total").html(messageSet.total);
+		$j("#current-page").html(messageSet.pageNumber+1);
 		//enable or disable the paging controls properly
 		if(messageSet.pageNumber === 0){
-			$('#previous-page').attr('class','disabled');
+			$j('#previous-page').attr('class','disabled');
 		}else{
-			$('#previous-page').attr('class','');
+			$j('#previous-page').attr('class','');
 		}
 
 		if(messageSet.pageSize > messageSet.messages.length){
-			$('#next-page').attr('class','disabled');
+			$j('#next-page').attr('class','disabled');
 		}else{
-			$('#next-page').attr('class','');
+			$j('#next-page').attr('class','');
 		}
 	}
 
 	function pageToPreviousPage(){
-		if($('#previous-page').hasClass('disabled')){
+		if($j('#previous-page').hasClass('disabled')){
 			return false;
 		}else{
 			pageNum--;
@@ -156,13 +148,15 @@
 	}
 
 	function pageToNextPage(){
-		if($('#next-page').hasClass('disabled')){
+		if($j('#next-page').hasClass('disabled')){
 			return false;
 		}else{
 			pageNum++;
-			console.log("PageNum: "+pageNum);
 			fillMessageTable();
-			console.log("Message table loading done");
 		}
+	}
+	function createMessageRow(mesgId){
+		msgString = "<tr class=\"message-row\" id=\"pattern#\"><td class=\"message-row-to\" id=\"message-dest#\"></td><td class=\"message-row-subject\" id=\"msg-subj-con#\"><div class=\"subj-con\" id=\"subject-cont#\"><span class=\"msg-subj\" id=\"message-subj#\"></span><span class=\"msg-msg\" id=\"message-mesg#\"></span></div></td><td class=\"message-row-date\" id=\"message-date#\"></td></tr>";
+		return msgString.replace(new RegExp("#",'g'),mesgId);
 	}
 </script>
