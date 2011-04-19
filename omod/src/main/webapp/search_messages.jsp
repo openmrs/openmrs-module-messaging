@@ -41,9 +41,9 @@
 			<table id="messages-table" class="message-table">
 				<thead>
 					<tr>
-						<th>From</th>
-						<th>Message</th>
-						<th>Date</th>
+						<th class="message-row-from">From</th>
+						<th class="message-row-subject">Message</th>
+						<th class="message-row-date">Date</th>
 					</tr>
 				</thead>
 				<tbody id="messages-table-body">		

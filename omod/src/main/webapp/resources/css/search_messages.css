@@ -53,6 +53,7 @@
 }
 #messages-table{
 	width:100%;
+	table-layout:fixed;
 	border:1px solid #aaa;
 	border-collapse:collapse;
 }
@@ -65,6 +66,24 @@
 	border: 1px solid #aaa;
 	padding: 0.2em;
 	cursor:pointer;
+}
+.message-row-from{
+	width:12.5%;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.message-row-subject{
+	width:72%;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.message-row-date{
+	width:15.5%;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
 }
 #paging-controls-container{
 	text-align:right;

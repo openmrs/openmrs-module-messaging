@@ -25,10 +25,10 @@
 		<div id="message-table-container">
 			<table id="messages-table" class="message-table">
 				<thead>
-					<tr>
-						<th>From</th>
-						<th>Message</th>
-						<th>Date</th>
+					<tr class="message-row">
+						<th class="message-row-from">From</th>
+						<th class="message-row-subject">Message</th>
+						<th class="message-row-date">Date</th>
 					</tr>
 				</thead>
 				<tbody id="messages-table-body">
@@ -98,7 +98,7 @@
 	var pageSize=10;
 	
 	function init() {
-//		$j("#inbox-search").watermark("search inbox");
+		//$j("#inbox-search").watermark("search inbox");
 		$j("#messages-table-body *").live("click",rowClicked);
 		fillMessageTable();
 	}

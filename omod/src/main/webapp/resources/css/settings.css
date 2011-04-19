@@ -62,6 +62,7 @@
 }
 .address-action-buttons img{
 	padding:1px;
+	border:0px;
 }
 #edit-address-panel{
 	display:none;

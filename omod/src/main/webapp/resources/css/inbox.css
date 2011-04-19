@@ -42,6 +42,7 @@
 }
 #messages-table{
 	width:100%;
+	table-layout:fixed;
 	border:1px solid #aaa;
 	border-collapse:collapse;
 }
@@ -54,8 +55,24 @@
 	border: 1px solid #aaa;
 	padding:0.2em 0.4em;
 	cursor:pointer;
+}
+.message-row-from{
+	width:12.5%;
+	overflow:hidden;
 	white-space:nowrap;
-	width:1%;
+	text-overflow:ellipsis;
+}
+.message-row-subject{
+	width:72%;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+}
+.message-row-date{
+	width:15.5%;
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
 }
 #paging-controls-container{
 	text-align:right;
@@ -108,14 +125,9 @@
 	border:1px solid black;
 	height:15em;
 	padding: 7px;
-	overflow:scroll;
+	overflow-y:scroll;
 	overflow-x:hidden;
-}
-.subj-con{
-	display:inline-block;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	position:relative;
 }
 a.disabled:link, a.disabled:visited, a.disabled:active, a.disabled:hover{
 	text-decoration:none;
