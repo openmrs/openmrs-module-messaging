@@ -29,7 +29,7 @@
 			<c:if test="${searchingSent != 'true'}">
 				<input type="radio" name="inbox-group" id="search-sent-check" value="sent"/>Sent Messages</input>
 			</c:if>
-			<button onclick="search(true)">Search</button>
+			<button onclick="search(true)" id="search-button">Search</button>
 		</div>
 		<div id="message-table-container">
 			<div id="loading-container">

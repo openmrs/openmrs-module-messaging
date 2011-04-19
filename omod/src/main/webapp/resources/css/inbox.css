@@ -88,11 +88,17 @@
 }
 #search-bar-container{
 	float:right;
-	margin-bottom:3px;
-	padding: 0px 7px 0px 0px;
+	margin-bottom:5px;
+	padding: 0px;
+	width:100%;
+}
+#search-button{
+	float:right;
+	margin-right:5px;
 }
 #inbox-search{
-	width: 350px;
+	float:right;
+	width: 300px;
 }
 #message-info-panel{
 	width:auto;

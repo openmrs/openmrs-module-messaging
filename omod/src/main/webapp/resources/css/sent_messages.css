@@ -86,12 +86,17 @@
 }
 #search-bar-container{
 	float:right;
-	margin-bottom:3px;
-	width:35%;
-	padding: 0px 7px 0px 0px;
+	margin-bottom:5px;
+	padding: 0px;
+	width:100%;
+}
+#search-button{
+	float:right;
+	margin-right:5px;
 }
 #sent-messages-search{
-	width: 78%;
+	float:right;
+	width: 300px;
 }
 .highlight-row{
 	background:#E3E4FA;

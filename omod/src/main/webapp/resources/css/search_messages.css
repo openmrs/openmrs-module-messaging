@@ -109,6 +109,9 @@
 	display:inline;
 	margin-right:0.5em;
 }
+#search-button{
+	margin-left:0.5em;
+}
 .highlight-row{
 	background:#E3E4FA;
 }
