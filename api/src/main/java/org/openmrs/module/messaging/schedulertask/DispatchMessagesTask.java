@@ -6,14 +6,18 @@ import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.MessageService;
+import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
+import org.openmrs.module.messaging.omail.OMailProtocol;
 import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
@@ -46,7 +50,6 @@ public class DispatchMessagesTask extends AbstractTask {
 	 */
 	public void execute() {
 		Context.openSession();
-
 		try {
 			// authenticate (for pre-1.7)
 			if (!Context.isAuthenticated())
@@ -74,7 +77,7 @@ public class DispatchMessagesTask extends AbstractTask {
 			Context.closeSession();
 		}
 	}
-
+	
 	private void dispatchMessages(List<Message> messages){
 		List<MessagingGateway> gateways;
 		for(Message message: messages){

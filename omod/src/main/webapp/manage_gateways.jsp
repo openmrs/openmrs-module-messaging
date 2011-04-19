@@ -49,6 +49,23 @@
 	</c:if>
 </div>
 <br/>
+<div id="omailBoxHeader" class="boxHeader"> 
+	<c:if test="${omailStatus =='true'}">
+		<img id="omailStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_green.png" style="vertical-align:bottom;"/>
+	</c:if>
+	<c:if test="${omailStatus =='false'}">
+		<img id="omailStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
+	</c:if>
+	OMail
+</div>
+<div id="omailBox" class="box">
+	<c:if test="${omailStatus =='true'}">
+		<button id="omailStartStopButton" onclick="toggleGatewayStatus('omail.OMailGateway','omail')">Stop Gateway</button>
+	</c:if>
+	<c:if test="${omailStatus =='false'}">
+		<button id="omailStartStopButton"onclick="toggleGatewayStatus('omail.OMailGateway','omail')">Start Gateway</button>
+	</c:if>
+</div><br>
 
 <div id="googleVoiceBoxHeader" class="boxHeader"> 
 	<c:if test="${googleVoiceStatus =='true'}">

@@ -10,6 +10,7 @@ import org.openmrs.module.messaging.EncryptionService;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.email.EmailGateway;
 import org.openmrs.module.messaging.googlevoice.GoogleVoiceGateway;
+import org.openmrs.module.messaging.omail.OMailGateway;
 import org.openmrs.module.messaging.sms.SmsLibGateway;
 import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.util.OpenmrsUtil;
@@ -51,6 +52,9 @@ public class ManageGatewaysController {
 		}
 		if(gatewayManager.getGatewayByClass(EmailGateway.class)!=null){
 			request.setAttribute("emailStatus", gatewayManager.getGatewayByClass(EmailGateway.class).isActive());
+		}
+		if(gatewayManager.getGatewayByClass(OMailGateway.class)!=null){
+			request.setAttribute("omailStatus", gatewayManager.getGatewayByClass(OMailGateway.class).isActive());
 		}
 		// add email config values
 		if(gatewayManager.getGatewayByClass(EmailGateway.class) != null){

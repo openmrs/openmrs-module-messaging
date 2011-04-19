@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
@@ -14,24 +15,9 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
 
 public class OMailGateway extends MessagingGateway {
 
-	private boolean initialized = false;
+	private boolean started = false;
+
 	public OMailGateway(){}
-	
-	private void initialize(){
-		List<Person> people = Context.getPersonService().getPeople("", false);
-		for(Person p: people){
-			List<MessagingAddress> addresses = getAddressService().getMessagingAddressesForPerson(p,false);
-			boolean hasOMailAddress=false;
-			for(MessagingAddress add:addresses){
-				if(add.getProtocol() == OMailProtocol.class) hasOMailAddress=true;
-			}
-			if(!hasOMailAddress){
-				MessagingAddress ma = new MessagingAddress(p.getPersonId().toString(),p,OMailProtocol.class);
-				getAddressService().saveMessagingAddress(ma);
-			}
-		}
-		initialized = true;
-	}
 	
 	@Override
 	public boolean canReceive() {
@@ -55,14 +41,11 @@ public class OMailGateway extends MessagingGateway {
 
 	@Override
 	public boolean isActive() {
-		return true;
+		return started;
 	}
 
 	@Override
 	public void receiveMessages() {
-		if(!initialized){
-			initialize();
-		}
 		List<Message> incomingMsgs = getMessageService().getMessagesForProtocolAndStatus(OMailProtocol.class, MessageStatus.SENT.getNumber());
 		for(Message m: incomingMsgs){
 			for(MessageRecipient recipient: m.getTo()){
@@ -85,6 +68,27 @@ public class OMailGateway extends MessagingGateway {
 
 	@Override
 	public void startup() {
+		try{
+			initializeAddresses();
+			started =true;
+		}catch(Throwable t){
+			started=false;
+		}
+	}
+	
+	private void initializeAddresses(){
+			List<Person> people = Context.getPersonService().getPeople("", false);
+			for(Person p: people){
+				List<MessagingAddress> addresses = Context.getService(MessagingAddressService.class).getMessagingAddressesForPerson(p,false);
+				boolean hasOMailAddress=false;
+				for(MessagingAddress add:addresses){
+					if(add.getProtocol() == OMailProtocol.class) hasOMailAddress=true;
+				}
+				if(!hasOMailAddress){
+					MessagingAddress ma = new MessagingAddress(p.getPersonId().toString(),p,OMailProtocol.class);
+					Context.getService(MessagingAddressService.class).saveMessagingAddress(ma);
+				}
+			}
 	}
 
 	@Override
