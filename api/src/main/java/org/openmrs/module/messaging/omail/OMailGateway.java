@@ -15,9 +15,7 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
 public class OMailGateway extends MessagingGateway {
 
 	private boolean initialized = false;
-	public OMailGateway(){
-		initialize();
-	}
+	public OMailGateway(){}
 	
 	private void initialize(){
 		List<Person> people = Context.getPersonService().getPeople("", false);
@@ -62,6 +60,9 @@ public class OMailGateway extends MessagingGateway {
 
 	@Override
 	public void receiveMessages() {
+		if(!initialized){
+			initialize();
+		}
 		List<Message> incomingMsgs = getMessageService().getMessagesForProtocolAndStatus(OMailProtocol.class, MessageStatus.SENT.getNumber());
 		for(Message m: incomingMsgs){
 			for(MessageRecipient recipient: m.getTo()){
@@ -84,9 +85,6 @@ public class OMailGateway extends MessagingGateway {
 
 	@Override
 	public void startup() {
-		if(!initialized){
-			initialize();
-		}
 	}
 
 	@Override
