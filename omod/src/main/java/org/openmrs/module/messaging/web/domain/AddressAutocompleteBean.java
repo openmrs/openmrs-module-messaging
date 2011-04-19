@@ -16,7 +16,7 @@ public class AddressAutocompleteBean {
 		}
 		String protocolAbbreviation = Context.getService(MessagingService.class).getProtocolByClass(address.getProtocol()).getProtocolAbbreviation();
 		value+="<"+protocolAbbreviation+":"+address.getAddress()+">";
-		label = value;
+		label = value.replaceAll("\"","&quot;").replaceAll("<","&lt;").replaceAll(">","&gt;");
 	}
 	/**
 	 * @param label the label to set
