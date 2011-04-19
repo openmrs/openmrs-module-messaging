@@ -37,8 +37,8 @@
 			<div id="paging-controls-container">
 				<span id="paging-controls">
 					<span id="paging-info">
-						<span id="paging-start">1</span> to 
-						<span id ="paging-end"></span> of 
+						<span id="paging-start"></span>&nbsp;to 
+						<span id ="paging-end"></span>&nbsp;of 
 						<span id="paging-total"></span>
 					</span>
 					<a href="#" id="previous-page" onclick="pageToPreviousPage()">&lt;</a>

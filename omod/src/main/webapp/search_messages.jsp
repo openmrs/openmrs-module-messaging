@@ -46,12 +46,7 @@
 						<th>Date</th>
 					</tr>
 				</thead>
-				<tbody id="messages-table-body">
-					<tr class="message-row" id="pattern" style="display:none;">
-						<td class="message-row-from" id="message-from"></td>
-						<td class="message-row-subject" id="message-subj"></td>
-						<td class="message-row-date" id="message-date"></td>
-					</tr>			
+				<tbody id="messages-table-body">		
 				</tbody>
 			</table>
 			<div id="paging-controls-container">
@@ -100,8 +95,8 @@
 	var pageSize=10;
 	
 	function init() {
-		$("#messages-table-body tr").live("click",rowClicked);
-		if(document.getElementById("search-textbox").value != ""){
+		$j("#messages-table-body tr").live("click",rowClicked);
+		if($j("#search-textbox").val() != ""){
 			search();
 		}
 	}
@@ -110,46 +105,41 @@
 		var who = e.target || e.srcElement;
 		var id = who.id.substring(12);
 		var message = messageCache[id];
-		document.getElementById("message-panel").style.display="";
-		document.getElementById("header-from").innerHTML = message.sender;
-		document.getElementById("header-subject").innerHTML = message.subject;
-		document.getElementById("header-date").innerHTML = message.date;
-		document.getElementById("header-to").innerHTML = message.recipients;
-		document.getElementById("message-text-panel").innerHTML = message.content;
-		$("#messages-table-body").children().removeClass("highlight-row");
-		$("#pattern"+id).addClass("highlight-row");	
-		$("#reply-buttons").css("visibility","visible");
-		$(".header-label").css("visibility","visible");
+		$j("#header-from").html(message.sender);
+		$j("#header-subject").html(message.subject);
+		$j("#header-date").html(message.date);
+		$j("#header-to").html(message.recipients);
+		$j("#message-text-panel").html(message.content);
+		$j("#messages-table-body").children().removeClass("highlight-row");
+		$j("#pattern"+id).addClass("highlight-row");	
+		$j("#reply-buttons").css("visibility","visible");
+		$j(".header-label").css("visibility","visible");
 	}
 	
 	function search(resetPaging){
 		if(resetPaging){
 			pageNum = 0;
 		}
-		toggleMessageLoading();
-		var searchString = document.getElementById("search-textbox").value;
-		var searchInbox = document.getElementById("search-inbox-check").checked == 1;
-		var searchOutbox = document.getElementById("search-sent-check").checked == 1;
+		var searchString = $j("#search-textbox").val();
+		var searchInbox = $j("#search-inbox-check").is(":checked");
+		var searchOutbox = $j("#search-sent-check").is(":checked");
 		DWRModuleMessageService.searchMessagesForAuthenticatedUser(pageNum,pageSize,searchString,searchInbox,searchOutbox,function(messageSet){
 			dwr.util.removeAllRows("messages-table-body", { filter:function(tr) {return (tr.id != "pattern");}});
-			var message, id;
+			var message;
 			var messages = messageSet.messages;
 			// iterate through the messages, cloning the pattern row
 			// and placing each message values into that row
 			for (var i = 0; i < messages.length; i++) {
 				message = messages[i];
-			    id = message.id;
-			    dwr.util.cloneNode("pattern", { idSuffix:id });
-			    dwr.util.setValue("message-from" + id, message.sender);
-			    dwr.util.setValue("message-subj" + id, message.subject);
-			    dwr.util.setValue("message-date" + id, message.time+ " " + message.date);
-			    document.getElementById("pattern" + id).style.display = "table-row";
-			    messageCache[id] = message;
+			    $j(createMessageRow(message.id)).appendTo("#messages-table-body");
+			    $j("#message-from" + message.id).html(message.sender);
+			    $j("#message-subj" + message.id).html(message.subject);
+			    $j("#message-date" + message.id).html(message.time+ " " + message.date);
+			    messageCache[message.id] = message;
 			}
 			pageNum = messageSet.pageNumber;
 			pageSize = messageSet.pageSize;
 			setPagingControls(messageSet);
-			toggleMessageLoading();
 		});
 	}
 	
@@ -160,26 +150,26 @@
 	function replyAllClicked(event){}
 
 	function setPagingControls(messageSet){
-		document.getElementById("paging-start").innerHTML = (messageSet.pageNumber * messageSet.pageSize) + 1;
-		document.getElementById("paging-end").innerHTML =  (messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length;
-		document.getElementById("paging-total").innerHTML =   messageSet.total;
-		document.getElementById("current-page").innerHTML =   messageSet.pageNumber+1;
+		$j("#paging-start").html((messageSet.pageNumber * messageSet.pageSize) + 1);
+		$j("#paging-end").html((messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length);
+		$j("#paging-total").html(messageSet.total);
+		$j("#current-page").html(messageSet.pageNumber+1);
 		//enable or disable the paging controls properly
 		if(messageSet.pageNumber === 0){
-			$('#previous-page').attr('class','disabled');
+			$j('#previous-page').attr('class','disabled');
 		}else{
-			$('#previous-page').attr('class','');
+			$j('#previous-page').attr('class','');
 		}
 		
 		if(messageSet.pageSize > messageSet.messages.length || ((messageSet.pageNumber * messageSet.pageSize)  + messageSet.messages.length) === messageSet.total){
-			$('#next-page').attr('class','disabled');
+			$j('#next-page').attr('class','disabled');
 		}else{
-			$('#next-page').attr('class','');
+			$j('#next-page').attr('class','');
 		}
 	}
 
 	function pageToPreviousPage(){
-		if($('#previous-page').hasClass('disabled')){
+		if($j('#previous-page').hasClass('disabled')){
 			return false;
 		}else{
 			pageNum--;
@@ -188,7 +178,7 @@
 	}
 
 	function pageToNextPage(){
-		if($('#next-page').hasClass('disabled')){
+		if($j('#next-page').hasClass('disabled')){
 			return false;
 		}else{
 			pageNum++;
@@ -196,17 +186,8 @@
 		}
 	}
 
-	function toggleMessageLoading(){
-		if(messageTableVisible){
-			document.getElementById("messages-table").style.display="none";
-			document.getElementById("paging-controls-container").style.display="none";
-			document.getElementById("loading-container").style.display="";
-			messageTableVisible=false;
-		}else{
-			document.getElementById("messages-table").style.display="";
-			document.getElementById("paging-controls-container").style.display="";
-			document.getElementById("loading-container").style.display="none";
-			messageTableVisible=true;
-		}
+	function createMessageRow(mesgId){
+		msgString = "<tr class=\"message-row\" id=\"pattern#\"><td class=\"message-row-from\" id=\"message-from#\"></td><td class=\"message-row-subject\" id=\"message-subj#\"></td><td class=\"message-row-date\" id=\"message-date#\"></td></tr>";
+		return msgString.replace(new RegExp("#",'g'),mesgId);
 	}
 </script>
