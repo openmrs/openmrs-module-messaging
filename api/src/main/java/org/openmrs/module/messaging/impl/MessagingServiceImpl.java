@@ -22,10 +22,9 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
 import org.openmrs.module.messaging.domain.gateway.exception.MessageFormattingException;
 import org.openmrs.module.messaging.domain.listener.IncomingMessageListener;
+import org.openmrs.module.messaging.email.EmailProtocol;
 import org.openmrs.module.messaging.omail.OMailProtocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
-
-import freemarker.template.utility.StringUtil;
 
 /**
  * The implementation of the MessagingService interface 
@@ -64,7 +63,7 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		protocols = new HashMap<Class<? extends Protocol>, Protocol>();
 		protocols.put(SmsProtocol.class, new SmsProtocol());
 		protocols.put(OMailProtocol.class, new OMailProtocol());
-		//protocols.put(EmailProtocol.class, new EmailProtocol());
+		protocols.put(EmailProtocol.class, new EmailProtocol());
 	}
 	
 	public void sendMessage(String message, String address, Class<? extends Protocol> protocolClass) throws Exception{

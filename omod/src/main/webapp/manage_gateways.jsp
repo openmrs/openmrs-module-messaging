@@ -272,7 +272,7 @@
 	function init(){
 	//	updateStatus("sms.SmsLibGateway","modems");
 	//	updateStatus("googlevoice.GoogleVoiceGateway","googleVoice");
-		//updateStatus("email.EmailGateway","email");
+	//	updateStatus("email.EmailGateway","email");
 		updateModemList();
 	}
 

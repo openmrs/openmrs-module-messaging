@@ -66,7 +66,9 @@
 	window.onload = init;
 	var viewed = -1;
 	var addressCache = { };
-	var protocolNames= {"org.openmrs.module.messaging.sms.SmsProtocol":"SMS","org.openmrs.module.messaging.omail.OMailProtocol":"OMail"};
+	var protocolNames= {"org.openmrs.module.messaging.sms.SmsProtocol":"SMS",
+						"org.openmrs.module.messaging.omail.OMailProtocol":"OMail",
+						"org.openmrs.module.messaging.email.EmailProtocol":"Email"};
 	
 	function init(){
 		//add the "Add Address" event listener
@@ -88,6 +90,7 @@
 			// and placing each message values into that row
 			for (var i = 0; i < addresses.length; i++) {
 				address = addresses[i];
+				if(protocolNames[address.protocolClass] == "OMail") continue;
 				$j(cloneAddressRow(address.id)).appendTo("#address-table-body");
 			    $j("#address-row-address" + address.id).html(address.address);
 			    $j("#address-row-type" + address.id).html(protocolNames[address.protocolClass]);

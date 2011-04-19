@@ -125,6 +125,9 @@ public class Message extends BaseOpenmrsObject {
 
 	public void setDate(Date date) {
 		this.date = date;
+		for(MessageRecipient recipient:to){
+			recipient.setDate(date);
+		}
 	}
 
 	public Integer getMessageId() {
@@ -235,7 +238,12 @@ public class Message extends BaseOpenmrsObject {
 	public Person getSender() {
 		return sender;
 	}
-
+	
+	public void setOrigin(String origin){
+		for(MessageRecipient recipient:to){
+			recipient.setOrigin(origin);
+		}
+	}
 	/**
 	 * @param inReplyTo the inReplyTo to set
 	 */
@@ -249,6 +257,13 @@ public class Message extends BaseOpenmrsObject {
 		return inReplyTo;
 	}
 
+	
+	public void setStatus(MessageStatus status){
+		for(MessageRecipient recipient:to){
+			recipient.setMessageStatus(status);
+		}
+	}
+	
 	public enum MessageFields{
 		DATE("date"),
 		IN_REPLY_TO("inReplyTo"),

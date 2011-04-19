@@ -14,7 +14,6 @@ import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
-import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.scheduler.tasks.AbstractTask;
 

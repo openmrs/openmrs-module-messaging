@@ -28,6 +28,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.EncryptionService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
+import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.gateway.MessagingGateway;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.util.MessagingConstants;
@@ -74,15 +75,15 @@ public class EmailGateway extends MessagingGateway {
 		// set sender
 		if (message.getSender() != null) {
 			InternetAddress sender = new InternetAddress();
-		//	sender.setAddress(message.getOrigin());
+			sender.setAddress(recipient.getOrigin());
 			// TODO make the sender's name a global property / configurable
 			sender.setPersonal("OpenMRS");
 			mimeMessage.setSender(sender);
 		}
-//		
-//		// set recipient
-//		mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO,
-//				InternetAddress.parse(message.getDestination(), false));
+		
+		// set recipient
+		mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO,
+				InternetAddress.parse(recipient.getRecipient().getAddress(), false));
 
 		// set subject
 		// TODO allow for text replacement in the subject (i.e. %U = sender's username)
@@ -126,7 +127,7 @@ public class EmailGateway extends MessagingGateway {
 			throw new MessageException(e);
 		}
 		
-	//	log.debug("Email message sent to " + message.getDestination() + " successfully");
+		log.debug("Email message sent to " + recipient.getRecipient().getAddress() + " successfully");
 	}
 
 	/**
@@ -199,7 +200,7 @@ public class EmailGateway extends MessagingGateway {
 
 	private void processMessage(javax.mail.Message message) throws MessagingException {
 		Person sender = null;
-		
+		String origin =null;
 		try {
 			// get the OpenMRS person for the sender
 			Address[] senders = message.getFrom();
@@ -212,10 +213,12 @@ public class EmailGateway extends MessagingGateway {
 			while (!found && i < senders.length) {
 				InternetAddress s = (InternetAddress) senders[i];
 				sender = this.getAddressService().getPersonForAddress(s.getAddress());
-				if (sender == null)
+				if (sender == null){
 					log.error("no person could be found for sender: " + s.toString());
-				else
+				}else{
 					found = true;
+					origin = s.getAddress();
+				}
 				i++;
 			}
 			if (sender == null) {
@@ -253,18 +256,15 @@ public class EmailGateway extends MessagingGateway {
 			}
 			
 			// post the message
-			org.openmrs.module.messaging.domain.Message m = new org.openmrs.module.messaging.domain.Message("", content,EmailProtocol.class);
-		//	m.setFrom(sender);
-		//	m.setMessageStatus(MessageStatus.RECEIVED);
+			org.openmrs.module.messaging.domain.Message m = new org.openmrs.module.messaging.domain.Message(content,"",EmailProtocol.class);
+			m.setSender(sender);
+			m.setStatus(MessageStatus.RECEIVED);
+			m.setOrigin(origin);
 			m.setDate(message.getSentDate());
-			//m.setProtocol(EmailProtocol.class.getName());
 			this.getMessageService().saveMessage(m);
 			
 			// mark the message as seen
-			message.setFlag(Flag.SEEN, true);
-			
-		//	log.debug("Received message from " + m.getFrom());
-			
+			message.setFlag(Flag.SEEN, true);			
 		} catch (IOException e) {
 			log.error("could not read message content due to an I/O error", e);
 		} catch (MessagingException e) {
@@ -386,7 +386,4 @@ public class EmailGateway extends MessagingGateway {
 			return false;
 		return p.equals(EmailProtocol.class);
 	}
-	
-
-	
 }
