@@ -55,7 +55,6 @@ public class GoogleVoiceGateway extends MessagingGateway {
 
 	@Override
 	public boolean isActive() {
-		updateCredentials();
 		return isActive;
 	}
 

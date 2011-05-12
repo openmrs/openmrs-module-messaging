@@ -49,6 +49,7 @@ public class DispatchMessagesTask extends AbstractTask {
 	 * dispatches them to the proper gateway.
 	 */
 	public void execute() {
+		long startTime = new Date().getTime();
 		Context.openSession();
 		try {
 			// authenticate (for pre-1.7)
@@ -56,13 +57,15 @@ public class DispatchMessagesTask extends AbstractTask {
 				authenticate();
 
 			GatewayManager manager = getGatewayManager();
-			if (manager == null)
+			if (manager == null){
+				log.info("Gateway Manager null");
 				return;
-
+			}
 			// receive messages
-			log.debug("Receiving messages");
+			log.info("Receiving messages");
 			for (MessagingGateway mg : manager.getActiveGateways()) {
 				if (mg.canReceive()) {
+					log.info(mg.getName()+" receiving messages");
 					mg.receiveMessages();
 				}
 			}
@@ -75,14 +78,18 @@ public class DispatchMessagesTask extends AbstractTask {
 			log.error("Exception occurred during DispatchMessagesTask", e);
 		} finally {
 			Context.closeSession();
+			long endTime= new Date().getTime();
+			log.info("Time Elapsed: " + ((endTime - startTime)/1000.0) + " seconds.");
 		}
 	}
 	
 	private void dispatchMessages(List<Message> messages){
 		List<MessagingGateway> gateways;
 		for(Message message: messages){
+			log.debug("Dispatching message: "+message.getContent());
 			for(MessageRecipient mRecipient: message.getTo()){
 				if(mRecipient.getMessageStatus() == MessageStatus.OUTBOX || mRecipient.getMessageStatus() == MessageStatus.RETRYING){
+					log.debug("Dispatching message to "+mRecipient.getRecipient().getAddress());
 					gateways = getGatewayManager().getActiveSupportingGateways(mRecipient.getRecipient().getProtocol());
 					//TODO maybe we should change the message status if there aren't any available gateways
 					if(gateways.size() <=0) continue;
@@ -90,7 +97,9 @@ public class DispatchMessagesTask extends AbstractTask {
 					mRecipient.setSendAttempts(mRecipient.getSendAttempts()+1);
 					try{
 						//TODO code better gateway routing logic
+						log.debug("Attempting to send message.");
 						gateways.get(0).sendMessage(message,mRecipient);
+						log.debug("Message sent");
 						//set the last attempt date
 						mRecipient.setDate(new Date());
 						//set the status as sent
@@ -100,10 +109,10 @@ public class DispatchMessagesTask extends AbstractTask {
 						//if the sending didn't work, update the message status
 						if(mRecipient.getSendAttempts() < getMaxRetryAttempts()){
 							mRecipient.setMessageStatus(MessageStatus.RETRYING);
-							log.info("Retrying message #" + message.getId());
+							log.debug("Retrying message #" + message.getId());
 						}else{
 							mRecipient.setMessageStatus(MessageStatus.FAILED);
-							log.info("Message #" + message.getId()+ " failed");
+							log.debug("Message #" + message.getId()+ " failed");
 						}
 					}
 					
@@ -112,6 +121,7 @@ public class DispatchMessagesTask extends AbstractTask {
 			//set the sent/last attempt date
 			message.setDate(new Date());
 			//save the message
+			log.debug("Saving Message");
 			getMessageService().saveMessage(message);
 		}
 	}

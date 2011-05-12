@@ -135,6 +135,7 @@ public class EmailGateway extends MessagingGateway {
 	 */
 	@Override
 	public void receiveMessages() {
+		log.info("Starting Recieving email messages");
 		if (inSession == null) {
 			log.error("cannot recieve messages; gateway is off");
 			return;
@@ -194,8 +195,12 @@ public class EmailGateway extends MessagingGateway {
 		} catch (MessagingException e) {
 			log.error("Error connecting to the incoming email store", e);
 			return;
+		}catch(Throwable t){
+			log.error("Error Recieving email messages",t);
+		}finally{
+			log.info("In Finally block");
 		}
-		
+		log.info("Done Recieving email messages");
 	}
 
 	private void processMessage(javax.mail.Message message) throws MessagingException {
@@ -285,7 +290,7 @@ public class EmailGateway extends MessagingGateway {
 	 */
 	@Override
 	public boolean canReceive() {
-		return inSession != null;
+		return false;
 	}
 
 	/**
@@ -298,6 +303,7 @@ public class EmailGateway extends MessagingGateway {
 
 	@Override
 	public void startup() {
+		log.info("Starting up Email Gateway");
 		AdministrationService adminService = Context.getAdministrationService();
 		
 		// get in and out protocols
@@ -352,6 +358,7 @@ public class EmailGateway extends MessagingGateway {
 		// initialize sessions
 		inSession = Session.getInstance(inProps, null);
 		outSession = Session.getInstance(outProps, null);
+		log.info("Done Starting up Email Gateway");
 	}
 
 	@Override

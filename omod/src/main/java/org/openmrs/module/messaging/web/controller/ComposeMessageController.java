@@ -1,6 +1,5 @@
 package org.openmrs.module.messaging.web.controller;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +10,6 @@ import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.omail.OMailProtocol;
-import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
