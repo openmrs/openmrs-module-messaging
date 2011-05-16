@@ -22,7 +22,7 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
  */
 public class Message extends BaseOpenmrsObject {
 
-	protected Message() {}
+	protected Message() {super();}
 	
 	private static final Log log = LogFactory.getLog(Message.class);
 

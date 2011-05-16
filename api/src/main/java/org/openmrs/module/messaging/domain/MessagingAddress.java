@@ -17,7 +17,7 @@ import org.openmrs.module.messaging.domain.gateway.Protocol;
  */
 public class MessagingAddress extends BaseOpenmrsData {
 
-	public MessagingAddress() {}
+	public MessagingAddress() {super();}
 	
 	public MessagingAddress(String address, Person person, Class<? extends Protocol> protocolClass) {
 		super();

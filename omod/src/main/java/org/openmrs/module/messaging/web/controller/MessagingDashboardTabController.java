@@ -16,6 +16,6 @@ public class MessagingDashboardTabController extends PortletController {
 	protected void populateModel(HttpServletRequest request, Map<String, Object> model) {
 		request.setAttribute("protocols", Context.getService(MessagingService.class).getProtocols());
 		Patient p = (Patient) model.get("patient");
-		request.setAttribute("patientAddresses", Context.getService(MessagingAddressService.class).getMessagingAddressesForPerson(p,false));
+		request.setAttribute("patientAddresses", Context.getService(MessagingAddressService.class).getMessagingAddressesForPerson(p,null,false));
 	}
 }

@@ -79,12 +79,8 @@ public class OMailGateway extends MessagingGateway {
 	private void initializeAddresses(){
 			List<Person> people = Context.getPersonService().getPeople("", false);
 			for(Person p: people){
-				List<MessagingAddress> addresses = Context.getService(MessagingAddressService.class).getMessagingAddressesForPerson(p,false);
-				boolean hasOMailAddress=false;
-				for(MessagingAddress add:addresses){
-					if(add.getProtocol() == OMailProtocol.class) hasOMailAddress=true;
-				}
-				if(!hasOMailAddress){
+				List<MessagingAddress> addresses = Context.getService(MessagingAddressService.class).getMessagingAddressesForPerson(p,OMailProtocol.class,false);
+				if(addresses.size() ==0){
 					MessagingAddress ma = new MessagingAddress(p.getPersonId().toString(),p,OMailProtocol.class);
 					Context.getService(MessagingAddressService.class).saveMessagingAddress(ma);
 				}

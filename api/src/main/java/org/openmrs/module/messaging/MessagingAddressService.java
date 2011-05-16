@@ -41,7 +41,7 @@ public interface MessagingAddressService extends OpenmrsService{
 	 * @return all messaging addresses for that person
 	 */
 	@Transactional(readOnly=true)
-	public List<MessagingAddress> getMessagingAddressesForPerson(Person person, boolean includeVoided);
+	public List<MessagingAddress> getMessagingAddressesForPerson(Person person, Class<? extends Protocol> protocolClass, boolean includeVoided);
 
 	/**
 	 * This method performs a like query on MessagingAddress.address with

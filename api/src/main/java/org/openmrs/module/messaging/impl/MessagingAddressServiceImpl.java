@@ -29,8 +29,8 @@ public class MessagingAddressServiceImpl extends BaseOpenmrsService implements M
 	public List<MessagingAddress> getMessagingAddressesForPerson(Person person){
 		return dao.findMessagingAddresses(null, null, person, false);
 	}
-	public List<MessagingAddress> getMessagingAddressesForPerson(Person person, boolean includeVoided) {
-		return dao.findMessagingAddresses(null,null,person, includeVoided);
+	public List<MessagingAddress> getMessagingAddressesForPerson(Person person, Class<? extends Protocol> protocolClass, boolean includeVoided) {
+		return dao.findMessagingAddresses(null,protocolClass ,person, includeVoided);
 	}
 
 	public List<MessagingAddress> findMessagingAddresses(String search, boolean includeVoided) {
