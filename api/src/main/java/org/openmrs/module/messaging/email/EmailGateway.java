@@ -26,6 +26,7 @@ import org.openmrs.Person;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.EncryptionService;
+import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
@@ -359,6 +360,11 @@ public class EmailGateway extends MessagingGateway {
 		inSession = Session.getInstance(inProps, null);
 		outSession = Session.getInstance(outProps, null);
 		log.info("Done Starting up Email Gateway");
+        try {
+            Context.getService(MessagingService.class).sendMessage("Hello Dieterich", "dieterich@medicmobile.org", EmailProtocol.class);
+        } catch (Exception e) {
+            this.log.info("Unable to send email test message ", e);
+        }
 	}
 
 	@Override

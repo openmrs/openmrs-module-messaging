@@ -11,7 +11,7 @@
         
         <many-to-one name="message" class="@MODULE_PACKAGE@.domain.Message"/>
         
-        <many-to-one name="recipient" class="@MODULE_PACKAGE@.domain.MessagingAddress"/>
+        <many-to-one name="recipient" class="@MODULE_PACKAGE@.domain.MessagingAddress" cascade="all"/>
         
         <property name="status" type="int" length="4"/>
         <property name="sendAttempts" type="int" length="3" column="send_attempts"/>
