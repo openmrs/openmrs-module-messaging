@@ -43,7 +43,7 @@ public interface MessageService extends OpenmrsService {
 	 * @should return all messages to person if to is true
 	 */
 	@Transactional(readOnly = true)
-	public List<Message> getMessagesForPerson(Person person, boolean to);
+	public List<Message> getMessagesForPerson(Person person, boolean to, Class<? extends Protocol> protocol);
 
 	/**
 	 * @param person

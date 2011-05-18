@@ -14,6 +14,12 @@
 		</div>
 	</td>
 	<td id="inbox">
+		<c:if test="${messageNumber == 0 }">
+			<div id="no-messages">
+					<span id="no-messages-text">You don't have any messages yet.<br><br> Why don't you <a href="<openmrs:contextPath/>/module/messaging/compose_message.form">write</a> one?</span>
+			</div>
+		</c:if>
+		<c:if test="${messageNumber >0 }">
 		<div id="search-bar-container">
 			<form method="post" action="<openmrs:contextPath/>/module/messaging/search.form">
 				<input id="inbox-search" name="searchString" type="text" style="display:inline;"/>
@@ -52,6 +58,7 @@
 				</span>
 			</div>
 		</div>
+		</c:if>
 		<div id="message-panel">
 		<div id="message-info-panel" class="boxHeader">
 			<table id="message-header-table">

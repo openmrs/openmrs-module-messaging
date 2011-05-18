@@ -3,6 +3,12 @@
 	margin-left:0px;
 	margin-right:auto;
 }
+#no-messages{
+	text-align:center;
+	font-size:1.2em;
+	padding:50px 0px 30px 0px;
+	border:1px solid black;
+}
 #link-cell{
 	vertical-align:top;
 	width:1%;
