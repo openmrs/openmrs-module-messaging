@@ -1,5 +1,7 @@
 package org.openmrs.module.messaging.domain;
 
+import java.util.UUID;
+
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Person;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
@@ -24,6 +26,7 @@ public class MessagingAddress extends BaseOpenmrsData {
 		this.address = address;
 		this.person = person;
 		this.setProtocol(protocolClass);
+		this.setUuid(UUID.randomUUID().toString());
 	}
  
 	private Integer messagingAddressId;

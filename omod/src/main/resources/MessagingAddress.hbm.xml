@@ -7,6 +7,7 @@
         <id name="messagingAddressId" type="int" column="address_id"  unsaved-value="0">
 				<generator class="native" />
 		</id>
+		
         <property name="uuid" type="string" length="38" not-null="true" />
         
         <property name="address" type="java.lang.String"/>
@@ -16,7 +17,7 @@
         <property name="findable" type="boolean" not-null="true" length="1"/>
         <property name="protocolClass" type="java.lang.String" column="protocol_class"/>	
                         
-        <many-to-one name="creator" class="org.openmrs.User" not-null="true" column="creator"/>
+        <many-to-one name="creator" class="org.openmrs.User" column="creator"/>
 		<property name="dateCreated" type="java.util.Date"  column="date_created" length="19" />
 
 		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>

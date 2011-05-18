@@ -67,7 +67,8 @@ public class Message extends BaseOpenmrsObject {
 		super();
 		this.to = new HashSet<MessageRecipient>();
 		this.content = content;
-		getTo().add(new MessageRecipient(new MessagingAddress(to,null,protocolClass),this));
+		MessagingAddress ma = new MessagingAddress(to,null,protocolClass);
+		getTo().add(new MessageRecipient(ma,this));
 	}
 	
 	/**
