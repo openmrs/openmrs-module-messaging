@@ -17,9 +17,10 @@ import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.PersonAttributeType;
+import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
-import org.openmrs.module.messaging.schedulertask.DispatchMessagesTask;
 import org.openmrs.scheduler.SchedulerException;
 import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.util.OpenmrsConstants;
@@ -34,6 +35,8 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 	
 	private static String TASK_NAME="Messaging Module Gateway Manager";
 	
+	public static String SEND_OMAIL_ALERTS_ATTR_NAME = "Send Omail Alerts";
+	public static String ALERT_ADDRESS_ATTR_NAME = "Alert Address";
 	/**
 	 * A boolean used to protect against multiple started() calls
 	 */
@@ -41,10 +44,35 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 	
 	public void started() {
 		log.info("Started Messaging Module");
-		if(!startedCalled) createGatewayManagerTask();
+		if(!startedCalled){ 
+			createGatewayManagerTask();
+			createPatientAttributes();
+			startedCalled = true;
+		}
 	}
 
 	public void willStop() {
+	}
+	
+	private void createPatientAttributes(){
+		Context.addProxyPrivilege(OpenmrsConstants.PRIV_MANAGE_PERSON_ATTRIBUTE_TYPES);
+		PersonService personService = Context.getPersonService();
+		if(personService.getPersonAttributeTypeByName(SEND_OMAIL_ALERTS_ATTR_NAME) == null){
+			PersonAttributeType sendOmailAlerts = new PersonAttributeType();
+			sendOmailAlerts.setName(SEND_OMAIL_ALERTS_ATTR_NAME);
+			sendOmailAlerts.setFormat("java.lang.Boolean");
+			sendOmailAlerts.setDescription("Boolean signalling whether or not the messaging module should send out alerts when a user receives OMail messages");
+			sendOmailAlerts.setSearchable(false);
+			personService.savePersonAttributeType(sendOmailAlerts);
+		}
+		if(personService.getPersonAttributeTypeByName(ALERT_ADDRESS_ATTR_NAME) == null){
+			PersonAttributeType alertAddress = new PersonAttributeType();
+			alertAddress.setName(ALERT_ADDRESS_ATTR_NAME);
+			alertAddress.setFormat("java.lang.Integer");
+			alertAddress.setDescription("Int id for the address to which we should send OMail alerts");
+			alertAddress.setSearchable(false);
+			personService.savePersonAttributeType(alertAddress);
+		}
 	}
 	
 	/**
@@ -70,7 +98,6 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 				log.error("Error creating the gateway manager task in the scheduler", e);
 			}
 		}
-		startedCalled = true;
 	}
 	
 }

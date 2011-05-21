@@ -3,7 +3,6 @@ package org.openmrs.module.messaging;
 import java.util.List;
 import java.util.Set;
 
-import org.openmrs.Person;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
@@ -49,16 +48,7 @@ public interface MessagingService {
 	 * @param message
 	 */
 	public void sendMessage(Message message)  throws Exception;
-
-	/**
-	 * Sends a message to the provided person using their preferred address.
-	 * TODO: error handling
-	 * 
-	 * @param message
-	 * @param person
-	 */
-	public void sendMessageToPreferredAddress(String message, Person person);
-
+	
 	/**
 	 * Queue multiple messages with this method.
 	 * 

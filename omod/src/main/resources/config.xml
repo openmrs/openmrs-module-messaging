@@ -59,6 +59,11 @@
 				<include method="redetectModems"/>
 				<include method="getConnectedModems"/>
 			</create>
+			
+			<create creator="new" javascript="DWRMessagingSettingsService">
+				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingSettingsService"/>
+				<include method="setAlertSettings"/>
+			</create>
 		</allow>
 	</dwr>
 	

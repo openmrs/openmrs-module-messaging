@@ -9,14 +9,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Person;
+import org.openmrs.PersonAttribute;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
+import org.openmrs.module.messaging.MessagingAddressService;
+import org.openmrs.module.messaging.MessagingModuleActivator;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
+import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.GatewayManager;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
 import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
@@ -34,7 +37,7 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 	private static Log log = LogFactory.getLog(MessagingServiceImpl.class);
 			
 	/**
-	 * A map containing all the protocols that this system can use
+	 * A map containing all the messaging protocols that this system can use
 	 */
 	private Map<Class<? extends Protocol>, Protocol> protocols;
 		
@@ -52,12 +55,26 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		//setup the listeners
 		listeners = new CopyOnWriteArrayList<IncomingMessageListener>();
 		
-		// add a trial listener
-//		listeners.add(new IncomingMessageListener() {	
-//			public void messageRecieved(Message message) {
-//				log.info("INCOMING MESSAGE RECIEVED: "+ message.getContent() + ". SENDER: "+ message.getOrigin());
-//			}
-//		});
+		listeners.add(new IncomingMessageListener() {	
+			public void messageRecieved(Message message) {
+				log.info("INCOMING MESSAGE RECIEVED: "+ message.getContent() + ". SENDER: "+ message.getSender().getPersonName());
+				for(MessageRecipient mr: message.getTo()){
+					if(mr.getProtocol().equals(OMailProtocol.class) && mr.getRecipient().getPerson() != null){
+						PersonAttribute shouldAlertAttr = mr.getRecipient().getPerson().getAttribute(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME);
+						if(shouldAlertAttr != null && Boolean.parseBoolean(shouldAlertAttr.getValue())){
+							int addressId = Integer.parseInt(mr.getRecipient().getPerson().getAttribute(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME).getValue());
+							MessagingAddress alertAddr = Context.getService(MessagingAddressService.class).getMessagingAddress(addressId);
+							Message alertMsg = new Message(alertAddr,"You have new Omail");
+							try {
+								sendMessage(alertMsg);
+							} catch (Exception e) {
+								log.error("Unable to send alert message",e);
+							}
+						}
+					}
+				}
+			}
+		});
 
 		//initialize the protocols
 		protocols = new HashMap<Class<? extends Protocol>, Protocol>();
@@ -103,10 +120,6 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		for(Message m: messages){
 			sendMessage(m);
 		}
-	}
-	
-	public void sendMessageToPreferredAddress(String message, Person person){
-		//TODO: Make this work
 	}
 
 	public List<Protocol> getProtocols(){

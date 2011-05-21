@@ -1,6 +1,8 @@
 package org.openmrs.module.messaging.db.hibernate;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,10 +14,13 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
+import org.hibernate.transform.RootEntityResultTransformer;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.db.MessageDAO;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.domain.MessageRecipient;
 import org.openmrs.module.messaging.domain.MessageStatus;
 import org.openmrs.module.messaging.domain.Message.MessageFields;
 import org.openmrs.module.messaging.domain.MessageRecipient.MessageRecipientFields;
@@ -27,7 +32,7 @@ public class HibernateMessageDAO implements MessageDAO {
 
 	protected Log log = LogFactory.getLog(getClass());
 	
-	
+	private Set<Integer> seenMessages = new HashSet<Integer>();
 	/**
 	 * Hibernate session factory
 	 */
@@ -76,6 +81,7 @@ public class HibernateMessageDAO implements MessageDAO {
 		if(status != null){
 			toCrit.add(Restrictions.eq(MessageRecipientFields.STATUS.name, status));
 		}
+		c.setResultTransformer(new DistinctRootEntityResultTransformer());
 		return c.list();
 	}
 	
@@ -90,7 +96,7 @@ public class HibernateMessageDAO implements MessageDAO {
 			//c.createAlias("to.recipient.person", "recipients");
 			//c.add(Restrictions.or(Restrictions.eq(MessageFields.SENDER.name,sender), Restrictions.eq("recipients",recipient)));
 		}else{
-			if(sender!= null){
+			if(sender!= null){   
 				c.add(Restrictions.eq(MessageFields.SENDER.name, sender));
 			}
 			if(recipient!= null){
@@ -104,6 +110,7 @@ public class HibernateMessageDAO implements MessageDAO {
 			toCrit.add(Restrictions.eq(MessageRecipientFields.STATUS.name, status));
 		}
 		c.addOrder(Order.asc(MessageFields.DATE.name));
+		c.setResultTransformer(new DistinctRootEntityResultTransformer());
 		return c.list();
 	}
 
@@ -112,6 +119,15 @@ public class HibernateMessageDAO implements MessageDAO {
 	}
 
 	public void saveMessage(Message message) {
+		for(MessageRecipient m: message.getTo()){
+			if(m.getMessageStatus() != null && m.getMessageStatus() == MessageStatus.RECEIVED && !seenMessages.contains(message.getId())){
+				Context.getService(MessagingService.class).notifyListeners(message);
+				if(message.getId() > 0){
+					seenMessages.add(message.getId());
+				}
+				break;
+			}
+		}
 		sessionFactory.getCurrentSession().saveOrUpdate(message);
 	}
 

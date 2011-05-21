@@ -61,7 +61,7 @@
 <openmrs:htmlInclude file="/dwr/engine.js"/>
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <script src="<openmrs:contextPath/>/dwr/interface/DWRMessagingAddressService.js"></script>
-
+<script src="<openmrs:contextPath/>/dwr/interface/DWRMessagingSettingsService.js"></script>
 <script type="text/javascript">
 	window.onload = init;
 	var viewed = -1;
@@ -76,6 +76,7 @@
 		$j('#save-address-button').live('click',saveAddressClick);
 		$j('#cancel-address-button').live('click',cancelAddressClick);
 		$j('#enable-alerts-checkbox').live('click',toggleAlerts);
+		$j('#alert-address-select').live('change',alertsChanged);
 		//watermark the address button
 		//$j('#address-textbox').watermark('Address');
 		fillAddressTable();
@@ -105,7 +106,7 @@
 	function fillAlertAddressSelect(){
 		DWRMessagingAddressService.getAllAddressesForCurrentUser(function(addresses) {
 			dwr.util.removeAllOptions("alert-address-select");
-			dwr.util.addOptions("alert-address-select",addresses,"address");
+			dwr.util.addOptions("alert-address-select",addresses,"messagingAddressId","address");
 		});
 	}
  
@@ -188,7 +189,11 @@
 		}else{
 			$j("#alert-address-select").attr("disabled","disabled");
 		}
-		
+		alertsChanged();
+	}
+
+	function alertsChanged(){
+		DWRMessagingSettingsService.setAlertSettings($j("#enable-alerts-checkbox").is(":checked"), $j("#alert-address-select").val());
 	}
 	
 	function cloneAddressRow(adrId){

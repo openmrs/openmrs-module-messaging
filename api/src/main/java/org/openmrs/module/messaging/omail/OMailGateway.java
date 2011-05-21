@@ -56,11 +56,13 @@ public class OMailGateway extends MessagingGateway {
 			}
 			getMessageService().saveMessage(m);
 		}
-	}
+	}  
 
 	@Override
 	public void sendMessage(Message message, MessageRecipient recipient) throws Exception {
-		recipient.setOrigin(message.getSender().getId().toString());
+		if(message.getSender() != null){
+			recipient.setOrigin(message.getSender().getId().toString());
+		}
 	}
 
 	@Override

@@ -45,7 +45,11 @@ public class MessageBean implements Serializable {
 		this.id =message.getId();
 		this.setContent(message.getContent());
 		this.setSubject(message.getSubject());
-		this.sender = message.getSender().getPersonName().toString();
+		if(message.getSender() != null){
+			this.sender = message.getSender().getPersonName().toString();
+		}else{
+			this.sender="";
+		}
 		setRecipients("");
 		setOrigin("");
 		Iterator<MessageRecipient> itr = message.getTo().iterator();

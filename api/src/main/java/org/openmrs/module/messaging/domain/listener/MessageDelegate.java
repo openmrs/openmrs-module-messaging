@@ -36,7 +36,7 @@ public interface MessageDelegate {
 	 * This method will be called when a response is received for a message that
 	 * was sent. Since determining which message is a response to which is
 	 * sometimes a tricky process, this callback may not be 100% accurate or may
-	 * not even be implemented by certain messaging frameworks
+	 * not even be implemented by certain messaging systems.
 	 * 
 	 * @param sentMessage  The original message that was sent
 	 * @param reply The reply to the message
