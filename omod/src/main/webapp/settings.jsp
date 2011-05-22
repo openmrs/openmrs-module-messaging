@@ -69,7 +69,7 @@
 	var protocolNames= {"org.openmrs.module.messaging.sms.SmsProtocol":"SMS",
 						"org.openmrs.module.messaging.omail.OMailProtocol":"OMail",
 						"org.openmrs.module.messaging.email.EmailProtocol":"Email"};
-	
+	var alertAddressId = <c:out value="${ alertAddress.messagingAddressId }">-1</c:out>;
 	function init(){
 		//add the "Add Address" event listener
 		$j('#add-address-button').live("click",addAddressClick);
@@ -104,10 +104,15 @@
 	}
 
 	function fillAlertAddressSelect(){
-		DWRMessagingAddressService.getAllAddressesForCurrentUser(function(addresses) {
+		DWRMessagingAddressService.getAlertableAddressesForCurrentUser(function(addresses) {
 			dwr.util.removeAllOptions("alert-address-select");
 			dwr.util.addOptions("alert-address-select",addresses,"messagingAddressId","address");
 			$j("#alert-address-select").val(<c:out value="${ alertAddress.messagingAddressId }"/>);
+			if(addresses.length == 0){
+				$j("#enable-alerts-checkbox").attr("disabled","disabled");
+			}else{
+				$j("#enable-alerts-checkbox").removeAttr("disabled");
+			}
 		});
 	}
  
@@ -144,6 +149,9 @@
 	    	fillAddressTable();
 	    	fillAlertAddressSelect();
 	    	dwr.engine.endBatch();
+	    	if(address.messagingAddressId == alertAddressId){
+				$j("#enable-alerts-checkbox").removeAttr("checked");
+	    	}
 	    	clearEditingArea();
 			if ($j("#edit-address-panel").is(":hidden")==false){
 				toggleEditingAddress();
@@ -195,6 +203,7 @@
 
 	function alertsChanged(){
 		DWRMessagingSettingsService.setAlertSettings($j("#enable-alerts-checkbox").is(":checked"), $j("#alert-address-select").val());
+		alertAddressId = $j("#alert-address-select").val();
 	}
 	
 	function cloneAddressRow(adrId){

@@ -19,6 +19,8 @@ public class DWRMessagingSettingsService {
 	
 	public void setAlertSettings(Boolean shouldAlert, Integer messagingAddressId){
 		log.info("Setting Omail Alert settings.");
+		//we should return if they are trying to alert a null address
+		if(shouldAlert && (messagingAddressId == null || messagingAddressId <= 0)) return;
 		//void the old attributes
 		PersonAttributeService personAttrService = Context.getService(PersonAttributeService.class);
 		PersonAttributeType shouldAlertType = Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME);
@@ -38,7 +40,7 @@ public class DWRMessagingSettingsService {
 		PersonAttribute shouldAlertAttr = new PersonAttribute(shouldAlertType,shouldAlert.toString());
 		SortedSet<PersonAttribute> attrSet = new TreeSet<PersonAttribute>();
 		attrSet.add(shouldAlertAttr);
-		if(messagingAddressId != null && messagingAddressId != 0){
+		if(messagingAddressId != null && messagingAddressId != 0 && shouldAlert){
 			PersonAttribute alertAddressAttr = new PersonAttribute(alertAddressType,messagingAddressId.toString());
 			attrSet.add(alertAddressAttr);
 		}

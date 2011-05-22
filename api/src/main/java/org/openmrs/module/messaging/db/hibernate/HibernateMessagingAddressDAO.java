@@ -48,7 +48,6 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
 
 	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocolClass, Person person, boolean includeVoided) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
@@ -71,16 +70,7 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	
 	public void deleteMessagingAddress(MessagingAddress address) throws DAOException{
 		sessionFactory.getCurrentSession().delete(address);
-		if(address.getPerson()!=null){
-			PersonAttribute pa = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME));
-			if(Integer.parseInt(pa.getValue()) == address.getId()){
-				pa.voidAttribute("Address Deleted");
-				PersonAttribute shouldAlert = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME));
-				shouldAlert.voidAttribute("Address Deleted");
-				Context.getService(PersonAttributeService.class).savePersonAttribute(pa);
-				Context.getService(PersonAttributeService.class).savePersonAttribute(shouldAlert);
-			}
-		}
+		checkAlertsForDeletedAddress(address);
 	}
 
 	public void voidMessagingAddress(MessagingAddress address, String reason) {
@@ -90,6 +80,27 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 		}catch(Exception e){}
 		address.setVoidReason(reason);
 		sessionFactory.getCurrentSession().saveOrUpdate(address);
+		checkAlertsForDeletedAddress(address);
+	}
+	
+	/**
+	 * When an address is deleted, we need to make sure that
+	 * there are no alerts that will still attempt to send 
+	 * notifications to the deleted address.
+	 */
+	private void checkAlertsForDeletedAddress(MessagingAddress address){
+		if(address.getPerson()!=null){
+			PersonAttribute pa = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME));
+			if(pa != null && Integer.parseInt(pa.getValue()) == address.getId()){
+				pa.voidAttribute("Address Deleted");
+				Context.getService(PersonAttributeService.class).savePersonAttribute(pa);
+				PersonAttribute shouldAlert = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME));
+				if(shouldAlert != null){
+					shouldAlert.voidAttribute("Address Deleted");
+					Context.getService(PersonAttributeService.class).savePersonAttribute(shouldAlert);
+				}
+			}
+		}
 	}
 
 	public void saveMessagingAddress(MessagingAddress address) throws DAOException{

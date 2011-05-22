@@ -12,7 +12,7 @@ import org.openmrs.module.messaging.MessagingAddressService;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
-import org.openmrs.module.messaging.domain.gateway.exception.AddressFormattingException;
+import org.openmrs.module.messaging.omail.OMailProtocol;
 import org.openmrs.module.messaging.web.domain.AddressAutocompleteBean;
 
 public class DWRMessagingAddressService {
@@ -35,15 +35,6 @@ public class DWRMessagingAddressService {
 	}
 	
 	/**
-	 * Returns only the 'public' messaging addresses for the person ID supplied.
-	 * @param personId The numeric database ID of the person in question
-	 * @return
-	 */
-	public List<MessagingAddress> getPublicAddressesForPersonId(Integer personId){
-		return addressService.getPublicAddressesForPerson(Context.getPersonService().getPerson(personId));
-	}
-	
-	/**
 	 * Returns all messaging addresses for the currently authenticated user.
 	 */
 	public List<MessagingAddress> getAllAddressesForCurrentUser(){
@@ -51,10 +42,17 @@ public class DWRMessagingAddressService {
 	}
 	
 	/**
-	 * Returns only public messaging addresses for the currently authenticated user.
+	 * Returns all non-omail messaging addresses for the currently authenticated user.
 	 */
-	public List<MessagingAddress> getPublicAddressesForCurrentUser(){
-		return addressService.getPublicAddressesForPerson(Context.getAuthenticatedUser().getPerson());
+	public List<MessagingAddress> getAlertableAddressesForCurrentUser(){
+		List<MessagingAddress> addresses = addressService.getMessagingAddressesForPerson(Context.getAuthenticatedUser().getPerson(),null,false);
+		List<MessagingAddress> results = new ArrayList<MessagingAddress>();
+		for(MessagingAddress ma: addresses){
+			if(ma.getProtocol() != OMailProtocol.class){
+				results.add(ma);
+			}
+		}
+		return results;
 	}
 	
 	/**

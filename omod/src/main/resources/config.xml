@@ -25,10 +25,9 @@
 						
 			<create creator="new" javascript="DWRMessagingAddressService">
 				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingAddressService"/>
-				<include method="getAllAddressesForCurrentUser"/>
 				<include method="getAllAddressesForPersonId"/>
-				<include method="getPublicAddressesForPersonId"/>
-				<include method="getPublicAddressesForCurrentUser"/>
+				<include method="getAllAddressesForCurrentUser"/>
+				<include method="getAlertableAddressesForCurrentUser"/>
 				<include method="deleteAddress"/>
 				<include method="saveOrUpdateAddress"/>
 				<include method="saveOrUpdateAddressForCurrentUser"/>
