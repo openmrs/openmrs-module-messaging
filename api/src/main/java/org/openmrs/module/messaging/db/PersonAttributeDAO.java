@@ -12,4 +12,6 @@ public interface PersonAttributeDAO {
 
 	public void savePersonAttribute(PersonAttribute attribute);
 
+	public PersonAttribute getPersonAttribute(Person person, PersonAttributeType type);
+
 }

@@ -36,10 +36,12 @@ public class DWRMessagingSettingsService {
 		
 		//create the new ones
 		PersonAttribute shouldAlertAttr = new PersonAttribute(shouldAlertType,shouldAlert.toString());
-		PersonAttribute alertAddressAttr = new PersonAttribute(alertAddressType,messagingAddressId.toString());
 		SortedSet<PersonAttribute> attrSet = new TreeSet<PersonAttribute>();
 		attrSet.add(shouldAlertAttr);
-		attrSet.add(alertAddressAttr);
+		if(messagingAddressId != null && messagingAddressId != 0){
+			PersonAttribute alertAddressAttr = new PersonAttribute(alertAddressType,messagingAddressId.toString());
+			attrSet.add(alertAddressAttr);
+		}
 		Context.getAuthenticatedUser().getPerson().setAttributes(attrSet);
 		//save the attributes
 		Context.getPersonService().savePerson(Context.getAuthenticatedUser().getPerson());

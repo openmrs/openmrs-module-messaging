@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
@@ -42,5 +43,15 @@ public class HibernatePersonAttributeDAO implements PersonAttributeDAO{
 
 	public void savePersonAttribute(PersonAttribute attribute) {
 		sessionFactory.getCurrentSession().saveOrUpdate(attribute);
+	}
+
+	public PersonAttribute getPersonAttribute(Person person, PersonAttributeType type) {
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(PersonAttribute.class);
+		c.add(Restrictions.eq("person",person));
+		c.add(Restrictions.eq("attributeType",type));
+		c.add(Restrictions.eq("voided", false));
+		c.addOrder(Order.desc("dateCreated"));
+		c.setMaxResults(1);
+		return (PersonAttribute) c.uniqueResult();
 	}
 }

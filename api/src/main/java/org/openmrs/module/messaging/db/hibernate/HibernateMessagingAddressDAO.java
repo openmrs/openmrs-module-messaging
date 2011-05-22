@@ -9,9 +9,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
-import org.openmrs.api.APIException;
+import org.openmrs.PersonAttribute;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.messaging.MessagingModuleActivator;
+import org.openmrs.module.messaging.PersonAttributeService;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
@@ -69,6 +71,16 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	
 	public void deleteMessagingAddress(MessagingAddress address) throws DAOException{
 		sessionFactory.getCurrentSession().delete(address);
+		if(address.getPerson()!=null){
+			PersonAttribute pa = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME));
+			if(Integer.parseInt(pa.getValue()) == address.getId()){
+				pa.voidAttribute("Address Deleted");
+				PersonAttribute shouldAlert = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME));
+				shouldAlert.voidAttribute("Address Deleted");
+				Context.getService(PersonAttributeService.class).savePersonAttribute(pa);
+				Context.getService(PersonAttributeService.class).savePersonAttribute(shouldAlert);
+			}
+		}
 	}
 
 	public void voidMessagingAddress(MessagingAddress address, String reason) {

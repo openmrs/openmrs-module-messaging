@@ -24,4 +24,8 @@ public class PersonAttributeServiceImpl extends BaseOpenmrsService implements Pe
 	public void savePersonAttribute(PersonAttribute attribute) {
 		dao.savePersonAttribute(attribute);
 	}
+
+	public PersonAttribute getPersonAttribute(Person person, PersonAttributeType type) {
+		return dao.getPersonAttribute(person,type);
+	}
 }

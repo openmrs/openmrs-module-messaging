@@ -13,6 +13,9 @@ public interface PersonAttributeService extends OpenmrsService{
 	@Transactional(readOnly=true)
 	public List<PersonAttribute> getPersonAttributes(Person person, PersonAttributeType type, boolean includeVoided);
 	
+	@Transactional(readOnly=true)
+	public PersonAttribute getPersonAttribute(Person person, PersonAttributeType type);
+	
 	@Transactional
 	public void savePersonAttribute(PersonAttribute attribute);
 }

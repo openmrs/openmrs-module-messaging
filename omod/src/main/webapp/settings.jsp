@@ -47,9 +47,9 @@
 			<div id="alert-settings">
 				<hr/>
 				<span style="display:block;">Alerts</span>
-				<input type="checkbox" id="enable-alerts-checkbox" style="display:inline;"></input>
+				<input type="checkbox" id="enable-alerts-checkbox" style="display:inline;" <c:if test="${ shouldAlert }">checked</c:if>></input>
 				<label for="enable-alerts-checkbox" style="display:inline;">Alert me when I have new OMail at</label>
-				<select style="display:inline;" id="alert-address-select" disabled="true">
+				<select style="display:inline;" id="alert-address-select" <c:if test="${ shouldAlert == null || shouldAlert == false }">disabled="disabled"</c:if>>
 				</select><br/>
 			</div>
 </td>
@@ -107,6 +107,7 @@
 		DWRMessagingAddressService.getAllAddressesForCurrentUser(function(addresses) {
 			dwr.util.removeAllOptions("alert-address-select");
 			dwr.util.addOptions("alert-address-select",addresses,"messagingAddressId","address");
+			$j("#alert-address-select").val(<c:out value="${ alertAddress.messagingAddressId }"/>);
 		});
 	}
  
