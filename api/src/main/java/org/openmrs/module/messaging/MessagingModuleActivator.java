@@ -56,6 +56,7 @@ public class MessagingModuleActivator extends BaseModuleActivator {
 	
 	private void createPatientAttributes(){
 		Context.addProxyPrivilege(OpenmrsConstants.PRIV_MANAGE_PERSON_ATTRIBUTE_TYPES);
+		Context.addProxyPrivilege(OpenmrsConstants.PRIV_VIEW_PERSON_ATTRIBUTE_TYPES);
 		PersonService personService = Context.getPersonService();
 		if(personService.getPersonAttributeTypeByName(SEND_OMAIL_ALERTS_ATTR_NAME) == null){
 			PersonAttributeType sendOmailAlerts = new PersonAttributeType();
