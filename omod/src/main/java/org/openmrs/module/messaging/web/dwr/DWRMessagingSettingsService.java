@@ -1,11 +1,13 @@
 package org.openmrs.module.messaging.web.dwr;
 
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
@@ -19,18 +21,22 @@ public class DWRMessagingSettingsService {
 	
 	public void setAlertSettings(Boolean shouldAlert, Integer messagingAddressId){
 		log.info("Setting Omail Alert settings.");
-		//we should return if they are trying to alert a null address
+
+		//Reload the Person object to avoid LazyInitializationException
+        Person per = Context.getPersonService().getPerson(Context.getAuthenticatedUser().getPerson().getPersonId());
+
+        //we should return if they are trying to alert a null address
 		if(shouldAlert && (messagingAddressId == null || messagingAddressId <= 0)) return;
 		//void the old attributes
 		PersonAttributeService personAttrService = Context.getService(PersonAttributeService.class);
 		PersonAttributeType shouldAlertType = Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME);
 		PersonAttributeType alertAddressType = Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME);
-		List<PersonAttribute> attributes = personAttrService.getPersonAttributes(Context.getAuthenticatedUser().getPerson(), shouldAlertType, false);
+		List<PersonAttribute> attributes = personAttrService.getPersonAttributes(per, shouldAlertType, false);
 		for(PersonAttribute attr: attributes){
 			attr.voidAttribute("New data provided");
 			personAttrService.savePersonAttribute(attr);
 		}
-		attributes = personAttrService.getPersonAttributes(Context.getAuthenticatedUser().getPerson(), alertAddressType, false);
+		attributes = personAttrService.getPersonAttributes(per, alertAddressType, false);
 		for(PersonAttribute attr: attributes){
 			attr.voidAttribute("New data provided");
 			personAttrService.savePersonAttribute(attr);
@@ -38,14 +44,19 @@ public class DWRMessagingSettingsService {
 		
 		//create the new ones
 		PersonAttribute shouldAlertAttr = new PersonAttribute(shouldAlertType,shouldAlert.toString());
-		SortedSet<PersonAttribute> attrSet = new TreeSet<PersonAttribute>();
+		Set<PersonAttribute> attrSet = per.getAttributes();
+		if(attrSet == null) {
+		    attrSet = new TreeSet<PersonAttribute>();
+		    per.setAttributes(attrSet);
+		}
 		attrSet.add(shouldAlertAttr);
 		if(messagingAddressId != null && messagingAddressId != 0 && shouldAlert){
 			PersonAttribute alertAddressAttr = new PersonAttribute(alertAddressType,messagingAddressId.toString());
 			attrSet.add(alertAddressAttr);
 		}
-		Context.getAuthenticatedUser().getPerson().setAttributes(attrSet);
-		//save the attributes
-		Context.getPersonService().savePerson(Context.getAuthenticatedUser().getPerson());
+		//per.setAttributes(attrSet);
+		
+		//save the attributes 
+		Context.getPersonService().savePerson(per);
 	}
 }
