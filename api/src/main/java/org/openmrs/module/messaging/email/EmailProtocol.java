@@ -17,7 +17,7 @@ public class EmailProtocol extends Protocol {
 	 * pattern for use with validating email addresses
 	 */
 	static final Pattern emailPattern = Pattern.compile(
-			"^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[A-Z]{2,4}$",
+			"^[\\w\\-]([\\.\\w\\-])+[\\w]+@([\\w\\-]+\\.)+[A-Z]{2,4}$",
 			Pattern.CASE_INSENSITIVE);
 
 	/**
