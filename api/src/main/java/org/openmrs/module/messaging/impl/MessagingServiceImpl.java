@@ -64,7 +64,10 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 						if(shouldAlertAttr != null && Boolean.parseBoolean(shouldAlertAttr.getValue())){
 							int addressId = Integer.parseInt(mr.getRecipient().getPerson().getAttribute(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME).getValue());
 							MessagingAddress alertAddr = Context.getService(MessagingAddressService.class).getMessagingAddress(addressId);
-							Message alertMsg = new Message(alertAddr,"You have new Omail");
+		                    final String deployUrl= Context.getRuntimeProperties().getProperty("deployment.url");//"https://65.111.248.164:8443/"; //"172.30.201.24";
+		                    final String url = deployUrl + "/openmrs/phr/index.htm";
+
+							Message alertMsg = new Message(alertAddr,"You have a new message in your personal cancer toolkit.\n\nYou can access your personal cancer toolkit by clicking the following link:\n\n"+url);
 							try {
 								sendMessage(alertMsg);
 							} catch (Exception e) {

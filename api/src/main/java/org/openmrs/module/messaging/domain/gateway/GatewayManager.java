@@ -25,9 +25,9 @@ public class GatewayManager {
 	public GatewayManager(){
 		gateways = new HashMap<Class<? extends MessagingGateway>,MessagingGateway>();
 		//add the gateways
-		gateways.put(SmsLibGateway.class, new SmsLibGateway());
+		//gateways.put(SmsLibGateway.class, new SmsLibGateway());
 		//gateways.put(TwitterGateway.class, new TwitterGateway());		
-		gateways.put(GoogleVoiceGateway.class, new GoogleVoiceGateway());
+		//gateways.put(GoogleVoiceGateway.class, new GoogleVoiceGateway());
 		gateways.put(EmailGateway.class, new EmailGateway());
 		gateways.put(OMailGateway.class, new OMailGateway());
 	}

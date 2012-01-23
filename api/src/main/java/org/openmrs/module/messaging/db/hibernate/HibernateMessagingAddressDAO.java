@@ -52,7 +52,8 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	public List<MessagingAddress> findMessagingAddresses(String address, Class<? extends Protocol> protocolClass, Person person, boolean includeVoided) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(MessagingAddress.class);
 		if(address != null && !address.equals("")){
-			c.add(Restrictions.like("address", address,MatchMode.ANYWHERE));
+			//c.add(Restrictions.like("address", address,MatchMode.ANYWHERE));
+		    c.add(Restrictions.eq("address", address));           
 		}
 		if(protocolClass != null){
 			c.add(Restrictions.eq("protocolClass", protocolClass.getName()));

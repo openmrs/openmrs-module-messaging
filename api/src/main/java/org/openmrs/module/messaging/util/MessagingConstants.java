@@ -2,6 +2,7 @@ package org.openmrs.module.messaging.util;
 
 public final class MessagingConstants {
 
+    public static final String PRIV_VIEW_ALL_MESSAGES = "View All Messages";
 	public static final String PRIV_VIEW_MESSAGES = "View Messages";
 	public static final String PRIV_SEND_MESSAGES = "Send Messages";
 	public static final String PRIV_MANAGE_MESSAGES= "Manage Messages";
