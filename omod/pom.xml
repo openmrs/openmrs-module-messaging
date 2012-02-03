@@ -13,11 +13,6 @@
 	<description>OpenMRS module project for Messaging Module</description>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>messaging-api</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
 		
 		<dependency>
 			<groupId>org.openmrs.api</groupId>
@@ -33,6 +28,16 @@
 			<groupId>org.openmrs.test</groupId>
 			<artifactId>openmrs-test</artifactId>
 			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>messaging-api</artifactId>
+			<version>0.9.0-beta</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>messaging-web</artifactId>
+			<version>0.9.0-beta</version>
 		</dependency>
 	</dependencies>
 
