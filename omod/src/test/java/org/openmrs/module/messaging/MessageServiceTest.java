@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
+import org.openmrs.module.messaging.omail.OMailProtocol;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 public class MessageServiceTest extends BaseModuleContextSensitiveTest {
@@ -32,11 +33,11 @@ public class MessageServiceTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	public void countMessagesForPerson_shouldReturnNumberOfMessagesToOrFromAPerson() throws Exception {
-		int count = Context.getService(MessageService.class).countMessagesForPerson(1, true);
+		int count = Context.getService(MessageService.class).countMessagesForPerson(1, true, OMailProtocol.class);
 		Assert.assertEquals(18, count);
-		int count2 = Context.getService(MessageService.class).countMessagesForPerson(5, true);
+		int count2 = Context.getService(MessageService.class).countMessagesForPerson(5, true, OMailProtocol.class);
 		Assert.assertEquals(17, count2);
-		int count3 = Context.getService(MessageService.class).countMessagesForPerson(6, true);
+		int count3 = Context.getService(MessageService.class).countMessagesForPerson(6, true, OMailProtocol.class);
 		Assert.assertEquals(29, count3);
 	}
 
@@ -134,7 +135,7 @@ public class MessageServiceTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void getMessagesForPerson_shouldReturnAllMessagesFromPersonIfToIsFalse() throws Exception {
 		Person p = Context.getPersonService().getPerson(1);
-		List<Message> messagesFromPerson = getMessageService().getMessagesForPerson(p, false);
+		List<Message> messagesFromPerson = getMessageService().getMessagesForPerson(p, false, OMailProtocol.class);
 		Assert.assertEquals(5, messagesFromPerson.size());
 		int[] ids = {1,2,3,4,5};
 		checkMessageIds(ids, messagesFromPerson);
@@ -147,7 +148,7 @@ public class MessageServiceTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void getMessagesForPerson_shouldReturnAllMessagesToPersonIfToIsTrue() throws Exception {
 		Person p = Context.getPersonService().getPerson(4);
-		List<Message> messagesToPerson = getMessageService().getMessagesForPerson(p, true);
+		List<Message> messagesToPerson = getMessageService().getMessagesForPerson(p, true, OMailProtocol.class);
 		Assert.assertEquals(20,messagesToPerson.size());
 		int[] ids = {1,2,3,4,8,9,10,13,14,26,27,28,29,30,31,32,33,34,35,36};
 		checkMessageIds(ids, messagesToPerson);
@@ -192,15 +193,15 @@ public class MessageServiceTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	public void getMessagesForPersonPaged_shouldReturnArbitraryPagesOfData() throws Exception {
-		List<Message> messages = getMessageService().getMessagesForPersonPaged(0,2, 5, false, false);
+		List<Message> messages = getMessageService().getMessagesForPersonPaged(0,2, 5, false, false, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{36,35}, messages);
-		List<Message> messages2 = getMessageService().getMessagesForPersonPaged(0,5, 5, false, false);
+		List<Message> messages2 = getMessageService().getMessagesForPersonPaged(0,5, 5, false, false, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{36,35,34,33,32}, messages2);
-		List<Message> messages3 = getMessageService().getMessagesForPersonPaged(1,4, 5, false, false);
+		List<Message> messages3 = getMessageService().getMessagesForPersonPaged(1,4, 5, false, false, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{32,31,30,29}, messages3);
-		List<Message> messages4 = getMessageService().getMessagesForPersonPaged(2,3, 5, false, false);
+		List<Message> messages4 = getMessageService().getMessagesForPersonPaged(2,3, 5, false, false, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{30,29,28}, messages4);
-		List<Message> messages5 = getMessageService().getMessagesForPersonPaged(2,10, 5, false, false);
+		List<Message> messages5 = getMessageService().getMessagesForPersonPaged(2,10, 5, false, false, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{16,15,14}, messages5);
 	}
 
@@ -285,9 +286,9 @@ public class MessageServiceTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	public void getMessagesForPersonPaged_shouldReturnInDescendingOrderByDateIfDateOrderAscendingIsFalse() throws Exception {
-		List<Message> ascendingMessagesFrom = getMessageService().getMessagesForPersonPaged(0,10, 5, false, false);
+		List<Message> ascendingMessagesFrom = getMessageService().getMessagesForPersonPaged(0,10, 5, false, false, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{36,35,34,33,32,31,30,29,28,27}, ascendingMessagesFrom);
-		List<Message> ascendingMessagesTo = getMessageService().getMessagesForPersonPaged(0,10, 5, true, false);
+		List<Message> ascendingMessagesTo = getMessageService().getMessagesForPersonPaged(0,10, 5, true, false, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{35,34,33,32,31,30,29,28,27,26}, ascendingMessagesTo);
 	}
 
@@ -297,9 +298,9 @@ public class MessageServiceTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	public void getMessagesForPersonPaged_shouldReturnInAscendingOrderByDateIfDateOrderAscendingIsTrue() throws Exception {
-		List<Message> ascendingMessagesFrom = getMessageService().getMessagesForPersonPaged(0,10, 5, false, true);
+		List<Message> ascendingMessagesFrom = getMessageService().getMessagesForPersonPaged(0,10, 5, false, true, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{14,15,16,17,18,19,20,21,22,23}, ascendingMessagesFrom);
-		List<Message> ascendingMessagesTo = getMessageService().getMessagesForPersonPaged(0,10, 5, true, true);
+		List<Message> ascendingMessagesTo = getMessageService().getMessagesForPersonPaged(0,10, 5, true, true, OMailProtocol.class);
 		checkMessageIdsInOrder(new int[]{1,2,6,7,10,13,14,26,27,28}, ascendingMessagesTo);
 	}
 }
