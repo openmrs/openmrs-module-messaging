@@ -110,7 +110,7 @@
 				<plugin>
 					<groupId>org.openmrs.maven.plugins</groupId>
 					<artifactId>maven-openmrs-plugin</artifactId>
-					<version>1.0</version>
+					<version>1.0.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
