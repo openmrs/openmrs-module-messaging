@@ -13,12 +13,17 @@ public enum MessageStatus{
 			this.number = number;
 		}
 		
-		public static MessageStatus getStatusByNumber(int number){
+		public static MessageStatus getStatusByNumber(Integer number){
+			if (number == null) {
+				return null;
+			}
+
 			for(MessageStatus m: MessageStatus.values()){
 				if(m.getNumber() == number){
 					return m;
 				}
 			}
+
 			return null;
 		}
 		

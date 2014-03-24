@@ -339,7 +339,7 @@ public class EmailGateway extends MessagingGateway {
 			outProps.setProperty("mail." + outProtocol + ".auth", 
 					adminService.getGlobalProperty("mail.smtp_auth"));
 			outProps.setProperty("mail." + outProtocol + ".starttls.enable", 
-					adminService.getGlobalProperty("mail.use_tls"));
+					adminService.getGlobalProperty("mail.use_tls", "false"));
 		} else {
 			// use ours
 			outProps.setProperty("mail.transport.protocol", outProtocol);

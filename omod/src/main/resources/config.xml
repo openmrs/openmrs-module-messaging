@@ -1,265 +1,267 @@
 <?xml version="1.0" encoding="UTF-8"?>
- <!-- DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.2.dtd"-->
+<!-- DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.2.dtd"-->
 
 <module configVersion="1.0">
-	
-	<!-- Messaging Module Properties -->
-	<id>@MODULE_ID@</id>
-	<name>@MODULE_NAME@</name>
-	<version>@MODULE_VERSION@</version>
-	<package>@MODULE_PACKAGE@</package>
-	<author>Dieterich Lawson</author>
-	<description>
-		Provides short messaging functionality for OpenMRS including SMS, email and twitter.
-	</description>
-	<activator>@MODULE_PACKAGE@.MessagingModuleActivator</activator>
-	
-	<dwr>
-		<allow>	
-			<convert converter="bean" match="org.openmrs.module.messaging.domain.MessagingAddress" />
-			<convert converter="bean" match="org.openmrs.module.messaging.domain.Message" />
-			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.MessageBean"/>
-			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.MessageBeanSet"/>
-			<convert converter="bean" match="org.openmrs.module.messaging.domain.Modem"/>
-			<convert converter="bean" match="org.openmrs.module.messaging.web.domain.AddressAutocompleteBean" />
-						
-			<create creator="new" javascript="DWRMessagingAddressService">
-				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingAddressService"/>
-				<include method="getAllAddressesForPersonId"/>
-				<include method="getAllAddressesForCurrentUser"/>
-				<include method="getAlertableAddressesForCurrentUser"/>
-				<include method="deleteAddress"/>
-				<include method="saveOrUpdateAddress"/>
-				<include method="saveOrUpdateAddressForCurrentUser"/>
-				<include method="autocompleteSearch"/>
-			</create>
-			
-			<create creator="new" javascript="DWRModuleMessageService">
-				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRModuleMessageService"/>
-				<include method="getMessagesForPatient"/>
-				<include method="sendMessage"/>
-				<include method="getMessagesForAuthenticatedUser"/>
-				<include method="getMessagesForAuthenticatedUserWithPageSize"/>
-				<include method="sendMessage"/>
-				<include method="searchMessages"/>
-				<include method="searchMessagesForAuthenticatedUser"/>
-				<include method="markMessageAsReadForAuthenticatedUser"/>
-			</create>
-			
-			<create creator="new" javascript="DWRGatewayStatusService">
-				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRGatewayStatusService"/>
-				<include method="isGatewayActive"/>
-				<include method="startGateway"/>
-				<include method="stopGateway"/>
-			</create>
-			
-			<create creator="new" javascript="DWRSmsLibGatewayService">
-				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRSmsLibGatewayService"/>
-				<include method="redetectModems"/>
-				<include method="getConnectedModems"/>
-			</create>
-			
-			<create creator="new" javascript="DWRMessagingSettingsService">
-				<param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingSettingsService"/>
-				<include method="setAlertSettings"/>
-			</create>
-		</allow>
-	</dwr>
-	
-	
-	<!-- /Messaging Module Properties -->
-	
-	<globalProperty>
-		<property>@MODULE_ID@.sms.default.country.code</property>
-		<defaultValue>1</defaultValue>
-		<description>The default country code for your location</description>
-	</globalProperty>
 
-	<globalProperty>
-		<property>@MODULE_ID@.googlevoice.password</property>
-		<defaultValue></defaultValue>
-		<description>The server's Google voice password</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.googlevoice.username</property>
-		<defaultValue></defaultValue>
-		<description>The server's Google voice username</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.max.retry</property>
-		<defaultValue>3</defaultValue>
-		<description>The number of times that the system should try to send a message once it fails.</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.email.in.protocol</property>
-		<defaultValue>pop3</defaultValue>
-		<description>Messaging Module incoming email protocol</description>
-	</globalProperty>
+    <!-- Messaging Module Properties -->
+    <id>@MODULE_ID@</id>
+    <name>@MODULE_NAME@</name>
+    <version>@MODULE_VERSION@</version>
+    <package>@MODULE_PACKAGE@</package>
+    <author>Dieterich Lawson</author>
+    <description>
+        Provides short messaging functionality for OpenMRS including SMS, email and twitter.
+    </description>
+    <activator>org.openmrs.module.messaging.MessagingModuleActivator</activator>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.in.host</property>
-		<defaultValue>localhost</defaultValue>
-		<description>Messaging Module incoming email host</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.email.in.port</property>
-		<defaultValue>110</defaultValue>
-		<description>Messaging Module incoming email port</description>
-	</globalProperty>
+    <dwr>
+        <allow>
+            <convert converter="bean" match="org.openmrs.module.messaging.domain.MessagingAddress"/>
+            <convert converter="bean" match="org.openmrs.module.messaging.domain.Message"/>
+            <convert converter="bean" match="org.openmrs.module.messaging.web.domain.MessageBean"/>
+            <convert converter="bean" match="org.openmrs.module.messaging.web.domain.MessageBeanSet"/>
+            <convert converter="bean" match="org.openmrs.module.messaging.domain.Modem"/>
+            <convert converter="bean" match="org.openmrs.module.messaging.web.domain.AddressAutocompleteBean"/>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.in.auth</property>
-		<defaultValue>true</defaultValue>
-		<description>Messaging Module incoming email auth flag</description>
-	</globalProperty>
+            <create creator="new" javascript="DWRMessagingAddressService">
+                <param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingAddressService"/>
+                <include method="getAllAddressesForPersonId"/>
+                <include method="getAllAddressesForCurrentUser"/>
+                <include method="getAlertableAddressesForCurrentUser"/>
+                <include method="deleteAddress"/>
+                <include method="saveOrUpdateAddress"/>
+                <include method="saveOrUpdateAddressForCurrentUser"/>
+                <include method="autocompleteSearch"/>
+            </create>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.in.tls</property>
-		<defaultValue>false</defaultValue>
-		<description>Messaging Module incoming email TLS flag</description>
-	</globalProperty>
+            <create creator="new" javascript="DWRModuleMessageService">
+                <param name="class" value="org.openmrs.module.messaging.web.dwr.DWRModuleMessageService"/>
+                <include method="getMessagesForPatient"/>
+                <include method="sendMessage"/>
+                <include method="getMessagesForAuthenticatedUser"/>
+                <include method="getMessagesForAuthenticatedUserWithPageSize"/>
+                <include method="sendMessage"/>
+                <include method="searchMessages"/>
+                <include method="searchMessagesForAuthenticatedUser"/>
+                <include method="markMessageAsReadForAuthenticatedUser"/>
+            </create>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.in.username</property>
-		<defaultValue></defaultValue>
-		<description>Messaging Module incoming email username</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.email.in.password</property>
-		<defaultValue></defaultValue>
-		<description>Messaging Module incoming email password (encrypted)</description>
-	</globalProperty>
+            <create creator="new" javascript="DWRGatewayStatusService">
+                <param name="class" value="org.openmrs.module.messaging.web.dwr.DWRGatewayStatusService"/>
+                <include method="isGatewayActive"/>
+                <include method="startGateway"/>
+                <include method="stopGateway"/>
+            </create>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.usedefault</property>
-		<defaultValue>true</defaultValue>
-		<description>Messaging Module outgoing email use default flag</description>
-	</globalProperty>
+            <create creator="new" javascript="DWRSmsLibGatewayService">
+                <param name="class" value="org.openmrs.module.messaging.web.dwr.DWRSmsLibGatewayService"/>
+                <include method="redetectModems"/>
+                <include method="getConnectedModems"/>
+            </create>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.protocol</property>
-		<defaultValue>smtp</defaultValue>
-		<description>Messaging Module outgoing email protocol</description>
-	</globalProperty>
+            <create creator="new" javascript="DWRMessagingSettingsService">
+                <param name="class" value="org.openmrs.module.messaging.web.dwr.DWRMessagingSettingsService"/>
+                <include method="setAlertSettings"/>
+            </create>
+        </allow>
+    </dwr>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.host</property>
-		<defaultValue>localhost</defaultValue>
-		<description>Messaging Module outgoing email host</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.port</property>
-		<defaultValue>25</defaultValue>
-		<description>Messaging Module outgoing email port</description>
-	</globalProperty>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.auth</property>
-		<defaultValue>false</defaultValue>
-		<description>Messaging Module outgoing email auth flag</description>
-	</globalProperty>
+    <!-- /Messaging Module Properties -->
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.tls</property>
-		<defaultValue>false</defaultValue>
-		<description>Messaging Module outgoing email TLS flag</description>
-	</globalProperty>
+    <globalProperty>
+        <property>@MODULE_ID@.sms.default.country.code</property>
+        <defaultValue>1</defaultValue>
+        <description>The default country code for your location</description>
+    </globalProperty>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.from</property>
-		<defaultValue></defaultValue>
-		<description>Messaging Module outgoing email from address</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.username</property>
-		<defaultValue></defaultValue>
-		<description>Messaging Module outgoing email username</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.email.out.password</property>
-		<defaultValue></defaultValue>
-		<description>Messaging Module outgoing email password (encrypted)</description>
-	</globalProperty>
+    <globalProperty>
+        <property>@MODULE_ID@.googlevoice.password</property>
+        <defaultValue></defaultValue>
+        <description>The server's Google voice password</description>
+    </globalProperty>
 
-	<globalProperty>
-		<property>@MODULE_ID@.email.subject</property>
-		<defaultValue>Message from OpenMRS</defaultValue>
-		<description>Messaging Module outgoing email subject</description>
-	</globalProperty>
-	
-	<globalProperty>
-		<property>@MODULE_ID@.email.signature</property>
-		<defaultValue></defaultValue>
-		<description>Messaging Module outgoing email signature</description>
-	</globalProperty>
+    <globalProperty>
+        <property>@MODULE_ID@.googlevoice.username</property>
+        <defaultValue></defaultValue>
+        <description>The server's Google voice username</description>
+    </globalProperty>
 
-	<globalProperty>
-		<property>@MODULE_ID@.encryption.key</property>
-		<defaultValue></defaultValue>
-		<description>Encryption key ... DO NOT DELETE UNLESS WILLING TO RESET ALL ENCRYPTED DATA</description>
-	</globalProperty>
+    <globalProperty>
+        <property>@MODULE_ID@.max.retry</property>
+        <defaultValue>3</defaultValue>
+        <description>The number of times that the system should try to send a message once it fails.</description>
+    </globalProperty>
 
-	<!-- Extension points -->
-	
-	<extension>
-		<point>org.openmrs.admin.list</point>
-		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
-	</extension>
-	
-	<extension>
-		<point>org.openmrs.patientDashboardTab</point>
-		<class>@MODULE_PACKAGE@.extension.html.MessagingPatientDashboardTabExt</class>
-	</extension>
-	
-	<!-- Privileges -->
-	
-	<privilege>
-		<name>@MODULE_NAME@</name>
-		<description>Able to view messages</description>
-	</privilege>
-	
-	<privilege>
-		<name>@MODULE_NAME@</name>
-		<description>Able to send messages</description>
-	</privilege>
+    <globalProperty>
+        <property>@MODULE_ID@.email.in.protocol</property>
+        <defaultValue>pop3</defaultValue>
+        <description>Messaging Module incoming email protocol</description>
+    </globalProperty>
 
-	<privilege>
-		<name>@MODULE_NAME@</name>
-		<description>Able to add/edit/delete messages</description>
-	</privilege>
-	
-	<privilege>
-		<name>@MODULE_NAME@</name>
-		<description>Able to view messaging addresses</description>
-	</privilege>
-	
-	<privilege>
-		<name>@MODULE_NAME@</name>
-		<description>Able to add/edit/delete messaging addresses</description>
-	</privilege>
-	
-	<privilege>
-		<name>@MODULE_NAME@</name>
-		<description>Able to start/stop and configure messaging gateways</description>
-	</privilege>
-	
-	<!-- Internationalization -->
-	<!-- All message codes should start with @MODULE_ID@.* -->
-	<messages>
-		<lang>en</lang>
-		<file>messages.properties</file>
-	</messages>
-	
-	<mappingFiles>
-		${omodHbmConfig}
-	</mappingFiles>
-	
+    <globalProperty>
+        <property>@MODULE_ID@.email.in.host</property>
+        <defaultValue>localhost</defaultValue>
+        <description>Messaging Module incoming email host</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.in.port</property>
+        <defaultValue>110</defaultValue>
+        <description>Messaging Module incoming email port</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.in.auth</property>
+        <defaultValue>true</defaultValue>
+        <description>Messaging Module incoming email auth flag</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.in.tls</property>
+        <defaultValue>false</defaultValue>
+        <description>Messaging Module incoming email TLS flag</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.in.username</property>
+        <defaultValue></defaultValue>
+        <description>Messaging Module incoming email username</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.in.password</property>
+        <defaultValue></defaultValue>
+        <description>Messaging Module incoming email password (encrypted)</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.usedefault</property>
+        <defaultValue>true</defaultValue>
+        <description>Messaging Module outgoing email use default flag</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.protocol</property>
+        <defaultValue>smtp</defaultValue>
+        <description>Messaging Module outgoing email protocol</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.host</property>
+        <defaultValue>localhost</defaultValue>
+        <description>Messaging Module outgoing email host</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.port</property>
+        <defaultValue>25</defaultValue>
+        <description>Messaging Module outgoing email port</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.auth</property>
+        <defaultValue>false</defaultValue>
+        <description>Messaging Module outgoing email auth flag</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.tls</property>
+        <defaultValue>false</defaultValue>
+        <description>Messaging Module outgoing email TLS flag</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.from</property>
+        <defaultValue></defaultValue>
+        <description>Messaging Module outgoing email from address</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.username</property>
+        <defaultValue></defaultValue>
+        <description>Messaging Module outgoing email username</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.out.password</property>
+        <defaultValue></defaultValue>
+        <description>Messaging Module outgoing email password (encrypted)</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.subject</property>
+        <defaultValue>Message from OpenMRS</defaultValue>
+        <description>Messaging Module outgoing email subject</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.email.signature</property>
+        <defaultValue></defaultValue>
+        <description>Messaging Module outgoing email signature</description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>@MODULE_ID@.encryption.key</property>
+        <defaultValue></defaultValue>
+        <description>Encryption key ... DO NOT DELETE UNLESS WILLING TO RESET ALL ENCRYPTED DATA</description>
+    </globalProperty>
+
+    <!-- Extension points -->
+
+    <extension>
+        <point>org.openmrs.admin.list</point>
+        <class>@MODULE_PACKAGE@.extension.html.AdminList</class>
+    </extension>
+
+    <extension>
+        <point>org.openmrs.patientDashboardTab</point>
+        <class>@MODULE_PACKAGE@.extension.html.MessagingPatientDashboardTabExt</class>
+    </extension>
+
+    <!-- Privileges -->
+
+    <privilege>
+        <name>@MODULE_NAME@</name>
+        <description>Able to view messages</description>
+    </privilege>
+
+    <privilege>
+        <name>@MODULE_NAME@</name>
+        <description>Able to send messages</description>
+    </privilege>
+
+    <privilege>
+        <name>@MODULE_NAME@</name>
+        <description>Able to add/edit/delete messages</description>
+    </privilege>
+
+    <privilege>
+        <name>@MODULE_NAME@</name>
+        <description>Able to view messaging addresses</description>
+    </privilege>
+
+    <privilege>
+        <name>@MODULE_NAME@</name>
+        <description>Able to add/edit/delete messaging addresses</description>
+    </privilege>
+
+    <privilege>
+        <name>@MODULE_NAME@</name>
+        <description>Able to start/stop and configure messaging gateways</description>
+    </privilege>
+
+    <!-- Internationalization -->
+    <!-- All message codes should start with @MODULE_ID@.* -->
+    <messages>
+        <lang>en</lang>
+        <file>messages.properties</file>
+    </messages>
+
+    <mappingFiles>
+        Message.hbm.xml
+        MessageRecipient.hbm.xml
+        MessagingAddress.hbm.xml
+    </mappingFiles>
+
 </module>

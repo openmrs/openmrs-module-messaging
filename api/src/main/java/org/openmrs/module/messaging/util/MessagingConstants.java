@@ -40,5 +40,8 @@ public final class MessagingConstants {
 
 	public static final String GP_ENCRYPTION_VECTOR = "messaging.encryption.vector";
 	public static final String GP_ENCRYPTION_KEY = "messaging.encryption.key";
+	public static String TASK_NAME="Messaging Module Gateway Manager";
+	public static String SEND_OMAIL_ALERTS_ATTR_NAME = "Send Omail Alerts";
+	public static String ALERT_ADDRESS_ATTR_NAME = "Alert Address";
 }
  

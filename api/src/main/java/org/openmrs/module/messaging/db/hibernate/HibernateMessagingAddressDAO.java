@@ -6,17 +6,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.DAOException;
-import org.openmrs.module.messaging.MessagingModuleActivator;
 import org.openmrs.module.messaging.PersonAttributeService;
 import org.openmrs.module.messaging.db.MessagingAddressDAO;
 import org.openmrs.module.messaging.domain.MessagingAddress;
 import org.openmrs.module.messaging.domain.gateway.Protocol;
+import org.openmrs.module.messaging.util.MessagingConstants;
 
 public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 
@@ -91,11 +90,11 @@ public class HibernateMessagingAddressDAO implements MessagingAddressDAO {
 	 */
 	private void checkAlertsForDeletedAddress(MessagingAddress address){
 		if(address.getPerson()!=null){
-			PersonAttribute pa = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME));
+			PersonAttribute pa = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingConstants.ALERT_ADDRESS_ATTR_NAME));
 			if(pa != null && Integer.parseInt(pa.getValue()) == address.getId()){
 				pa.voidAttribute("Address Deleted");
 				Context.getService(PersonAttributeService.class).savePersonAttribute(pa);
-				PersonAttribute shouldAlert = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME));
+				PersonAttribute shouldAlert = Context.getService(PersonAttributeService.class).getPersonAttribute(address.getPerson(), Context.getPersonService().getPersonAttributeTypeByName(MessagingConstants.SEND_OMAIL_ALERTS_ATTR_NAME));
 				if(shouldAlert != null){
 					shouldAlert.voidAttribute("Address Deleted");
 					Context.getService(PersonAttributeService.class).savePersonAttribute(shouldAlert);

@@ -5,13 +5,13 @@
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
-				<value>@MODULE_PACKAGE@.MessageService</value> 
+				<value>org.openmrs.module.messaging.MessageService</value> 
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="@MODULE_PACKAGE@.impl.MessageServiceImpl">
+						<bean class="org.openmrs.module.messaging.impl.MessageServiceImpl">
 							<property name="messageDAO">
-								<bean class="@MODULE_PACKAGE@.db.hibernate.HibernateMessageDAO">
+								<bean class="org.openmrs.module.messaging.db.hibernate.HibernateMessageDAO">
 									<property name="sessionFactory"><ref bean="sessionFactory"/></property>
 								</bean>
 							</property>	
@@ -31,13 +31,13 @@
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
-				<value>@MODULE_PACKAGE@.MessagingAddressService</value> 
+				<value>org.openmrs.module.messaging.MessagingAddressService</value> 
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="@MODULE_PACKAGE@.impl.MessagingAddressServiceImpl">
+						<bean class="org.openmrs.module.messaging.impl.MessagingAddressServiceImpl">
 							<property name="messagingAddressDAO">
-								<bean class="@MODULE_PACKAGE@.db.hibernate.HibernateMessagingAddressDAO">
+								<bean class="org.openmrs.module.messaging.db.hibernate.HibernateMessagingAddressDAO">
 									<property name="sessionFactory"><ref bean="sessionFactory"/></property>	
 								</bean>
 							</property>	
@@ -57,13 +57,13 @@
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
-				<value>@MODULE_PACKAGE@.PersonAttributeService</value> 
+				<value>org.openmrs.module.messaging.PersonAttributeService</value> 
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="@MODULE_PACKAGE@.impl.PersonAttributeServiceImpl">
+						<bean class="org.openmrs.module.messaging.impl.PersonAttributeServiceImpl">
 							<property name="personAttributeDAO">
-								<bean class="@MODULE_PACKAGE@.db.hibernate.HibernatePersonAttributeDAO">
+								<bean class="org.openmrs.module.messaging.db.hibernate.HibernatePersonAttributeDAO">
 									<property name="sessionFactory"><ref bean="sessionFactory"/></property>
 								</bean>
 							</property>	
@@ -87,11 +87,11 @@
 	<bean parent="serviceContext" >
 		<property name="moduleService">
 			<list>
-				<value>@MODULE_PACKAGE@.MessagingService</value> 
+				<value>org.openmrs.module.messaging.MessagingService</value> 
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="@MODULE_PACKAGE@.impl.MessagingServiceImpl">
+						<bean class="org.openmrs.module.messaging.impl.MessagingServiceImpl">
 							<property name="gatewayManager"><ref bean="gatewayManager"/></property>
 						</bean>
 					</property>
@@ -109,11 +109,11 @@
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
-				<value>@MODULE_PACKAGE@.EncryptionService</value> 
+				<value>org.openmrs.module.messaging.EncryptionService</value> 
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="@MODULE_PACKAGE@.impl.EncryptionServiceImpl" />
+						<bean class="org.openmrs.module.messaging.impl.EncryptionServiceImpl" />
 					</property>
 					<property name="preInterceptors">
                         <ref bean="serviceInterceptors" />

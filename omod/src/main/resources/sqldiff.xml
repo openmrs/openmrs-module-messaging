@@ -1,101 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE sqldiff PUBLIC "-//OpenMRS//DTD OpenMRS SQL Diff Config 1.0//EN" "http://resources.openmrs.org/doctype/sqldiff-1.0.dtd">
+<!DOCTYPE sqldiff PUBLIC "-//OpenMRS//DTD OpenMRS SQL Diff Config 1.0//EN"
+        "http://resources.openmrs.org/doctype/sqldiff-1.0.dtd">
 
 <sqldiff version="1.0">
-	<help>
-	</help>
+    <help>
+    </help>
 
-	<diff>
-		<version>1.0</version>
-		<author>Dieterich Lawson</author>
-		<date>March 14th 2010</date>
-		<description>
+    <diff>
+        <version>1.0</version>
+        <author>Dieterich Lawson</author>
+        <date>March 14th 2010</date>
+        <description>
 
-		</description>
-		<sql>
-			CREATE TABLE IF NOT EXISTS messaging_addresses (
-				`address_id` int(11) NOT NULL auto_increment,
-				`uuid` char(38) NOT NULL,
-				`address` varchar(255) NOT NULL default '',
-				`password` varchar(255) default '',
-				`person` int(11) default 0,
-				`preferred` tinyint(1) NOT NULL default '0',
-				`findable` tinyint(1) NOT NULL default '0',
-				`protocol_id` varchar(255) NOT NULL default '',
-				`creator` int(11) default '0',
-				`date_created` datetime default null,
-				`changed_by` int(11) default NULL,
-				`date_changed` datetime default NULL,
-				`voided` tinyint(1) NOT NULL default '0',
-				`voided_by` int(11) default NULL,
-				`date_voided` datetime default NULL,
-				`void_reason` varchar(255) default NULL,
-				PRIMARY KEY (address_id)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        </description>
+        <sql>
+            CREATE TABLE IF NOT EXISTS messaging_addresses (
+            `address_id` int(11) NOT NULL auto_increment,
+            `uuid` char(38) NOT NULL,
+            `address` varchar(255) NOT NULL default '',
+            `password` varchar(255) default '',
+            `person` int(11) default 0,
+            `preferred` tinyint(1) NOT NULL default '0',
+            `findable` tinyint(1) NOT NULL default '0',
+            `protocol_id` varchar(255) NOT NULL default '',
+            `creator` int(11) default '0',
+            `date_created` datetime default null,
+            `changed_by` int(11) default NULL,
+            `date_changed` datetime default NULL,
+            `voided` tinyint(1) NOT NULL default '0',
+            `voided_by` int(11) default NULL,
+            `date_voided` datetime default NULL,
+            `void_reason` varchar(255) default NULL,
+            PRIMARY KEY (address_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-			CREATE TABLE IF NOT EXISTS messaging_messages (
-				`message_id` int(11) NOT NULL auto_increment,
-				`uuid` char(38) NOT NULL,
-				`content` varchar(600) default '',
-				`protocol_id` varchar(255) NOT NULL default '',
-				`origin` varchar(255) default '',
-				`destination` varchar(255) default '',
-				`sender` int(11) default 0,
-				`recipient` int(11) default NULL,
-				`date` datetime default NULL,
-				`send_attempts` int(3) default 0,
-				`status` int(4) default NULL,
-				PRIMARY KEY (`message_id`)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-				
-		</sql>
-	</diff>
-	<diff>
-		<version>1.1</version>
-		<author>Dieterich Lawson</author>
-		<date>February 12th, 2011</date>
-		<description>
-			Makes these changes to the database structure:
-			- make Message.content a MySQL TEXT type (holds ~64 kb of text)
-			- add Message.in_reply_to field - reference to the message that this message is in reply to.
-			- add Message.subject (plain text, 256 characters)
-			- remove "recipient" and "destination" of MessagingAddress, replacing them with MessagingAddresses.
-			- make Message.recipients a list of MessagingAddresses (one to many relationship with associative table/join table)
-			- rename protocol_id to protocol_class
-			- remove password field from MessagingAddress
-		</description>
-		<sql>
-			ALTER TABLE messaging_messages MODIFY COLUMN content TEXT; 
-			ALTER TABLE messaging_messages ADD COLUMN in_reply_to int(11) DEFAULT NULL, ADD COLUMN subject varchar(256) DEFAULT '';
-			ALTER TABLE messaging_messages DROP COLUMN destination, DROP COLUMN recipient;
-			ALTER TABLE messaging_messages CHANGE protocol_id protocol_class varchar(300);
-			ALTER TABLE messaging_addresses CHANGE protocol_id protocol_class varchar(300);
-			
-			ALTER TABLE messaging_addresses DROP COLUMN password;
-			
-			CREATE TABLE IF NOT EXISTS messaging_message_recipients(
-				`recipient_id` int(11) NOT NULL auto_increment,
-				`uuid` char(38) NOT NULL,
-				`message` int(11) NOT NULL default 0,
-				`is_read` tinyint(1) NOT NULL default '0',
-				`recipient` int(11) NOT NULL default 0,
-				PRIMARY KEY (recipient_id)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-			
-		</sql>
-	</diff>
-	<diff>
-		<version>1.2</version>
-		<author>Dieterich Lawson</author>
-		<date>April 7th, 2011</date>
-		<description>
-			This diff removes send_attempts, protocol_class, and status
-			from the messaging_messages, and adds send_attempts, status,
-			origin, and a date field to the messaging_message_recipients table.
-		</description>
-		<sql>
-			ALTER TABLE messaging_messages DROP COLUMN protocol_class, DROP COLUMN status, DROP COLUMN send_attempts, DROP COLUMN origin;
-			ALTER TABLE messaging_message_recipients ADD COLUMN status int(4) default NULL, ADD COLUMN send_attempts int(3) default 0, ADD COLUMN date datetime default NULL, ADD COLUMN origin varchar(255) default '';
-		</sql>
-	</diff>
+            CREATE TABLE IF NOT EXISTS messaging_messages (
+            `message_id` int(11) NOT NULL auto_increment,
+            `uuid` char(38) NOT NULL,
+            `content` varchar(600) default '',
+            `protocol_id` varchar(255) NOT NULL default '',
+            `origin` varchar(255) default '',
+            `destination` varchar(255) default '',
+            `sender` int(11) default 0,
+            `recipient` int(11) default NULL,
+            `date` datetime default NULL,
+            `send_attempts` int(3) default 0,
+            `status` int(4) default NULL,
+            PRIMARY KEY (`message_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        </sql>
+    </diff>
+    <diff>
+        <version>1.1</version>
+        <author>Dieterich Lawson</author>
+        <date>February 12th, 2011</date>
+        <description>
+            Makes these changes to the database structure:
+            - make Message.content a MySQL TEXT type (holds ~64 kb of text)
+            - add Message.in_reply_to field - reference to the message that this message is in reply to.
+            - add Message.subject (plain text, 256 characters)
+            - remove "recipient" and "destination" of MessagingAddress, replacing them with MessagingAddresses.
+            - make Message.recipients a list of MessagingAddresses (one to many relationship with associative table/join
+            table)
+            - rename protocol_id to protocol_class
+            - remove password field from MessagingAddress
+        </description>
+        <sql>
+            ALTER TABLE messaging_messages MODIFY COLUMN content TEXT;
+            ALTER TABLE messaging_messages ADD COLUMN in_reply_to int(11) DEFAULT NULL, ADD COLUMN subject varchar(256)
+            DEFAULT '';
+            ALTER TABLE messaging_messages DROP COLUMN destination, DROP COLUMN recipient;
+            ALTER TABLE messaging_messages CHANGE protocol_id protocol_class varchar(300);
+            ALTER TABLE messaging_addresses CHANGE protocol_id protocol_class varchar(300);
+
+            ALTER TABLE messaging_addresses DROP COLUMN password;
+
+            CREATE TABLE IF NOT EXISTS messaging_message_recipients(
+            `recipient_id` int(11) NOT NULL auto_increment,
+            `uuid` char(38) NOT NULL,
+            `message` int(11) NOT NULL default 0,
+            `is_read` tinyint(1) NOT NULL default '0',
+            `recipient` int(11) NOT NULL default 0,
+            PRIMARY KEY (recipient_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        </sql>
+    </diff>
+    <diff>
+        <version>1.2</version>
+        <author>Dieterich Lawson</author>
+        <date>April 7th, 2011</date>
+        <description>
+            This diff removes send_attempts, protocol_class, and status
+            from the messaging_messages, and adds send_attempts, status,
+            origin, and a date field to the messaging_message_recipients table.
+        </description>
+        <sql>
+            ALTER TABLE messaging_messages DROP COLUMN protocol_class, DROP COLUMN status, DROP COLUMN send_attempts,
+            DROP COLUMN origin;
+            ALTER TABLE messaging_message_recipients ADD COLUMN status int(4) default NULL, ADD COLUMN send_attempts
+            int(3) default 0, ADD COLUMN date datetime default NULL, ADD COLUMN origin varchar(255) default '';
+        </sql>
+    </diff>
 </sqldiff>

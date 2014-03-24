@@ -14,7 +14,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.messaging.MessageService;
 import org.openmrs.module.messaging.MessagingAddressService;
-import org.openmrs.module.messaging.MessagingModuleActivator;
 import org.openmrs.module.messaging.MessagingService;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
@@ -28,6 +27,7 @@ import org.openmrs.module.messaging.domain.listener.IncomingMessageListener;
 import org.openmrs.module.messaging.email.EmailProtocol;
 import org.openmrs.module.messaging.omail.OMailProtocol;
 import org.openmrs.module.messaging.sms.SmsProtocol;
+import org.openmrs.module.messaging.util.MessagingConstants;
 
 /**
  * The implementation of the MessagingService interface 
@@ -60,9 +60,9 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 				log.info("INCOMING MESSAGE RECIEVED: "+ message.getContent() + ". SENDER: "+ message.getSender().getPersonName());
 				for(MessageRecipient mr: message.getTo()){
 					if(mr.getProtocol().equals(OMailProtocol.class) && mr.getRecipient().getPerson() != null){
-						PersonAttribute shouldAlertAttr = mr.getRecipient().getPerson().getAttribute(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME);
+						PersonAttribute shouldAlertAttr = mr.getRecipient().getPerson().getAttribute(MessagingConstants.SEND_OMAIL_ALERTS_ATTR_NAME);
 						if(shouldAlertAttr != null && Boolean.parseBoolean(shouldAlertAttr.getValue())){
-							int addressId = Integer.parseInt(mr.getRecipient().getPerson().getAttribute(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME).getValue());
+							int addressId = Integer.parseInt(mr.getRecipient().getPerson().getAttribute(MessagingConstants.ALERT_ADDRESS_ATTR_NAME).getValue());
 							MessagingAddress alertAddr = Context.getService(MessagingAddressService.class).getMessagingAddress(addressId);
 		                    final String deployUrl= Context.getRuntimeProperties().getProperty("deployment.url");//"https://65.111.248.164:8443/"; //"172.30.201.24";
 		                    final String url = deployUrl + "/openmrs/phr/index.htm";

@@ -5,6 +5,8 @@
 
 <hibernate-configuration>
 	<session-factory>
-		${hbmConfig}
+        <mapping resource="Message.hbm.xml"/>
+        <mapping resource="MessageRecipient.hbm.xml"/>
+        <mapping resource="MessagingAddress.hbm.xml"/>
 	</session-factory>
 </hibernate-configuration>

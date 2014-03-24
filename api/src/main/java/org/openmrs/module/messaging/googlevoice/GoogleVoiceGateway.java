@@ -1,10 +1,11 @@
 package org.openmrs.module.messaging.googlevoice;
 
-import java.io.IOException;
-import java.util.Date;
-
+import com.techventus.server.voice.Voice;
+import com.techventus.server.voice.datatypes.Phone;
+import gvjava.org.json.JSONException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.messaging.domain.Message;
 import org.openmrs.module.messaging.domain.MessageRecipient;
@@ -14,8 +15,7 @@ import org.openmrs.module.messaging.sms.SmsProtocol;
 import org.openmrs.module.messaging.util.MessagingConstants;
 import org.openmrs.module.messaging.util.Pair;
 
-import com.techventus.server.voice.Voice;
-import com.techventus.server.voice.datatypes.Phone;
+import java.io.IOException;
 
 public class GoogleVoiceGateway extends MessagingGateway {
 
@@ -59,10 +59,21 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	}
 
 	@Override
-	public void sendMessage(Message message,MessageRecipient recipient) throws Exception{
+	public void sendMessage(Message message,MessageRecipient recipient) {
 		updateCredentials();
-		googleVoice.sendSMS(recipient.getRecipient().getAddress(), message.getContent());
-		Phone phone = googleVoice.getSettings(false).getPhones()[0];
+		try {
+			googleVoice.sendSMS(recipient.getRecipient().getAddress(), message.getContent());
+		} catch (IOException e) {
+			throw new APIException("could not send an SMS", e);
+		}
+		Phone phone = null;
+		try {
+			phone = googleVoice.getSettings(false).getPhones()[0];
+		} catch (JSONException e) {
+			throw new APIException("could not handle JSON", e);
+		} catch (IOException e) {
+			throw new APIException("could not interface with phone", e);
+		}
 		if(phone != null) recipient.setOrigin(phone.getFormattedNumber());
 	}
 

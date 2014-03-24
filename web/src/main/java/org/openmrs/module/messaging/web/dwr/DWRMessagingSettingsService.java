@@ -2,7 +2,6 @@ package org.openmrs.module.messaging.web.dwr;
 
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -11,8 +10,8 @@ import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.messaging.MessagingModuleActivator;
 import org.openmrs.module.messaging.PersonAttributeService;
+import org.openmrs.module.messaging.util.MessagingConstants;
 
 public class DWRMessagingSettingsService {
 	Log log = LogFactory.getLog(getClass());
@@ -29,8 +28,8 @@ public class DWRMessagingSettingsService {
 		if(shouldAlert && (messagingAddressId == null || messagingAddressId <= 0)) return;
 		//void the old attributes
 		PersonAttributeService personAttrService = Context.getService(PersonAttributeService.class);
-		PersonAttributeType shouldAlertType = Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.SEND_OMAIL_ALERTS_ATTR_NAME);
-		PersonAttributeType alertAddressType = Context.getPersonService().getPersonAttributeTypeByName(MessagingModuleActivator.ALERT_ADDRESS_ATTR_NAME);
+		PersonAttributeType shouldAlertType = Context.getPersonService().getPersonAttributeTypeByName(MessagingConstants.SEND_OMAIL_ALERTS_ATTR_NAME);
+		PersonAttributeType alertAddressType = Context.getPersonService().getPersonAttributeTypeByName(MessagingConstants.ALERT_ADDRESS_ATTR_NAME);
 		List<PersonAttribute> attributes = personAttrService.getPersonAttributes(per, shouldAlertType, false);
 		for(PersonAttribute attr: attributes){
 			attr.voidAttribute("New data provided");

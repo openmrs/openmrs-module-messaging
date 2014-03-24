@@ -2,16 +2,16 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class table="messaging_message_recipients" name="@MODULE_PACKAGE@.domain.MessageRecipient">
+	<class table="messaging_message_recipients" name="org.openmrs.module.messaging.domain.MessageRecipient">
     
 		<id name="messageRecipientId" type="int" column="recipient_id"  unsaved-value="0">
 				<generator class="native" />
 		</id>
         <property name="uuid" type="string" length="38" not-null="true" />
         
-        <many-to-one name="message" class="@MODULE_PACKAGE@.domain.Message"/>
+        <many-to-one name="message" class="org.openmrs.module.messaging.domain.Message"/>
         
-        <many-to-one name="recipient" class="@MODULE_PACKAGE@.domain.MessagingAddress" cascade="all"/>
+        <many-to-one name="recipient" class="org.openmrs.module.messaging.domain.MessagingAddress" cascade="all"/>
         
         <property name="status" type="int" length="4"/>
         <property name="sendAttempts" type="int" length="3" column="send_attempts"/>

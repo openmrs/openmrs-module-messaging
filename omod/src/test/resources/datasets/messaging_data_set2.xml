@@ -14,8 +14,8 @@
   <person_name person_name_id="5" preferred="0" person_id="5" given_name="Juan" middle_name="" family_name="Valdez" creator="1" date_created="2011-03-13 22:56:51.0" voided="0" changed_by="1" date_changed="2011-03-14 10:40:51.0" uuid="a0b506cd-8e8d-41a5-8c52-91932cf10560"/>
   <person_name person_name_id="6" preferred="0" person_id="6" given_name="Kermit" middle_name="" family_name="The Frog" creator="1" date_created="2011-03-13 22:57:17.0" voided="0" changed_by="1" date_changed="2011-03-14 10:40:56.0" uuid="f8a055ad-afab-4eaa-a25c-82434498a517"/>
   <person_name person_name_id="7" preferred="0" person_id="7" given_name="Gonzo" middle_name="" family_name="The Great" creator="1" date_created="2011-03-13 22:57:48.0" voided="0" changed_by="1" date_changed="2011-03-14 10:40:46.0" uuid="bbe22676-5765-458e-b218-1c6a47a5f416"/>
-  <patient patient_id="2" tribe="1" creator="1" date_created="2005-09-22 00:00:00.0" voided="0"/>
-  <patient patient_id="3" tribe="1" creator="1" date_created="2005-09-22 00:00:00.0" voided="0"/>
+  <patient patient_id="2" creator="1" date_created="2005-09-22 00:00:00.0" voided="0"/>
+  <patient patient_id="3" creator="1" date_created="2005-09-22 00:00:00.0" voided="0"/>
   <user_role user_id="1" role="Provider"/>
   <user_role user_id="1" role="System Developer"/>
   <user_role user_id="3" role="Provider"/>
@@ -29,7 +29,7 @@
   <user_property user_id="1" property="loginAttempts" property_value="0"/>
   <user_property user_id="6" property="loginAttempts" property_value="0"/>
   <users user_id="1" system_id="admin" username="" password="6165944cd7f30a16e6d5d1160fb665b0fe03ee03053fda699c39909bc0ee07959fc39c6ed85b2e3cbb4cb92876e96ac9c5c79e7a8098b56501879b77b0743639" salt="07bdc507a4884156cd86a3592f423f06c71a299aba00459d0eb78a18b7c9514e832e59c32128611ad2279496adf6b71b0778f66ef3aa7f137faf087840a419a2" creator="1" date_created="2005-01-01 00:00:00.0" changed_by="1" date_changed="2011-03-12 11:35:10.0" person_id="1" retired="0" uuid="fecf390a-4cce-11e0-af83-5cb57b47f3ee"/>
-  <users user_id="2" system_id="daemon" username="daemon" creator="1" date_created="2010-04-26 13:25:00.0" retired="0" uuid="A4F30A1B-5EB9-11DF-A648-37A07F9C90FB"/>
+  <users user_id="2" system_id="daemon" username="daemon" creator="1" date_created="2010-04-26 13:25:00.0" person_id="-1" retired="0" uuid="A4F30A1B-5EB9-11DF-A648-37A07F9C90FB"/>
   <users user_id="3" system_id="3-4" username="dlawson" password="333fe79557de31947c734bcacaad682cadebb2d122cd4a0ffcda31374123efd3995451f33ab466d90d046f6425d3ca5059710d52f2f94af2e1fc52c3809354f5" salt="126f264075845994a59d819b11fa5ec673df7fdb45e3132a56f52960d2730663f78b0afeb64565aea9b078908b08045ac2c2fa84687cf0fd5cb45df195c6dd15" secret_question="" creator="1" date_created="2011-03-13 22:56:04.0" changed_by="1" date_changed="2011-03-14 10:40:41.0" person_id="4" retired="0" uuid="1e5062f5-1e3e-4627-8cc6-4811baac2dbe"/>
   <users user_id="4" system_id="4-2" username="jvaldez" password="77310f2c3fc69a610744c62ee70516a50783f7574249e38381d6ddd0c68645b6d68e4acbb91ae3cf7d834f8f057c023e4e5eb6c12bf7786b31d9ec196ef592d3" salt="685a5c45e6da027bbc39f78ce9f4286618efaed9eea79a99fad60a1faf6a515965f54abfe1737ca0a1e2bb344a6d18dc06f5a5d7d509eccda89c541b9976ae29" secret_question="" creator="1" date_created="2011-03-13 22:56:51.0" changed_by="1" date_changed="2011-03-14 10:40:51.0" person_id="5" retired="0" uuid="ee62d932-7586-489e-98b0-246aed9fc6dd"/>
   <users user_id="5" system_id="5-9" username="kFrog" password="34ed6747387f0e35e4877d0db843c76de948ea9298a253bc7217ba4fd48c40c3cb231fb369160f7cd3e2e34fd6ccae8f70d726deba1075c76ea82298d229daa5" salt="2eb03c20f25aea7b99edfb2abc6b4922fb16a18809fef1240da8c7082d6b367d4723428ed468f7cd9a5c49d591c546403a8d7e8c986055514e7e74f4420d8143" secret_question="" creator="1" date_created="2011-03-13 22:57:17.0" changed_by="1" date_changed="2011-03-14 10:40:56.0" person_id="6" retired="0" uuid="aa315683-68ac-4156-b14a-8a48649d67c7"/>
