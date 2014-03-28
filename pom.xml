@@ -12,9 +12,9 @@
 	<url>http://openmrs.org</url>
 
 	<scm>
-		<connection>scm:svn:http://svn.openmrs.org/openmrs-modules/messaging/trunk/</connection>
-		<developerConnection>scm:svn:http://svn.openmrs.org/openmrs-modules/messaging/trunk/</developerConnection>
-		<url>http://svn.openmrs.org/openmrs-modules/messaging/trunk/</url>
+		<connection>scm:git:https://github.com/openmrs/openmrs-module-messaging/</connection>
+		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-messaging/</developerConnection>
+		<url>https://github.com/openmrs/openmrs-module-messaging/</url>
 	</scm>
 
 	<modules>
