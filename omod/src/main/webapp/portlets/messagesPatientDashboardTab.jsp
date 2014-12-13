@@ -88,7 +88,7 @@
 				<td class="send-box-cell"><textarea class="send-box" rows="2" id="messageContentBox"></textarea></td>
 				<td>
 					<select id="toAddressSelect"></select><br/>
-					<input class="send-button" type="submit" value="Send" onclick="sendMessage()"></input>
+					<input class="send-button" type="submit" value="<spring:message code="messaging.send" />" onclick="sendMessage()"></input>
 				</td>
 			</tr>
 			<tr>
@@ -106,22 +106,22 @@
 	<table id="addresses" class="rowed grey">
 	  <thead>
 	    <tr>
-			<th>Type</th>
-			<th>Address</th>
-			<th>Date Created</th>
-			<th>Preferred</th>
-			<th>Actions</th>
+			<th><spring:message code="messaging.type" /></th>
+			<th><spring:message code="messaging.address" /></th>
+			<th><spring:message code="messaging.created" /></th>
+			<th><spring:message code="messaging.preferred" /></th>
+			<th><spring:message code="messaging.actions" /></th>
 		</tr>
 	  </thead>
 	  <tbody id="addressbody">
 	    <tr id="pattern" style="display:none;">
-	      <td><span id="tableType">Type</span><br/></td>
-	      <td><span id="tableAddress">Address</span></td>
-	      <td><span id="tableDateCreated">Date Created</span></td>
-	      <td><span id="tablePreferred">Preferred</span></td>
+	      <td><span id="tableType"><spring:message code="messaging.type" /></span><br/></td>
+	      <td><span id="tableAddress"><spring:message code="messaging.address" /></span></td>
+	      <td><span id="tableDateCreated"><spring:message code="messaging.created" /></span></td>
+	      <td><span id="tablePreferred"><spring:message code="messaging.preferred" /></span></td>
 	      <td>
-	        <input id="edit" type="button" value="Edit" onclick="editClicked(this.id)"/>
-	        <input id="delete" type="button" value="Delete" onclick="deleteClicked(this.id)"/>
+	        <input id="edit" type="button" value="<spring:message code="messaging.edit" />" onclick="editClicked(this.id)"/>
+	        <input id="delete" type="button" value="<spring:message code="messaging.delete" />" onclick="deleteClicked(this.id)"/>
 	      </td>
 	    </tr>
 	  </tbody>
@@ -129,10 +129,10 @@
 	
 	<br/>
 	
-	<h3 id="editSpan">Add an Address</h3>
+	<h3 id="editSpan"><spring:message code="messaging.addAddress" /></h3>
 	<table class="plain">
 	  <tr>
-	  	<td>Type</td>
+	  	<td><spring:message code="messaging.type" /></td>
 	  	<td>
 	  		<select id="protocolId">
 				<c:forEach var="protocol" items="${protocols}">
@@ -140,12 +140,12 @@
 				</c:forEach>
 			</select>
 		</td>
-	    <td>Address</td>
+	    <td><spring:message code="messaging.Address" /></td>
 	    <td>
 	    	<input id="address" type="text" size="20"/>
 			<span id="messagingAddressId" style="display:none">-1</span>
 	    </td>
-	    <td>Preferred</td>
+	    <td><spring:message code="messaging.preferred" /></td>
 	    <td><input id="preferred" type="checkbox"/></td>
 	    <td colspan="2" align="right">
 	      <input type="button" value="Save" onclick="writeAddress()"/>
@@ -190,7 +190,7 @@
 				address = addresses[i];
 			    id = address.messagingAddressId;
 			    dwr.util.cloneNode("pattern", { idSuffix:id });
-			    dwr.util.setValue("tableType" + id, address.protocolId.substring(address.protocolId.lastIndexOf(".")+1).replace("Protocol",""));
+			    dwr.util.setValue("tableType" + id, address.protocolId.substring(address.protocolId.lastIndexOf(".")+1).replace("<spring:message code="messaging.protocol" />",""));
 			    dwr.util.setValue("tableAddress" + id, address.address);
 			    dwr.util.setValue("tableDateCreated" + id, "");
 			    dwr.util.setValue("tablePreferred" + id, address.preferred?"*":"");
@@ -213,7 +213,7 @@
 		// we were an id of the form "delete{id}", eg "delete42". We lookup the "42"
 		var address = addressCache[eleid.substring(6)];
 		//confirm the delete
-		if (confirm("Are you sure you want to delete address " + address.address + "?")) {
+		if (confirm("<spring:message code="messaging.deleteAddress" /> " + address.address + "?")) {
 	    	dwr.engine.beginBatch();
 	    	DWRMessagingAddressService.deleteAddress(address.messagingAddressId);
 	    	fillAddressesTable();
@@ -227,7 +227,7 @@
 	function clearAddress() {
 	 	viewed = -1;
 		dwr.util.setValues({ messagingAddressId:-1, address:null, preferred:null, dateCreated:null });
-		$j("#editSpan").html("Add an Address");
+		$j("#editSpan").html("<spring:message code="messaging.addAddress" />");
 		
 	}
 

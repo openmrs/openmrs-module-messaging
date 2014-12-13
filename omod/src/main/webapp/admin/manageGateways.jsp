@@ -4,34 +4,34 @@
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 
-<h2>Manage Messaging Gateways</h2><br/>
+<h2> <spring:message code="messaging.manageGateway" /></h2><br/>
 
 <div id="modemsBoxHeader" class="boxHeader"> 
 	<img id="modemsStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
-	Phones and Modems
+	<spring:message code="messaging.phones" /> <spring:message code="messaging.and" /> <spring:message code="messaging.modems" />
 </div>
 <div id="modemsBox" class="box">
-	Phones
+	<spring:message code="messaging.phones" />
 	<table id="modemsTable" cellpadding="2" border="1">
 		<thead>
 			<tr>
-				<td>Port</td>
-				<td>Number</td>
-				<td>Serial</td>
-				<td>Model</td>
-				<td>Status</td>
+				<td><spring:message code="messaging.port" /></td>
+				<td><spring:message code="messaging.number" /></td>
+				<td><spring:message code="messaging.serial" /></td>
+				<td><spring:message code="messaging.model" /></td>
+				<td><spring:message code="messaging.status" /></td>
 			</tr>
 		</thead>
 		<tbody id="modemsTableBody"></tbody>
 	</table><br/><br/>
-	Bulk SMS Accounts
+	<spring:message code="messaging.SMS" />
 	<table id="bulkSmsTable" cellpadding="2" border="1">
 		<thead>
 			<tr>
-				<td>Service</td>
-				<td>Username</td>
-				<td>Status</td>
-				<td>Actions</td>
+				<td><spring:message code="messaging.service" /></td>
+				<td><spring:message code="messaging.username" /></td>
+				<td><spring:message code="messaging.status" /></td>
+				<td><spring:message code="messaging.actions" /></td>
 			</tr>
 		</thead>
 		<tbody id="modemsTableBody"></tbody>
@@ -43,16 +43,16 @@
 
 <div id="googleVoiceBoxHeader" class="boxHeader"> 
 	<img id="googleVoiceStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
-	Google Voice
+	<spring:message code="messaging.googleVoice" />
 </div>
 <div id="googleVoiceBox" class="box">
-	Google Voice username: ${googleVoiceUsername}<br/><br/>
-	Change the Google Voice login:
+	<spring:message code="messaging.googleVoice" /> <spring:message code="messaging.username" />: ${googleVoiceUsername}<br/><br/>
+	<spring:message code="messaging.changeGoogleVoiceLogin" />:
 	<form method="post" action="<openmrs:contextPath/>/module/messaging/changeGoogleVoiceCreds.form">
-		Username:  <input type="text" name="username"/><br/>
-		Password:  <input type="password" name="password1"/><br/>
-		Confirm Password:  <input type="password" name="password2"/><br/>
-		<input type="submit" value="Save Changes" />
+		<spring:message code="messaging.username" />:  <input type="text" name="username"/><br/>
+		<spring:message code="messaging.password" />:  <input type="password" name="password1"/><br/>
+		<spring:message code="messaging.confirmPassword" />:  <input type="password" name="password2"/><br/>
+		<input type="submit" value="<spring:message code="messaging.save" />" />
 	</form>
 	<br/>
 	<button id="googleVoiceStartStopButton" onclick="toggleGatewayStatus('googlevoice.GoogleVoiceGateway','googleVoice')"></button>
@@ -62,29 +62,29 @@
 
 <b id="emailBoxHeader" class="boxHeader">
 	<img id="emailStatusImg" src="<openmrs:contextPath/>/moduleResources/messaging/images/bullet_red.png" style="vertical-align:bottom;"/>
-	Email
+	<spring:message code="messaging.email" />
 </b>
 <div id="emailBox" class="box">
-	Configure Email accounts:
+	<spring:message code="messaging.configureEmail" />
 	<form method="post" action="<openmrs:contextPath/>/module/messaging/changeEmailCreds.form">
 		<fieldset style="padding:1em;margin:1em;">
-			<legend>Outgoing Message Format</legend>
+			<legend><spring:message code="messaging.outgoingFormat" /></legend>
 			<table>
 				<tr>
-					<td><label for="messageSubject">Subject Line:</label></td>
+					<td><label for="messageSubject"><spring:message code="messaging.subjectLine" /></label></td>
 					<td><input type="text" name="messageSubject" value="${emailMessageSubject}"/></td>
 				</tr>
 				<tr>
-					<td style="vertical-align:top;"><label for="messageSignature">Message Signature:</label></td>
+					<td style="vertical-align:top;"><label for="messageSignature"><spring:message code="messaging.messageSignature" /></label></td>
 					<td><textarea name="messageSignature" rows="6" cols="60">${emailMessageSignature}</textarea></td>
 				</tr>
 			</table>
 		</fieldset>
 		<fieldset style="padding:1em;margin:1em;">
-			<legend>Incoming Email Server</legend>
+			<legend><spring:message code="messaging.incomingEmail" /></legend>
 			<table>
 				<tr>
-					<td><label for="inprotocol">Protocol:</label></td>
+					<td><label for="inprotocol"><spring:message code="messaging.protocol" />:</label></td>
 					<td>
 						<select name="inprotocol">
 							<option value="pop3">POP3</option>
@@ -95,15 +95,15 @@
 					</td>
 				</tr>
 				<tr>
-					<td><label for="inhost">Host:</label></td>
+					<td><label for="inhost"><spring:message code="messaging.host" />:</label></td>
 					<td><input type="text" name="inhost" value="${emailInHost}"/></td>
 				</tr>
 				<tr>
-					<td><label for="inport">Port:</label></td>
+					<td><label for="inport"><spring:message code="messaging.port" />:</label></td>
 					<td><input type="text" name="inport" size="3" value="${emailInPort}"/></td>
 				</tr>
 				<tr>
-					<td><label for="inauth">Authentication Required:</label></td>
+					<td><label for="inauth"><spring:message code="messaging.authenticate" /></label></td>
 					<td>
 						<c:if test="${emailInAuth == 'true'}">
 							<input type="checkbox" name="inauth" checked/>
@@ -114,7 +114,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td><label for="intls">Use TLS:</label></td>
+					<td><label for="intls"><spring:message code="messaging.TLS" /></label></td>
 					<td>
 						<c:if test="${emailInTLS == 'true'}">
 							<input type="checkbox" name="intls" checked/>
@@ -125,22 +125,22 @@
 					</td>
 				</tr>
 				<tr>
-					<td><label for="inusername">Username:</label></td>
+					<td><label for="inusername"><spring:message code="messaging.username" />:</label></td>
 					<td><input type="text" name="inusername" value="${emailInUsername}"/></td>
 				</tr>
 				<tr>
-					<td><label for="inpwd1">Password:</label></td>
+					<td><label for="inpwd1"><spring:message code="messaging.password" />:</label></td>
 					<td><input class="emailpassword" type="password" name="inpwd1" value="########"/></td>
 				</tr>
 				<tr>
-					<td><label for="inpwd2">Confirm Password:</label></td>
+					<td><label for="inpwd2"><spring:message code="messaging.confirmPassword" />:</label></td>
 					<td><input class="emailpassword" type="password" name="inpwd2" value="########"/></td>
 				</tr>
 			</table>
 			<input type="hidden" name="inpwdchanged" value="false"/>
 		</fieldset>
 		<fieldset style="padding:1em;margin:1em;">
-			<legend>Outgoing Email Server</legend>
+			<legend><spring:message code="messaging.outgoingEmail" /></legend>
 			<c:if test="${emailOutUseDefault == 'true'}">
 				<input type="checkbox" name="usedefaultout" checked/>
 			</c:if> 
@@ -151,7 +151,7 @@
 			<br /><br />
 			<table id="emailOut">
 				<tr>
-					<td><label for="outprotocol">Protocol:</label></td>
+					<td><label for="outprotocol"><spring:message code="messaging.protocol" />:</label></td>
 					<td>
 						<select name="outprotocol">
 							<option value="smtp">SMTP</option>
@@ -160,15 +160,15 @@
 					</td>
 				</tr>
 				<tr>
-					<td><label for="outhost">Host:</label></td>
+					<td><label for="outhost"><spring:message code="messaging.host" />:</label></td>
 					<td><input type="text" name="outhost" value="${emailOutHost}"/></td>
 				</tr>
 				<tr>
-					<td><label for="outport">Port:</label></td>
+					<td><label for="outport"><spring:message code="messaging.port" />:</label></td>
 					<td><input type="text" name="outport" size="3" value="${emailOutPort}"/></td>
 				</tr>
 				<tr>
-					<td><label for="outauth">Authentication Required:</label></td>
+					<td><label for="outauth"><spring:message code="messaging.authenticate" /></label></td>
 					<td>
 						<c:if test="${emailOutAuth == 'true'}">
 							<input type="checkbox" name="outauth" checked/>
@@ -179,7 +179,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td><label for="outtls">Use TLS:</label></td>
+					<td><label for="outtls"><spring:message code="messaging.TLS" /></label></td>
 					<td>
 						<c:if test="${emailOutTLS == 'true'}">
 							<input type="checkbox" name="outtls" checked/>
@@ -190,25 +190,25 @@
 					</td>
 				</tr>
 				<tr>
-					<td><label for="outfrom">Sending Address:</label></td>
+					<td><label for="outfrom"><spring:message code="messaging.sendingAddress" /></label></td>
 					<td><input type="text" name="outfrom" value="${emailOutFrom}"/></td>
 				</tr>
 				<tr>
-					<td><label for="outusername">Username:</label></td>
+					<td><label for="outusername"><spring:message code="messaging.username" />:</label></td>
 					<td><input type="text" name="outusername" value="${emailOutUsername}"/></td>
 				</tr>
 				<tr>
-					<td><label for="outpwd1">Password:</label></td>
+					<td><label for="outpwd1"><spring:message code="messaging.password" />:</label></td>
 					<td><input class="emailpassword" type="password" name="outpwd1" value="########"/></td>
 				</tr>
 				<tr>
-					<td><label for="outpwd2">Confirm Password:</label></td>
+					<td><label for="outpwd2"><spring:message code="messaging.confirmPassword" />:</label></td>
 					<td><input class="emailpassword" type="password" name="outpwd2" value="########"/></td>
 				</tr>
 			</table>
 			<input type="hidden" name="outpwdchanged" value="false"/>
 		</fieldset>
-		<input type="submit" value="Save Changes" />
+		<input type="submit" value="<spring:message code="messaging.save" />" />
 	</form>
 	<br/>
 	<button id="emailStartStopButton" onclick="toggleGatewayStatus('email.EmailGateway','email')"></button>
