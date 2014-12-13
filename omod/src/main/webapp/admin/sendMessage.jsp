@@ -2,7 +2,7 @@
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 
-<h2>Send a Message</h2>
+<h2> <spring:message code="messaging.sendMessage" /></h2>
 
 </br>
 <form class="box" method="post" action="<openmrs:contextPath/>/module/messaging/admin/sendMessage.form">
@@ -15,7 +15,7 @@
 	<br/>
 	<input type="text" name="toAddress"></input><br/><br/>
 	<textarea rows="6" cols="40" name="content"></textarea><br/><br/>
-	<input type="submit" value="Send"/>
+	<input type="submit" value="<spring:message code="messaging.send" />"/>
 </form>
 
 <%@ include file="/WEB-INF/template/footer.jsp" %>
