@@ -20,7 +20,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	 * The object that allows control of a google voice account
 	 */
 	private Voice googleVoice;
-	
+
 	/**
 	 * The credentials of the currently logged in user
 	 */
@@ -30,14 +30,14 @@ public class GoogleVoiceGateway extends MessagingGateway {
 	 * Boolean indicating whether or not this gateway is connected to Twitter
 	 */
 	private volatile boolean isActive = false;
-	
+
 	/**
 	 * Boolean used for starting and stopping the activity-checking thread
 	 */
 	private volatile boolean stopThread = false;
 
 	private static Log log = LogFactory.getLog(GoogleVoiceGateway.class);
-	
+
 	@Override
 	public boolean canReceive() {
 		return false;
@@ -77,7 +77,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 		googleVoice = null;
 		stopThread();
 	}
-	
+
 	@Override
 	public void startup() {
 		//update the stored credentials
@@ -91,7 +91,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 		}
 		startActivityCheckingThread();
 	}
-	
+
 	/**
 	 * Starts a thread that polls twitter every 2 seconds to see if the gateway
 	 * is still connected.
@@ -143,7 +143,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 		CredentialSet credentials = new CredentialSet(username,password);
 		return credentials;
 	}
-	
+
 	public void updateCredentials(String username, String password){
 		this.currentCredentials = new CredentialSet(username, password);
 		try {
@@ -153,7 +153,7 @@ public class GoogleVoiceGateway extends MessagingGateway {
 		}
 	}
 
-	
+
 	@Override
 	public boolean supportsProtocol(Protocol p) {
 		return p.getProtocolId() == SmsProtocol.class.getName();
