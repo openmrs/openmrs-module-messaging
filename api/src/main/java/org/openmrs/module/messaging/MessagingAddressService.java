@@ -83,7 +83,7 @@ public interface MessagingAddressService extends OpenmrsService{
 	public void retireMessagingAddress(MessagingAddress address, String reason);
 
 	/**
-	 * Unretires a MessagingAddress, leaving retiredBy, dateRetired, and retireReason set
+	 * Un-retires a MessagingAddress, leaving retiredBy, dateRetired, and retireReason set
 	 * as markers of the last time the object was retired
 	 * @param address
 	 */

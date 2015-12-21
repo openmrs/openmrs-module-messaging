@@ -51,7 +51,7 @@ public class MessagingServiceImpl extends BaseOpenmrsService implements Messagin
 		// add a trial listener
 		listeners.add(new IncomingMessageListener() {	
 			public void messageRecieved(Message message) {
-				log.info("INCOMING MESSAGE RECIEVED: "+ message.getContent() + ". SENDER: "+ message.getOrigin());
+				log.info("INCOMING MESSAGE RECEIVED: "+ message.getContent() + ". SENDER: "+ message.getOrigin());
 			}
 		});
 
