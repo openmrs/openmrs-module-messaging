@@ -8,17 +8,17 @@ Developer Quick Start
 
 # Sending a Message
 
-# To send an SMS message, use the following code:
+To send an SMS message, use the following code:
 
 This sends the message "Hello, world!" to the number 18007654321 via SMS. If the supplied phone number or message are badly formatted, an exception will be thrown.
 
-# Sending a Message to Multiple Recipients
+Sending a Message to Multiple Recipients
 
-# To send a message to multiple recipients, you must create a Message object and add messaging addresses as recipients. You should retrieve 
+ To send a message to multiple recipients, you must create a Message object and add messaging addresses as recipients. You should retrieve 
 
 # Listening for Received Messages
 
-# To register a listener that will receive alerts when a message comes in, use this line of code:
+ To register a listener that will receive alerts when a message comes in, use this line of code:
 
 The listener must implement the IncomingMessageListener interface.
 
