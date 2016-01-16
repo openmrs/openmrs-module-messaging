@@ -1,7 +1,7 @@
 OpenMRS-Module-Messaging
 ========================
 
-The messaging module allows you to send all kinds of messages, including email and SMS. It also helps you handle various ancillary aspects of messaging, including managing addresses and browsing past conversations. recently, it has an easy-to-use API so that other modules can incorporate messaging into their own projects.
+The Messaging Module allows you to send all kinds of messages, including email and SMS. It also helps you handle various ancillary aspects of messaging, including managing addresses and browsing past conversations. Recently, it has an easy-to-use API so that other modules can incorporate messaging into their own projects.
 
 Developer Quick Start
 ========================
@@ -14,7 +14,7 @@ This sends the message "Hello, world!" to the number 18007654321 via SMS. If the
 
 Sending a Message to Multiple Recipients
 
- To send a message to multiple recipients, you must create a Message object and add messaging addresses as recipients. You should retrieve 
+To send a message to multiple recipients, you must create a Message object and add messaging addresses as recipients. You should retrieve 
 
 # Listening for Received Messages
 
